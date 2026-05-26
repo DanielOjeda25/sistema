@@ -1,32 +1,469 @@
-# CRUZNEGRA — Plan de Implementación
+# CRUZNEGRA — Guía de Implementación Paso a Paso
 
-## FASE 1 — Ajuste de la tabla `users` existente
+> **Leer antes de empezar:**
+> - Cada paso debe hacerse **en orden**, de arriba hacia abajo.
+> - Todos los comandos se ejecutan en la **terminal**, parados dentro de la carpeta del proyecto.
+> - Si algo falla, **no avanzar** al siguiente paso hasta resolver el error.
+
+---
+
+## ESTADO DEL AVANCE
+
+| Paso | Estado | Quién |
+|------|--------|-------|
+| PASO 1 — Modificar `users` | **HECHO** (2026-05-26) | Daniel |
+| PASO 2 — Crear `clientes` | **HECHO** (2026-05-26) | Daniel |
+| PASO 3 — Crear `proyectos` | Pendiente | — |
+| PASO 4 — Crear `solicitudes_cambio` | Pendiente | — |
+| PASO 5 — Crear `tareas` | Pendiente | — |
+| PASO 6 — Crear `hitos` | Pendiente | — |
+| PASO 7 — Crear `entregables_ia` | Pendiente | — |
+| PASO 8 — Crear `facturas` | Pendiente | — |
+| PASO 9 — Ejecutar migraciones | Pendiente | — |
+| PASO 10 — Modelos | Pendiente | — |
+| PASO 11 — Controladores | Pendiente | — |
+| PASO 12 — Rutas | Pendiente | — |
+
+> **Si te sumás ahora: empezá desde el PASO 2.** El archivo del PASO 1 ya está creado en `database/migrations/2026_05_26_215211_add_fields_to_users_table.php`. **NO lo borres ni lo edites.**
+
+---
+
+## ¿Por qué este orden?
+
+Algunas tablas dependen de otras (usan su `id` como referencia). Si creamos una tabla que depende de otra que todavía no existe, Laravel dará error.
+
+```
+users ──┐
+        ├──► proyectos ──┬──► solicitudes_cambio ──► tareas
+clientes┘                ├──► hitos
+                         ├──► entregables_ia
+                         └──► facturas
+```
+
+---
+
+## PASO 1 — Modificar la tabla `users` (ya existe) — **[HECHO]**
+
+> Migración creada en `database/migrations/2026_05_26_215211_add_fields_to_users_table.php`. No re-ejecutar este paso. Saltar al PASO 2.
+
+### 1.1 Crear la migración
 
 ```bash
 php artisan make:migration add_fields_to_users_table
 ```
 
-Campos a agregar: `apellido`, `estado`
+### 1.2 Abrir el archivo generado
+
+Ir a la carpeta `database/migrations/` y abrir el archivo que termina en `add_fields_to_users_table.php`.
+
+Reemplazar **todo** el contenido con esto:
+
+```php
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('apellido')->after('name');
+            $table->enum('estado', ['activo', 'inactivo'])->default('activo')->after('email');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn(['apellido', 'estado']);
+        });
+    }
+};
+```
 
 ---
 
-## FASE 2 — Crear migraciones de las nuevas tablas
+## PASO 2 — Crear la tabla `clientes` — **[HECHO]**
+
+> Migración creada en `database/migrations/2026_05_26_221716_create_clientes_table.php`. No re-ejecutar este paso. Saltar al PASO 3.
+
+### 2.1 Crear la migración
 
 ```bash
 php artisan make:migration create_clientes_table
-php artisan make:migration create_proyectos_table
-php artisan make:migration create_solicitudes_cambio_table
-php artisan make:migration create_tareas_table
-php artisan make:migration create_hitos_table
-php artisan make:migration create_entregables_ia_table
-php artisan make:migration create_facturas_table
 ```
 
-> El orden importa: `proyectos` depende de `clientes` y `users`. `tareas` depende de `proyectos` y `solicitudes_cambio`. `facturas` y `entregables_ia` dependen de `proyectos`.
+### 2.2 Abrir el archivo generado
+
+Ir a `database/migrations/` y abrir el archivo que termina en `create_clientes_table.php`.
+
+Reemplazar **todo** el contenido con esto:
+
+```php
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('clientes', function (Blueprint $table) {
+            $table->id();
+            $table->string('nombre');
+            $table->string('apellido');
+            $table->string('email')->unique();
+            $table->string('telefono')->nullable();
+            $table->string('empresa')->nullable();
+            $table->enum('estado', ['activo', 'inactivo'])->default('activo');
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('clientes');
+    }
+};
+```
 
 ---
 
-## FASE 3 — Crear los Modelos
+## PASO 3 — Crear la tabla `proyectos`
+
+> Depende de: `users` y `clientes` (deben existir primero — ya los creamos).
+
+### 3.1 Crear la migración
+
+```bash
+php artisan make:migration create_proyectos_table
+```
+
+### 3.2 Abrir el archivo generado
+
+Ir a `database/migrations/` y abrir el archivo que termina en `create_proyectos_table.php`.
+
+Reemplazar **todo** el contenido con esto:
+
+```php
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('proyectos', function (Blueprint $table) {
+            $table->id();
+            $table->string('nombre');
+            $table->text('descripcion')->nullable();
+            $table->date('fecha_inicio');
+            $table->date('fecha_fin_estimada')->nullable();
+            $table->enum('estado', ['pendiente', 'en_progreso', 'completado', 'cancelado'])->default('pendiente');
+            $table->foreignId('cliente_id')->constrained('clientes')->onDelete('cascade');
+            $table->foreignId('pm_id')->constrained('users')->onDelete('cascade');
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('proyectos');
+    }
+};
+```
+
+---
+
+## PASO 4 — Crear la tabla `solicitudes_cambio`
+
+> Depende de: `proyectos` (debe existir primero — ya la creamos).
+
+### 4.1 Crear la migración
+
+```bash
+php artisan make:migration create_solicitudes_cambio_table
+```
+
+### 4.2 Abrir el archivo generado
+
+Ir a `database/migrations/` y abrir el archivo que termina en `create_solicitudes_cambio_table.php`.
+
+Reemplazar **todo** el contenido con esto:
+
+```php
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('solicitudes_cambio', function (Blueprint $table) {
+            $table->id();
+            $table->string('titulo');
+            $table->text('descripcion');
+            $table->enum('estado', ['pendiente', 'aprobada', 'rechazada'])->default('pendiente');
+            $table->enum('prioridad', ['baja', 'media', 'alta'])->default('media');
+            $table->foreignId('proyecto_id')->constrained('proyectos')->onDelete('cascade');
+            $table->foreignId('solicitado_por')->constrained('users')->onDelete('cascade');
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('solicitudes_cambio');
+    }
+};
+```
+
+---
+
+## PASO 5 — Crear la tabla `tareas`
+
+> Depende de: `proyectos`, `users` y `solicitudes_cambio` (todas ya creadas).
+
+### 5.1 Crear la migración
+
+```bash
+php artisan make:migration create_tareas_table
+```
+
+### 5.2 Abrir el archivo generado
+
+Ir a `database/migrations/` y abrir el archivo que termina en `create_tareas_table.php`.
+
+Reemplazar **todo** el contenido con esto:
+
+```php
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('tareas', function (Blueprint $table) {
+            $table->id();
+            $table->string('titulo');
+            $table->text('descripcion')->nullable();
+            $table->enum('estado', ['pendiente', 'en_progreso', 'completada', 'cancelada'])->default('pendiente');
+            $table->enum('prioridad', ['baja', 'media', 'alta'])->default('media');
+            $table->date('fecha_limite')->nullable();
+            $table->foreignId('proyecto_id')->constrained('proyectos')->onDelete('cascade');
+            $table->foreignId('asignado_a')->constrained('users')->onDelete('cascade');
+            $table->foreignId('solicitud_cambio_id')->nullable()->constrained('solicitudes_cambio')->onDelete('set null');
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('tareas');
+    }
+};
+```
+
+---
+
+## PASO 6 — Crear la tabla `hitos`
+
+> Depende de: `proyectos` (ya creada).
+
+### 6.1 Crear la migración
+
+```bash
+php artisan make:migration create_hitos_table
+```
+
+### 6.2 Abrir el archivo generado
+
+Ir a `database/migrations/` y abrir el archivo que termina en `create_hitos_table.php`.
+
+Reemplazar **todo** el contenido con esto:
+
+```php
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('hitos', function (Blueprint $table) {
+            $table->id();
+            $table->string('nombre');
+            $table->text('descripcion')->nullable();
+            $table->date('fecha_objetivo');
+            $table->boolean('completado')->default(false);
+            $table->foreignId('proyecto_id')->constrained('proyectos')->onDelete('cascade');
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('hitos');
+    }
+};
+```
+
+---
+
+## PASO 7 — Crear la tabla `entregables_ia`
+
+> Depende de: `proyectos` y `users` (ya creadas).
+
+### 7.1 Crear la migración
+
+```bash
+php artisan make:migration create_entregables_ia_table
+```
+
+### 7.2 Abrir el archivo generado
+
+Ir a `database/migrations/` y abrir el archivo que termina en `create_entregables_ia_table.php`.
+
+Reemplazar **todo** el contenido con esto:
+
+```php
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('entregables_ia', function (Blueprint $table) {
+            $table->id();
+            $table->string('titulo');
+            $table->text('contenido');
+            $table->string('tipo')->default('documento');
+            $table->enum('estado', ['borrador', 'revisado', 'aprobado'])->default('borrador');
+            $table->foreignId('proyecto_id')->constrained('proyectos')->onDelete('cascade');
+            $table->foreignId('generado_por')->constrained('users')->onDelete('cascade');
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('entregables_ia');
+    }
+};
+```
+
+---
+
+## PASO 8 — Crear la tabla `facturas`
+
+> Depende de: `proyectos` y `users` (ya creadas).
+
+### 8.1 Crear la migración
+
+```bash
+php artisan make:migration create_facturas_table
+```
+
+### 8.2 Abrir el archivo generado
+
+Ir a `database/migrations/` y abrir el archivo que termina en `create_facturas_table.php`.
+
+Reemplazar **todo** el contenido con esto:
+
+```php
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('facturas', function (Blueprint $table) {
+            $table->id();
+            $table->string('numero')->unique();
+            $table->decimal('monto', 10, 2);
+            $table->date('fecha_emision');
+            $table->date('fecha_vencimiento')->nullable();
+            $table->enum('estado', ['pendiente', 'pagada', 'vencida'])->default('pendiente');
+            $table->text('detalle')->nullable();
+            $table->foreignId('proyecto_id')->constrained('proyectos')->onDelete('cascade');
+            $table->foreignId('emitida_por')->constrained('users')->onDelete('cascade');
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('facturas');
+    }
+};
+```
+
+---
+
+## PASO 9 — Ejecutar TODAS las migraciones
+
+Una vez que los 8 archivos están editados, ejecutar este único comando para crear todas las tablas en la base de datos:
+
+```bash
+php artisan migrate
+```
+
+### ¿Cómo saber si funcionó?
+
+El output debe mostrar algo así:
+
+```
+INFO  Running migrations.
+
+  YYYY_MM_DD_XXXXXX_add_fields_to_users_table ............. DONE
+  YYYY_MM_DD_XXXXXX_create_clientes_table ................. DONE
+  YYYY_MM_DD_XXXXXX_create_proyectos_table ................ DONE
+  YYYY_MM_DD_XXXXXX_create_solicitudes_cambio_table ....... DONE
+  YYYY_MM_DD_XXXXXX_create_tareas_table ................... DONE
+  YYYY_MM_DD_XXXXXX_create_hitos_table .................... DONE
+  YYYY_MM_DD_XXXXXX_create_entregables_ia_table ........... DONE
+  YYYY_MM_DD_XXXXXX_create_facturas_table ................. DONE
+```
+
+### Si algo sale mal (empezar desde cero)
+
+```bash
+php artisan migrate:fresh
+```
+
+> ⚠️ Este comando **borra todo** y vuelve a crear las tablas. Usarlo solo en desarrollo, nunca en producción.
+
+---
+
+## PASO 10 — Crear los Modelos
+
+Un modelo por tabla. Ejecutar cada comando:
 
 ```bash
 php artisan make:model Cliente
@@ -38,9 +475,11 @@ php artisan make:model EntregableIA
 php artisan make:model Factura
 ```
 
+Los archivos se crean en `app/Models/`.
+
 ---
 
-## FASE 4 — Crear los Controladores
+## PASO 11 — Crear los Controladores
 
 ```bash
 php artisan make:controller ClienteController --resource
@@ -52,81 +491,14 @@ php artisan make:controller EntregableIAController --resource
 php artisan make:controller FacturaController --resource
 ```
 
-> `--resource` genera automáticamente los métodos: `index`, `create`, `store`, `show`, `edit`, `update`, `destroy`.
+Los archivos se crean en `app/Http/Controllers/`.  
+El flag `--resource` genera automáticamente los métodos: `index`, `create`, `store`, `show`, `edit`, `update`, `destroy`.
 
 ---
 
-## FASE 5 — Actualizar Seeders
+## PASO 12 — Registrar las rutas
 
-```bash
-php artisan make:seeder ClienteSeeder
-php artisan make:seeder ProyectoSeeder
-php artisan make:seeder TareaSeeder
-```
-
-> `RoleSeeder` ya existe — editar para reemplazar roles actuales por: `PM`, `PO`, `Programador`, `Jefe`, `Cliente`.
-> `UserSeeder` ya existe — editar para asignar los nuevos roles.
-
----
-
-## FASE 6 — Correr migraciones y seeders
-
-```bash
-# Primera vez o reseteo completo
-php artisan migrate:fresh --seed
-
-# Solo correr las migraciones nuevas (sin borrar datos)
-php artisan migrate
-
-# Solo correr los seeders
-php artisan db:seed
-
-# Correr un seeder específico
-php artisan db:seed --class=RoleSeeder
-php artisan db:seed --class=ClienteSeeder
-```
-
----
-
-## FASE 7 — Crear las Vistas (por módulo)
-
-```bash
-# Las vistas se crean manualmente en resources/views/
-# Estructura sugerida:
-
-resources/views/
-├── clientes/
-│   ├── index.blade.php
-│   ├── create.blade.php
-│   ├── edit.blade.php
-│   └── show.blade.php
-├── proyectos/
-│   ├── index.blade.php
-│   ├── create.blade.php
-│   ├── edit.blade.php
-│   └── show.blade.php
-├── tareas/
-│   ├── index.blade.php
-│   ├── create.blade.php
-│   ├── edit.blade.php
-│   └── show.blade.php
-├── hitos/
-│   ├── index.blade.php
-│   └── create.blade.php
-├── solicitudes_cambio/
-│   ├── index.blade.php
-│   └── create.blade.php
-├── entregables/
-│   ├── index.blade.php
-│   └── show.blade.php
-└── facturas/
-    ├── index.blade.php
-    └── show.blade.php
-```
-
----
-
-## FASE 8 — Registrar rutas en `routes/web.php`
+Abrir el archivo `routes/web.php` y agregar al final:
 
 ```php
 Route::resource('clientes', ClienteController::class);
@@ -138,33 +510,15 @@ Route::resource('entregables', EntregableIAController::class);
 Route::resource('facturas', FacturaController::class);
 ```
 
----
-
-## FASE 9 — Comandos de verificación y utilidad
+Para verificar que las rutas quedaron registradas:
 
 ```bash
-# Ver todas las rutas registradas
 php artisan route:list
-
-# Ver estado de las migraciones
-php artisan migrate:status
-
-# Limpiar caché de configuración (después de editar .env)
-php artisan config:clear
-
-# Limpiar caché de vistas
-php artisan view:clear
-
-# Limpiar toda la caché
-php artisan optimize:clear
-
-# Abrir tinker (consola interactiva de Laravel)
-php artisan tinker
 ```
 
 ---
 
-## RESUMEN DE TABLAS A CREAR
+## RESUMEN DE TABLAS Y DEPENDENCIAS
 
 | # | Tabla | Depende de |
 |---|-------|-----------|
@@ -179,12 +533,12 @@ php artisan tinker
 
 ---
 
-## ROLES A DEFINIR EN `RoleSeeder`
+## ROLES DEL SISTEMA
 
-| Rol | Descripción |
-|-----|-------------|
-| `PM` | Project Manager — gestiona proyectos y asigna tareas |
-| `PO` | Product Owner — valida tareas y entregables IA |
+| Rol | Qué puede hacer |
+|-----|----------------|
+| `PM` | Gestiona proyectos y asigna tareas |
+| `PO` | Valida tareas y entregables IA |
 | `Programador` | Ejecuta tareas y marca finalización |
 | `Jefe` | Aprueba cambios, emite facturas, consulta reportes |
 | `Cliente` | Solo lectura — consulta avance y solicita cambios |
