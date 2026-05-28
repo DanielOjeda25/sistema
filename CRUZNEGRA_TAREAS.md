@@ -14,7 +14,7 @@
 | PASO 1 — Modificar `users` | **HECHO** (2026-05-26) | Daniel |
 | PASO 2 — Crear `clientes` | **HECHO** (2026-05-26) | Daniel |
 | PASO 3 — Crear `proyectos` | **HECHO** (2026-05-28) | Jesus |
-| PASO 4 — Crear `solicitudes_cambio` | Pendiente | — |
+| PASO 4 — Crear `solicitudes_cambio` | **HECHO** (2026-05-28) | Daniel |
 | PASO 5 — Crear `tareas` | Pendiente | — |
 | PASO 6 — Crear `hitos` | Pendiente | — |
 | PASO 7 — Crear `entregables_ia` | Pendiente | — |
@@ -185,7 +185,9 @@ return new class extends Migration
 
 ---
 
-## PASO 4 — Crear la tabla `solicitudes_cambio`
+## PASO 4 — Crear la tabla `solicitudes_cambio` — **[HECHO]**
+
+> Migración creada en `database/migrations/2026_05_28_202909_create_solicitudes_cambio_table.php`. No re-ejecutar este paso. Saltar al PASO 5.
 
 > Depende de: `proyectos` (debe existir primero — ya la creamos).
 
