@@ -1,19 +1,23 @@
-# Sistema de Gestión
+# CRUZNEGRA — Sistema de Gestión
 
-Este repositorio sirve como base para el sistema de gestión.
+Sistema interno para gestión de clientes, proyectos, tareas, hitos, entregables y facturación.
 
-## Estructura
+## Stack
 
-- `/var/www/html/sistema-gestion/` : carpeta raíz del proyecto
-- `README.md` : documentación principal
+- Laravel 12 + PHP 8.2
+- Spatie Permission (roles y permisos)
+- Laravel Breeze (autenticación)
+- Laravel Auditing (registro de cambios)
+- MySQL (vía Laragon)
+- Vite + TailwindCSS + Alpine.js
 
-## Uso
+## Documentación
 
-1. Clonar el repositorio.
-2. Configurar el entorno en el servidor web.
-3. Abrir el proyecto en el navegador.
+| Documento | Para qué |
+|-----------|----------|
+| [INSTALACION.md](INSTALACION.md) | Cómo correr el proyecto desde cero en una máquina nueva |
+| [CRUZNEGRA_TAREAS.md](CRUZNEGRA_TAREAS.md) | Guía paso a paso para construir el modelo de datos (tablas) |
 
-## Notas
+## Empezar acá
 
-- Ajustar permisos si es necesario.
-- Actualizar la documentación a medida que avance el desarrollo.
+Si nunca corriste el proyecto, ir directo a [INSTALACION.md](INSTALACION.md).

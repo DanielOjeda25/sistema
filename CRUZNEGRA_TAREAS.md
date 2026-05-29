@@ -15,7 +15,7 @@
 | PASO 2 — Crear `clientes` | **HECHO** (2026-05-26) | Daniel |
 | PASO 3 — Crear `proyectos` | **HECHO** (2026-05-28) | Jesus |
 | PASO 4 — Crear `solicitudes_cambio` | **HECHO** (2026-05-28) | Daniel |
-| PASO 5 — Crear `tareas` | Pendiente | — |
+| PASO 5 — Crear `tareas` | **HECHO** (2026-05-29) | crookdteeth |
 | PASO 6 — Crear `hitos` | Pendiente | — |
 | PASO 7 — Crear `entregables_ia` | Pendiente | — |
 | PASO 8 — Crear `facturas` | Pendiente | — |
@@ -235,7 +235,9 @@ return new class extends Migration
 
 ---
 
-## PASO 5 — Crear la tabla `tareas`
+## PASO 5 — Crear la tabla `tareas` — **[HECHO]**
+
+> Migración creada en `database/migrations/2026_05_29_000000_create_tareas_table.php`. No re-ejecutar este paso. Saltar al PASO 6.
 
 > Depende de: `proyectos`, `users` y `solicitudes_cambio` (todas ya creadas).
 
