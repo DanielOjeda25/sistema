@@ -16,7 +16,7 @@
 | PASO 3 — Crear `proyectos` | **HECHO** (2026-05-28) | Jesus |
 | PASO 4 — Crear `solicitudes_cambio` | **HECHO** (2026-05-28) | Daniel |
 | PASO 5 — Crear `tareas` | **HECHO** (2026-05-29) | crookdteeth |
-| PASO 6 — Crear `hitos` | **HECHO** (2026-05-29) | crookdteeth |
+| PASO 6 — Crear `hitos` | **HECHO** (2026-05-29) | Dantex-dmv |
 | PASO 7 — Crear `entregables_ia` | Pendiente | — |
 | PASO 8 — Crear `facturas` | Pendiente | — |
 | PASO 9 — Ejecutar migraciones | Pendiente | — |
@@ -287,7 +287,9 @@ return new class extends Migration
 
 ---
 
-## PASO 6 — Crear la tabla `hitos`
+## PASO 6 — Crear la tabla `hitos` — **[HECHO]**
+
+> Migración creada en `database/migrations/2026_05_29_204456_create_hitos_table.php`. No re-ejecutar este paso. Saltar al PASO 7.
 
 > Depende de: `proyectos` (ya creada).
 
