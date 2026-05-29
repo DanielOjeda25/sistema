@@ -16,7 +16,7 @@
 | PASO 3 — Crear `proyectos` | **HECHO** (2026-05-28) | Jesus |
 | PASO 4 — Crear `solicitudes_cambio` | **HECHO** (2026-05-28) | Daniel |
 | PASO 5 — Crear `tareas` | **HECHO** (2026-05-29) | crookdteeth |
-| PASO 6 — Crear `hitos` | Pendiente | — |
+| PASO 6 — Crear `hitos` | **HECHO** (2026-05-29) | crookdteeth |
 | PASO 7 — Crear `entregables_ia` | Pendiente | — |
 | PASO 8 — Crear `facturas` | Pendiente | — |
 | PASO 9 — Ejecutar migraciones | Pendiente | — |
