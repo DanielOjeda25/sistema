@@ -19,10 +19,10 @@
 | PASO 6 — Crear `hitos` | **HECHO** (2026-05-29) | Dantex-dmv |
 | PASO 7 — Crear `entregables_ia` | **HECHO** (2026-05-29) | Dantex-dmv |
 | PASO 8 — Crear `facturas` | **HECHO** (2026-05-29) | Daniel |
-| PASO 9 — Ejecutar migraciones | Pendiente | — |
-| PASO 10 — Modelos | Pendiente | — |
-| PASO 11 — Controladores | Pendiente | — |
-| PASO 12 — Rutas | Pendiente | — |
+| PASO 9 — Ejecutar migraciones | **HECHO** (2026-06-01) | Daniel |
+| PASO 10 — Modelos | **HECHO** (2026-06-01) | Daniel |
+| PASO 11 — Controladores | **HECHO** (2026-06-01) | Daniel |
+| PASO 12 — Rutas | **HECHO** (2026-06-01) | Daniel |
 
 > **Si te sumás ahora: empezá desde el PASO 2.** El archivo del PASO 1 ya está creado en `database/migrations/2026_05_26_215211_add_fields_to_users_table.php`. **NO lo borres ni lo edites.**
 
@@ -543,10 +543,31 @@ php artisan route:list
 
 ## ROLES DEL SISTEMA
 
+Son los **5 roles únicos** del sistema. Cada usuario tiene uno o más.
+
 | Rol | Qué puede hacer |
 |-----|----------------|
-| `PM` | Gestiona proyectos y asigna tareas |
-| `PO` | Valida tareas y entregables IA |
-| `Programador` | Ejecuta tareas y marca finalización |
-| `Jefe` | Aprueba cambios, emite facturas, consulta reportes |
-| `Cliente` | Solo lectura — consulta avance y solicita cambios |
+| `Jefe` | Aprueba cambios, emite facturas, consulta reportes, edita roles de usuarios. |
+| `PM` | Gestiona proyectos, asigna tareas, puede ver la lista de usuarios. |
+| `PO` | Valida tareas y entregables IA. |
+| `Programador` | Ejecuta tareas asignadas y marca finalización. |
+| `Cliente` | Solo lectura — consulta avance del proyecto y solicita cambios. |
+
+> El acceso a `/usuarios` está restringido a `Jefe` y `PM`. La edición de roles solo la puede hacer `Jefe`. Ver [routes/web.php:38-52](routes/web.php#L38-L52).
+
+---
+
+## ¿Y AHORA QUÉ? — SIGUIENTE FASE
+
+Los 12 pasos de esta guía están **completos**: las tablas existen, los modelos tienen relaciones, los controllers funcionan, las rutas están registradas.
+
+Pero el sistema todavía **no es usable** porque:
+
+1. **No hay datos para probar.** Las pantallas y endpoints existen, pero sin clientes, proyectos, tareas o usuarios cargados, no se puede ver nada en acción.
+2. **No hay vistas Blade.** Los controllers apuntan a `view('clientes.index')`, etc., pero esos archivos no existen todavía. Cualquier `GET` en el navegador va a tirar "View not found".
+
+La siguiente fase es **cargar datos de prueba** vía seeders, para que cuando empecemos las vistas haya algo concreto para mostrar. Ver:
+
+| Guía | Para qué |
+|------|----------|
+| [CRUZNEGRA_DATOS_PRUEBA.md](CRUZNEGRA_DATOS_PRUEBA.md) | Paso a paso para cargar roles operativos, usuarios de prueba y datos de ejemplo para cada tabla |

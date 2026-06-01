@@ -16,7 +16,8 @@ Sistema interno para gestión de clientes, proyectos, tareas, hitos, entregables
 | Documento | Para qué |
 |-----------|----------|
 | [INSTALACION.md](INSTALACION.md) | Cómo correr el proyecto desde cero en una máquina nueva |
-| [CRUZNEGRA_TAREAS.md](CRUZNEGRA_TAREAS.md) | Guía paso a paso para construir el modelo de datos (tablas) |
+| [CRUZNEGRA_TAREAS.md](CRUZNEGRA_TAREAS.md) | Guía paso a paso para construir el modelo de datos (tablas, modelos, controllers, rutas) |
+| [CRUZNEGRA_DATOS_PRUEBA.md](CRUZNEGRA_DATOS_PRUEBA.md) | Cómo cargar roles operativos, usuarios y datos de prueba vía seeders |
 
 ## Empezar acá
 
