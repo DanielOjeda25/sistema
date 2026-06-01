@@ -2,31 +2,22 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role; 
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class RoleSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
+        $permisoEditarRoles = Permission::firstOrCreate(['name' => 'editar_roles']);
 
-        $permisoEditarRoles = Permission::create(['name' => 'editar_roles']);
+        $jefe        = Role::firstOrCreate(['name' => 'Jefe']);
+        $pm          = Role::firstOrCreate(['name' => 'PM']);
+        $po          = Role::firstOrCreate(['name' => 'PO']);
+        $programador = Role::firstOrCreate(['name' => 'Programador']);
+        $cliente     = Role::firstOrCreate(['name' => 'Cliente']);
 
-
-        // Creamos los roles base del sistema
-        $rol_admin=Role::create(['name' => 'Administrador']);
-        $rol_empleado=Role::create(['name' => 'Empleado']);
-        $rol_cliente=Role::create(['name' => 'Cliente']);
-        $rol_supervisor=Role::create(['name' => 'Supervisor']);
-
-
-        // Asignamos permisos a los roles
-        $rol_admin->givePermissionTo($permisoEditarRoles);
-
+        $jefe->givePermissionTo($permisoEditarRoles);
     }
 }

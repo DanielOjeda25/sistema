@@ -2,40 +2,41 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
 use App\Models\User;
+use Illuminate\Database\Seeder;
 
 class UserSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
+        $jefe = User::firstOrCreate(
+            ['email' => 'jefe@example.com'],
+            ['name' => 'Roberto', 'apellido' => 'Acosta', 'password' => bcrypt('1234')]
+        );
+        $jefe->syncRoles(['Jefe']);
 
-        // Creamos un usuario administrador por defecto
-        $admin = User::create([
-            'name' => 'Admin',
-            'email' => 'admin@example.com',
-            'password' => bcrypt('1234')
-        ]);
-        $admin->assignRole('Administrador');
+        $pm = User::firstOrCreate(
+            ['email' => 'pm@example.com'],
+            ['name' => 'Laura', 'apellido' => 'Mendez', 'password' => bcrypt('1234')]
+        );
+        $pm->syncRoles(['PM']);
 
-        $usuario1 = User::create([
-            'name' => 'Carlos VIllalba',
-            'email' => 'carlos@example.com',
-            'password' => bcrypt('1234')
-        ]);
-        $usuario1->assignRole('Empleado');
+        $po = User::firstOrCreate(
+            ['email' => 'po@example.com'],
+            ['name' => 'Diego', 'apellido' => 'Sosa', 'password' => bcrypt('1234')]
+        );
+        $po->syncRoles(['PO']);
 
-        $usuario2 = User::create([
-            'name' => 'Juan Perez',
-            'email' => 'juanperez@example.com',
-            'password' => bcrypt('1234')
-        ]);
-        $usuario2->assignRole('Cliente');
+        $programador = User::firstOrCreate(
+            ['email' => 'dev@example.com'],
+            ['name' => 'Sofia', 'apellido' => 'Ruiz', 'password' => bcrypt('1234')]
+        );
+        $programador->syncRoles(['Programador']);
 
-
+        $cliente = User::firstOrCreate(
+            ['email' => 'cliente@example.com'],
+            ['name' => 'Juan', 'apellido' => 'Perez', 'password' => bcrypt('1234')]
+        );
+        $cliente->syncRoles(['Cliente']);
     }
 }
