@@ -16,12 +16,27 @@ Sistema interno para gestión de clientes, proyectos, tareas, hitos, entregables
 | Documento | Para qué |
 |-----------|----------|
 | [INSTALACION.md](INSTALACION.md) | Cómo correr el proyecto desde cero en una máquina nueva |
-| [CRUZNEGRA_TAREAS.md](CRUZNEGRA_TAREAS.md) | Guía paso a paso para construir el modelo de datos (tablas, modelos, controllers, rutas) |
+| **[CRUZNEGRA_FASES_EQUIPO.md](CRUZNEGRA_FASES_EQUIPO.md)** | **Trabajo actual del equipo:** preparación y Fase 1 de las vistas |
+| **[CRUZNEGRA_FASES_2Y3.md](CRUZNEGRA_FASES_2Y3.md)** | **Trabajo actual del equipo:** Fases 2, 3 y 4 |
+| [CRUZNEGRA_TAREAS.md](CRUZNEGRA_TAREAS.md) | Cómo se construyó el modelo de datos (tablas, modelos, controllers, rutas) — ya completo |
 | [CRUZNEGRA_DATOS_PRUEBA.md](CRUZNEGRA_DATOS_PRUEBA.md) | Cómo cargar roles operativos, usuarios y datos de prueba vía seeders |
+| [CRUZNEGRA_MODELO_RELACIONAL.md](CRUZNEGRA_MODELO_RELACIONAL.md) | Diagrama entidad-relación de la base de datos |
+| [CRUZNEGRA_DIAGRAMA_CLASES.md](CRUZNEGRA_DIAGRAMA_CLASES.md) | Diagrama de clases de los modelos Eloquent |
 
 ## Empezar acá
 
 Si nunca corriste el proyecto, ir directo a [INSTALACION.md](INSTALACION.md).
+
+**Marcos, Jesús y Dante:** su trabajo arranca en
+[CRUZNEGRA_FASES_EQUIPO.md](CRUZNEGRA_FASES_EQUIPO.md).
+
+## Estado del proyecto
+
+- ✅ Base de datos, modelos, controllers y rutas de los 7 módulos
+- ✅ Login, roles y permisos
+- ✅ Datos de prueba (seeders)
+- ✅ Módulo de **Clientes** con sus 4 pantallas
+- ⬜ Vistas de los 6 módulos restantes — **en curso, ver las guías de fases**
 
 ---
 

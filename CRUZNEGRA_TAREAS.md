@@ -561,13 +561,19 @@ Son los **5 roles únicos** del sistema. Cada usuario tiene uno o más.
 
 Los 12 pasos de esta guía están **completos**: las tablas existen, los modelos tienen relaciones, los controllers funcionan, las rutas están registradas.
 
-Pero el sistema todavía **no es usable** porque:
+Después de estos 12 pasos se completaron además:
 
-1. **No hay datos para probar.** Las pantallas y endpoints existen, pero sin clientes, proyectos, tareas o usuarios cargados, no se puede ver nada en acción.
-2. **No hay vistas Blade.** Los controllers apuntan a `view('clientes.index')`, etc., pero esos archivos no existen todavía. Cualquier `GET` en el navegador va a tirar "View not found".
+- **Datos de prueba** vía seeders — ver [CRUZNEGRA_DATOS_PRUEBA.md](CRUZNEGRA_DATOS_PRUEBA.md)
+- **Módulo de Clientes** con sus 4 vistas Blade funcionando, como ejemplo de referencia
 
-La siguiente fase es **cargar datos de prueba** vía seeders, para que cuando empecemos las vistas haya algo concreto para mostrar. Ver:
+Lo que falta ahora son las **vistas de los 6 módulos restantes**: Proyectos, Tareas,
+Hitos, Solicitudes de Cambio, Entregables IA y Facturas. Los controllers apuntan a
+`view('proyectos.index')`, etc., pero esos archivos todavía no existen, así que entrar a
+esas direcciones tira "View not found".
+
+Ese trabajo está repartido en fases entre Marcos, Jesús y Dante:
 
 | Guía | Para qué |
 |------|----------|
-| [CRUZNEGRA_DATOS_PRUEBA.md](CRUZNEGRA_DATOS_PRUEBA.md) | Paso a paso para cargar roles operativos, usuarios de prueba y datos de ejemplo para cada tabla |
+| [CRUZNEGRA_FASES_EQUIPO.md](CRUZNEGRA_FASES_EQUIPO.md) | Preparación del entorno y Fase 1 (Hitos, Proyectos, Tareas) |
+| [CRUZNEGRA_FASES_2Y3.md](CRUZNEGRA_FASES_2Y3.md) | Fases 2, 3 y 4 (los módulos restantes, menú, dashboard y repaso) |
