@@ -11,6 +11,9 @@
 > figura dentro de la clase hija.
 
 ```mermaid
+---
+id: 26c23357-88a0-4b99-8f3e-647b0b694548
+---
 classDiagram
     class Cliente {
         +proyectos() HasMany
