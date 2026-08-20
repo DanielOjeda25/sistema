@@ -575,5 +575,4 @@ Ese trabajo está repartido en fases entre Marcos, Jesús y Dante:
 
 | Guía | Para qué |
 |------|----------|
-| [CRUZNEGRA_FASES_EQUIPO.md](CRUZNEGRA_FASES_EQUIPO.md) | Preparación del entorno y Fase 1 (Hitos, Proyectos, Tareas) |
-| [CRUZNEGRA_FASES_2Y3.md](CRUZNEGRA_FASES_2Y3.md) | Fases 2, 3 y 4 (los módulos restantes, menú, dashboard y repaso) |
+| [CRUZNEGRA_GUIA_EQUIPO.md](CRUZNEGRA_GUIA_EQUIPO.md) | Las 4 fases con el código completo de cada vista, repartidas por persona |
