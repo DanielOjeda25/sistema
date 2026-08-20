@@ -13,21 +13,30 @@ Sistema interno para gestión de clientes, proyectos, tareas, hitos, entregables
 
 ## Documentación
 
+### Lo que se usa todos los días
+
 | Documento | Para qué |
 |-----------|----------|
-| [INSTALACION.md](INSTALACION.md) | Cómo correr el proyecto desde cero en una máquina nueva |
-| **[CRUZNEGRA_GUIA_EQUIPO.md](CRUZNEGRA_GUIA_EQUIPO.md)** | **Trabajo actual del equipo:** las 4 fases de las vistas, con el código completo |
-| [CRUZNEGRA_TAREAS.md](CRUZNEGRA_TAREAS.md) | Cómo se construyó el modelo de datos (tablas, modelos, controllers, rutas) — ya completo |
-| [CRUZNEGRA_DATOS_PRUEBA.md](CRUZNEGRA_DATOS_PRUEBA.md) | Cómo cargar roles operativos, usuarios y datos de prueba vía seeders |
-| [CRUZNEGRA_MODELO_RELACIONAL.md](CRUZNEGRA_MODELO_RELACIONAL.md) | Diagrama entidad-relación de la base de datos |
-| [CRUZNEGRA_DIAGRAMA_CLASES.md](CRUZNEGRA_DIAGRAMA_CLASES.md) | Diagrama de clases de los modelos Eloquent |
+| **[CRUZNEGRA_GUIA_EQUIPO.md](CRUZNEGRA_GUIA_EQUIPO.md)** | **Trabajo actual del equipo:** las 4 fases de las vistas, con el código completo listo para copiar |
+| [docs/INSTALACION.md](docs/INSTALACION.md) | Cómo correr el proyecto desde cero en una máquina nueva |
+
+### Consulta ocasional (carpeta `docs/`)
+
+| Documento | Para qué |
+|-----------|----------|
+| [CRUZNEGRA_TAREAS.md](docs/CRUZNEGRA_TAREAS.md) | Cómo se construyó el modelo de datos (tablas, modelos, controllers, rutas) — ya completo |
+| [CRUZNEGRA_DATOS_PRUEBA.md](docs/CRUZNEGRA_DATOS_PRUEBA.md) | Cómo cargar roles operativos, usuarios y datos de prueba vía seeders |
+| [CRUZNEGRA_MODELO_RELACIONAL.md](docs/CRUZNEGRA_MODELO_RELACIONAL.md) | Diagrama entidad-relación de la base de datos |
+| [CRUZNEGRA_DIAGRAMA_CLASES.md](docs/CRUZNEGRA_DIAGRAMA_CLASES.md) | Diagrama de clases de los modelos Eloquent |
 
 ## Empezar acá
 
-Si nunca corriste el proyecto, ir directo a [INSTALACION.md](INSTALACION.md).
+Si nunca corriste el proyecto, ir directo a [docs/INSTALACION.md](docs/INSTALACION.md).
 
 **Marcos, Jesús y Dante:** todo su trabajo está en
-[CRUZNEGRA_GUIA_EQUIPO.md](CRUZNEGRA_GUIA_EQUIPO.md) — es la única guía que necesitan.
+[CRUZNEGRA_GUIA_EQUIPO.md](CRUZNEGRA_GUIA_EQUIPO.md), acá en la raíz — es la única guía
+que necesitan abrir. El resto de la documentación está en `docs/` y es para consultar
+si hace falta, no para leer ahora.
 
 ## Estado del proyecto
 

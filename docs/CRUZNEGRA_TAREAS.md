@@ -575,4 +575,4 @@ Ese trabajo está repartido en fases entre Marcos, Jesús y Dante:
 
 | Guía | Para qué |
 |------|----------|
-| [CRUZNEGRA_GUIA_EQUIPO.md](CRUZNEGRA_GUIA_EQUIPO.md) | Las 4 fases con el código completo de cada vista, repartidas por persona |
+| [CRUZNEGRA_GUIA_EQUIPO.md](../CRUZNEGRA_GUIA_EQUIPO.md) | Las 4 fases con el código completo de cada vista, repartidas por persona |
