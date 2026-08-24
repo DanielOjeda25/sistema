@@ -6,6 +6,10 @@
 
         <title>{{ config('app.name', 'CRUZNEGRA') }} · Sistema de Gestión</title>
 
+        <link rel="icon" href="/favicon.ico" sizes="32x32">
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
 
