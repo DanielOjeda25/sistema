@@ -25,17 +25,17 @@ Copiás, pegás, guardás y funciona.
 
 ## Índice
 
-| Parte | Qué es |
-|-------|--------|
-| [PASO 0](#paso-0--preparar-la-máquina-todos-una-sola-vez) | Preparar la máquina — **hacelo una vez, antes que nada** |
-| [Reglas](#reglas) | Lo que no hay que romper |
-| [Cómo crear un archivo](#cómo-crear-un-archivo-por-si-nunca-lo-hiciste) | Por si nunca lo hiciste en VS Code |
-| [El ejemplo de Clientes](#el-módulo-de-clientes-ya-está-hecho-es-tu-ejemplo) | El módulo ya hecho que podés mirar cuando dudes |
-| [FASE 1](#fase-1) | Marcos: Hitos · Jesús: Proyectos · Dante: Tareas |
-| [FASE 2](#fase-2) | Marcos: Facturas · Jesús: Solicitudes · Dante: Entregables |
-| [FASE 3](#fase-3) | Jesús: Menú · Dante: Dashboard · Marcos: probar |
-| [FASE 4](#fase-4--repaso-final-entre-los-tres) | Repaso final entre los tres |
-| [Si algo sale mal](#si-algo-sale-mal--soluciones-rápidas) | Tabla de errores y cómo resolverlos |
+| Parte                                                                         | Qué es                                                         |
+| ----------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| [PASO 0](#paso-0--preparar-la-máquina-todos-una-sola-vez)                     | Preparar la máquina —**hacelo una vez, antes que nada** |
+| [Reglas](#reglas)                                                              | Lo que no hay que romper                                        |
+| [Cómo crear un archivo](#cómo-crear-un-archivo-por-si-nunca-lo-hiciste)      | Por si nunca lo hiciste en VS Code                              |
+| [El ejemplo de Clientes](#el-módulo-de-clientes-ya-está-hecho-es-tu-ejemplo) | El módulo ya hecho que podés mirar cuando dudes               |
+| [FASE 1](#fase-1)                                                              | Marcos: Hitos · Jesús: Proyectos · Dante: Tareas             |
+| [FASE 2](#fase-2)                                                              | Marcos: Facturas · Jesús: Solicitudes · Dante: Entregables   |
+| [FASE 3](#fase-3)                                                              | Jesús: Menú · Dante: Dashboard · Marcos: probar             |
+| [FASE 4](#fase-4--repaso-final-entre-los-tres)                                 | Repaso final entre los tres                                     |
+| [Si algo sale mal](#si-algo-sale-mal--soluciones-rápidas)                     | Tabla de errores y cómo resolverlos                            |
 
 > **Consejo:** en VS Code abrí este archivo y apretá **Ctrl+Shift+V** para verlo lindo,
 > con el índice clickeable.
@@ -44,12 +44,12 @@ Copiás, pegás, guardás y funciona.
 
 ## Quién hace qué
 
-| Fase | Marcos | Jesús | Dante |
-|------|--------|-------|-------|
-| **1** | Hitos | Proyectos | Tareas |
-| **2** | Facturas | Solicitudes de Cambio | Entregables IA |
-| **3** | Ayudar en el repaso | Menú de navegación | Dashboard |
-| **4** | Repaso final entre los tres | | |
+| Fase        | Marcos                      | Jesús                | Dante          |
+| ----------- | --------------------------- | --------------------- | -------------- |
+| **1** | Hitos                       | Proyectos             | Tareas         |
+| **2** | Facturas                    | Solicitudes de Cambio | Entregables IA |
+| **3** | Ayudar en el repaso         | Menú de navegación  | Dashboard      |
+| **4** | Repaso final entre los tres |                       |                |
 
 Cada uno hace **4 archivos** por fase. Los 4 archivos son siempre lo mismo:
 
@@ -97,11 +97,19 @@ Para los demás comandos, abrí **otra** terminal.
 Abrí el navegador en `http://sistema.test` (si no anda, probá
 `http://localhost/sistema/public`).
 
-Usuario y contraseña para entrar:
+Usuario y contraseña para entrar (las creadas por el seeder del proyecto):
 
-| Email | Contraseña |
-|-------|-----------|
-| `jefe@example.com` | `1234` |
+| Email                   | Contraseña | Rol         |
+| ----------------------- | ----------- | ----------- |
+| `jefe@example.com`    | `1234`    | Jefe        |
+| `pm@example.com`      | `1234`    | PM          |
+| `po@example.com`      | `1234`    | PO          |
+| `dev@example.com`     | `1234`    | Programador |
+| `cliente@example.com` | `1234`    | Cliente     |
+
+> Las credenciales de prueba son solo para desarrollo. Usá `1234` solo en este entorno local.
+
+> ⚠️ Si el login falla, revisá que estés usando la misma versión del proyecto que está corriendo en Laravel y que la base haya sido sembrada con `php artisan migrate:fresh --seed`. El problema más común fue una copia desincronizada del proyecto.
 
 ### 5. Creá tu rama
 
@@ -143,12 +151,12 @@ que lo mires cuando tengas dudas.
 
 Sus 4 archivos están en `resources/views/clientes/`:
 
-| Si tenés que hacer... | Abrí este archivo y miralo |
-|-----------------------|----------------------------|
-| Una lista con tabla | `clientes/index.blade.php` |
-| Un formulario de crear | `clientes/create.blade.php` |
-| Un formulario de editar | `clientes/edit.blade.php` |
-| Una ficha de detalle | `clientes/show.blade.php` |
+| Si tenés que hacer...  | Abrí este archivo y miralo   |
+| ----------------------- | ----------------------------- |
+| Una lista con tabla     | `clientes/index.blade.php`  |
+| Un formulario de crear  | `clientes/create.blade.php` |
+| Un formulario de editar | `clientes/edit.blade.php`   |
+| Una ficha de detalle    | `clientes/show.blade.php`   |
 
 **Cuando algo no te salga, comparalo con el archivo equivalente de Clientes.**
 Entrá a `http://sistema.test/clientes` y probalo: creá un cliente, editalo, mirá el
@@ -733,7 +741,7 @@ Entrá a `http://sistema.test/proyectos` y verificá:
 
 - [ ] Se ve la lista con el nombre del cliente y del PM en cada fila
 - [ ] Apretás "+ Nuevo Proyecto", elegís cliente y PM de las listas, guardás → vuelve con
-      cartel verde
+  cartel verde
 - [ ] Apretás "Editar" → las fechas y los dos desplegables aparecen **ya seleccionados**
 - [ ] Apretás "Ver" → se ve el detalle con la lista de tareas del proyecto
 
@@ -1117,8 +1125,8 @@ Recién ahí empieza la Fase 2.
 > git checkout -b fase2-marcos
 > ```
 
-| Marcos | Jesús | Dante |
-|--------|-------|-------|
+| Marcos   | Jesús                | Dante          |
+| -------- | --------------------- | -------------- |
 | Facturas | Solicitudes de Cambio | Entregables IA |
 
 ---
@@ -1434,7 +1442,7 @@ Entrá a `http://sistema.test/facturas`:
 - [ ] Se ve la lista con los montos formateados con `$` y dos decimales
 - [ ] Podés crear una factura nueva
 - [ ] **Probá poner un número de factura que ya existe** → tiene que aparecer un mensaje
-      de error en rojo debajo del campo, y no guardarse. Eso está bien, es a propósito.
+  de error en rojo debajo del campo, y no guardarse. Eso está bien, es a propósito.
 - [ ] Al editar, las fechas aparecen ya cargadas
 
 **Con esto quedan los 7 módulos completos.**
@@ -2066,8 +2074,8 @@ php artisan migrate:fresh --seed
 
 # FASE 3
 
-| Marcos | Jesús | Dante |
-|--------|-------|-------|
+| Marcos             | Jesús               | Dante     |
+| ------------------ | -------------------- | --------- |
 | Ayuda en el repaso | Menú de navegación | Dashboard |
 
 En esta fase ya están los 7 CRUDs listos. Falta unir todo: el menú para llegar a los
@@ -2173,7 +2181,7 @@ pegá esto:
 - [ ] Hacés clic en cada uno y te lleva a su listado
 - [ ] El que estás viendo aparece resaltado
 - [ ] Achicás la ventana del navegador hasta que aparezca el menú de tres rayitas
-      → adentro también están los 7
+  → adentro también están los 7
 
 ---
 
@@ -2328,16 +2336,16 @@ git push -u origin fase4-final
 
 ## Si algo sale mal — soluciones rápidas
 
-| Lo que ves en pantalla | Qué hacer |
-|------------------------|-----------|
-| `View [hitos.index] not found` | El archivo no existe o le falta `.blade.php`. Revisá el nombre de la carpeta. |
-| `Route [...] not defined` | Copiaste mal el código. Borrá todo y pegá el bloque completo de nuevo. |
-| `Undefined variable` | Pegaste el código de otro módulo. Fijate que sea el tuyo. |
-| Error rojo largo con `syntax error` | Copiaste solo una parte. Borrá todo y pegá el bloque entero. |
-| `SQLSTATE... Connection refused` | Laragon apagado → **Start All**. |
-| La página se ve sin colores | Falta `npm run dev` corriendo en una terminal. |
-| `419 Page Expired` | Refrescá con F5 y volvé a intentar. |
-| Guardaste y no cambia nada | `php artisan optimize:clear` y refrescá. |
-| El menú no muestra los módulos nuevos | Jesús todavía no subió la Fase 3, o te falta `git pull`. |
+| Lo que ves en pantalla                  | Qué hacer                                                                      |
+| --------------------------------------- | ------------------------------------------------------------------------------- |
+| `View [hitos.index] not found`        | El archivo no existe o le falta`.blade.php`. Revisá el nombre de la carpeta. |
+| `Route [...] not defined`             | Copiaste mal el código. Borrá todo y pegá el bloque completo de nuevo.       |
+| `Undefined variable`                  | Pegaste el código de otro módulo. Fijate que sea el tuyo.                     |
+| Error rojo largo con`syntax error`    | Copiaste solo una parte. Borrá todo y pegá el bloque entero.                  |
+| `SQLSTATE... Connection refused`      | Laragon apagado →**Start All**.                                          |
+| La página se ve sin colores            | Falta`npm run dev` corriendo en una terminal.                                 |
+| `419 Page Expired`                    | Refrescá con F5 y volvé a intentar.                                           |
+| Guardaste y no cambia nada              | `php artisan optimize:clear` y refrescá.                                     |
+| El menú no muestra los módulos nuevos | Jesús todavía no subió la Fase 3, o te falta`git pull`.                    |
 
 **Si nada lo soluciona:** captura de pantalla completa al grupo. No borres archivos.
