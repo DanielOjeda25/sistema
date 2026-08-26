@@ -739,11 +739,11 @@ Creá la carpeta `proyectos` dentro de `resources/views/`, y adentro los 4 archi
 
 Entrá a `http://sistema.test/proyectos` y verificá:
 
-- [ ] Se ve la lista con el nombre del cliente y del PM en cada fila
-- [ ] Apretás "+ Nuevo Proyecto", elegís cliente y PM de las listas, guardás → vuelve con
+- [X] Se ve la lista con el nombre del cliente y del PM en cada fila
+- [X] Apretás "+ Nuevo Proyecto", elegís cliente y PM de las listas, guardás → vuelve con
   cartel verde
-- [ ] Apretás "Editar" → las fechas y los dos desplegables aparecen **ya seleccionados**
-- [ ] Apretás "Ver" → se ve el detalle con la lista de tareas del proyecto
+- [X] Apretás "Editar" → las fechas y los dos desplegables aparecen **ya seleccionados**
+- [X] Apretás "Ver" → se ve el detalle con la lista de tareas del proyecto
 
 ---
 
@@ -1754,10 +1754,10 @@ Entrá a `http://sistema.test/facturas`:
 
 Entrá a `http://sistema.test/solicitudes-cambio` (con **guion medio** en la URL):
 
-- [ ] Se ve la lista con proyecto y solicitante
-- [ ] Podés crear una solicitud nueva
-- [ ] Al editar, los desplegables aparecen ya seleccionados
-- [ ] El detalle muestra la lista de tareas asociadas
+- [X] Se ve la lista con proyecto y solicitante
+- [X] Podés crear una solicitud nueva
+- [X] Al editar, los desplegables aparecen ya seleccionados
+- [X] El detalle muestra la lista de tareas asociadas
 
 ---
 
