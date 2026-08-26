@@ -11,7 +11,7 @@
 
     // Vistas ya construidas. Los modulos que todavia no las tienen se muestran
     // sin enlace, para no mandar a nadie a una pantalla que no existe.
-    $listos = ['clientes', 'tareas', 'entregables'];
+    $listos = ['clientes', 'proyectos', 'tareas', 'solicitudes', 'entregables'];
 
     $tarjetas = [
         ['clave' => 'clientes',   'ruta' => 'clientes.index',           'titulo' => 'Clientes',    'valor' => Cliente::count(),        'detalle' => 'registrados'],
