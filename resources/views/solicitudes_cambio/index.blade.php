@@ -4,9 +4,11 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Listado de Solicitudes de Cambio
             </h2>
-            <a href="{{ route('solicitudes-cambio.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700">
+            @hasanyrole('Jefe|PM|PO')
+                <a href="{{ route('solicitudes-cambio.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
                 + Nueva Solicitud
             </a>
+            @endhasanyrole
         </div>
     </x-slot>
 
@@ -42,7 +44,9 @@
                                     <td class="px-6 py-4">{{ ucfirst($solicitud->prioridad) }}</td>
                                     <td class="px-6 py-4 text-sm font-medium">
                                         <a href="{{ route('solicitudes-cambio.show', $solicitud) }}" class="text-blue-600 hover:underline">Ver</a>
-                                        <a href="{{ route('solicitudes-cambio.edit', $solicitud) }}" class="text-yellow-600 hover:underline ml-3">Editar</a>
+                                        @hasanyrole('Jefe|PM|PO')
+                                            <a href="{{ route('solicitudes-cambio.edit', $solicitud) }}" class="text-yellow-600 hover:underline ml-3">Editar</a>
+                                        @endhasanyrole
                                     </td>
                                 </tr>
                             @empty

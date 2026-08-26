@@ -49,6 +49,12 @@ Route::middleware(['auth', 'role:Jefe|PM'])->group(function () {
  * sola persona para evitar escaladas de permisos.
  */
 Route::middleware(['auth', 'role:Jefe'])->group(function () {
+    // Alta de usuarios. No hay registro público: las cuentas se crean acá y se
+    // les asigna un rol. La contraseña que se pone es provisional; la persona
+    // la cambia desde su perfil cuando entra.
+    Route::get('/usuarios/crear', [UserController::class, 'create'])->name('users.create');
+    Route::post('/usuarios', [UserController::class, 'store'])->name('users.store');
+
     Route::get('/usuarios/{user}/roles', [UserController::class, 'editRoles'])->name('users.roles.edit');
     Route::put('/usuarios/{user}/roles', [UserController::class, 'updateRoles'])->name('users.roles.update');
 });
@@ -61,16 +67,60 @@ Route::get('/tutorial', function () {
 // -----------------------------------------------------------------------------
 // MÓDULOS DEL SISTEMA (CRUD recursos del proyecto)
 // -----------------------------------------------------------------------------
-// Todos requieren sesión iniciada. La granularidad por rol se aplica adentro
-// de cada controller o vía Gate/Policy cuando se definan.
+// El acceso se corta acá, en la ruta, y no solamente escondiendo botones en la
+// vista: esconder un botón no impide que alguien escriba la URL a mano.
+//
+// La regla es la misma en todos los módulos: cualquiera con sesión iniciada
+// puede LEER (index y show), pero ESCRIBIR (create, store, edit, update y
+// destroy) queda limitado a los roles que correspondan.
+//
+// El orden importa: los grupos de escritura van PRIMERO porque definen rutas
+// literales como /clientes/create. Si fueran después, la ruta de lectura
+// /clientes/{cliente} tomaría "create" como si fuera un id y daría 404.
+
+/*
+ * ESCRITURA — parte comercial y facturación.
+ * Clientes, proyectos y facturas los maneja quien responde por la relación con
+ * el cliente y por la plata: el Jefe y el PM.
+ */
+Route::middleware(['auth', 'role:Jefe|PM'])->group(function () {
+    Route::resource('clientes', ClienteController::class)->except(['index', 'show']);
+    Route::resource('proyectos', ProyectoController::class)->except(['index', 'show']);
+    Route::resource('facturas', FacturaController::class)->except(['index', 'show']);
+});
+
+/*
+ * ESCRITURA — planificación del trabajo.
+ * El PO entra acá porque define el alcance: qué se hace, en qué orden y qué
+ * cambios se aceptan. Tareas e hitos salen de esa definición.
+ */
+Route::middleware(['auth', 'role:Jefe|PM|PO'])->group(function () {
+    Route::resource('tareas', TareaController::class)->except(['index', 'show']);
+    Route::resource('hitos', HitoController::class)->except(['index', 'show']);
+    Route::resource('solicitudes-cambio', SolicitudCambioController::class)->except(['index', 'show']);
+});
+
+/*
+ * ESCRITURA — entregables.
+ * Suma al Programador, que es quien produce el material que se entrega.
+ */
+Route::middleware(['auth', 'role:Jefe|PM|PO|Programador'])->group(function () {
+    Route::resource('entregables', EntregableIAController::class)->except(['index', 'show']);
+});
+
+/*
+ * LECTURA — cualquiera con sesión iniciada.
+ * El Cliente entra a seguir el avance de sus proyectos; el Programador, a ver
+ * sus tareas. Ninguno de los dos puede modificar nada.
+ */
 Route::middleware('auth')->group(function () {
-    Route::resource('clientes', ClienteController::class);
-    Route::resource('proyectos', ProyectoController::class);
-    Route::resource('tareas', TareaController::class);
-    Route::resource('hitos', HitoController::class);
-    Route::resource('solicitudes-cambio', SolicitudCambioController::class);
-    Route::resource('entregables', EntregableIAController::class);
-    Route::resource('facturas', FacturaController::class);
+    Route::resource('clientes', ClienteController::class)->only(['index', 'show']);
+    Route::resource('proyectos', ProyectoController::class)->only(['index', 'show']);
+    Route::resource('tareas', TareaController::class)->only(['index', 'show']);
+    Route::resource('hitos', HitoController::class)->only(['index', 'show']);
+    Route::resource('solicitudes-cambio', SolicitudCambioController::class)->only(['index', 'show']);
+    Route::resource('entregables', EntregableIAController::class)->only(['index', 'show']);
+    Route::resource('facturas', FacturaController::class)->only(['index', 'show']);
 });
 
 // -----------------------------------------------------------------------------

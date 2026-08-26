@@ -1075,10 +1075,10 @@ Entrá a `http://sistema.test/proyectos` y verificá:
 
 Entrá a `http://sistema.test/tareas` y verificá:
 
-- [ ] Se ve la lista con el proyecto y el responsable de cada tarea
-- [ ] Creás una tarea dejando "Solicitud de Cambio" en **— Ninguna —** → se guarda igual
-- [ ] Apretás "Editar" → los desplegables aparecen ya seleccionados
-- [ ] Apretás "Ver" → se ve el detalle completo
+- [X] Se ve la lista con el proyecto y el responsable de cada tarea
+- [X] Creás una tarea dejando "Solicitud de Cambio" en **— Ninguna —** → se guarda igual
+- [X] Apretás "Editar" → los desplegables aparecen ya seleccionados
+- [X] Apretás "Ver" → se ve el detalle completo
 
 ---
 
@@ -2047,10 +2047,10 @@ Entrá a `http://sistema.test/solicitudes-cambio` (con **guion medio** en la URL
 
 Entrá a `http://sistema.test/entregables`:
 
-- [ ] Se ve la lista con proyecto y quién lo generó
-- [ ] Podés crear un entregable nuevo
-- [ ] Al editar, el contenido largo aparece completo en el cuadro de texto
-- [ ] En el detalle, el contenido respeta los saltos de línea
+- [X] Se ve la lista con proyecto y quién lo generó
+- [X] Podés crear un entregable nuevo
+- [X] Al editar, el contenido largo aparece completo en el cuadro de texto
+- [X] En el detalle, el contenido respeta los saltos de línea
 
 ---
 

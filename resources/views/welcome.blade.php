@@ -35,15 +35,9 @@
                                 Ir al panel
                             </a>
                         @else
-                            <a href="{{ route('login') }}" class="text-sm font-semibold text-gray-700 hover:text-indigo-600 px-3 py-2 transition">
+                            <a href="{{ route('login') }}" class="text-sm font-semibold bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
                                 Ingresar
                             </a>
-
-                            @if (Route::has('register'))
-                                <a href="{{ route('register') }}" class="text-sm font-semibold bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
-                                    Registrarse
-                                </a>
-                            @endif
                         @endauth
                     </nav>
                 @endif
@@ -70,15 +64,13 @@
                     </p>
 
                     @guest
-                        <div class="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
+                        <div class="mt-10">
                             <a href="{{ route('login') }}" class="inline-flex items-center justify-center px-6 py-3 bg-white text-indigo-700 font-semibold rounded-lg hover:bg-indigo-50 transition">
                                 Ingresar al sistema
                             </a>
-                            @if (Route::has('register'))
-                                <a href="{{ route('register') }}" class="inline-flex items-center justify-center px-6 py-3 border border-indigo-400 text-white font-semibold rounded-lg hover:bg-indigo-600 transition">
-                                    Crear una cuenta
-                                </a>
-                            @endif
+                            <p class="mt-4 text-sm text-indigo-200">
+                                Las cuentas las crea el administrador del sistema.
+                            </p>
                         </div>
                     @else
                         <div class="mt-10">

@@ -41,12 +41,9 @@
             Ingresar
         </button>
 
-        @if (Route::has('register'))
-            <p class="text-center text-sm text-gray-500">
-                ¿No tenés cuenta?
-                <a href="{{ route('register') }}" class="font-semibold text-indigo-600 hover:text-indigo-800 hover:underline">Registrate</a>
-            </p>
-        @endif
+        <p class="text-center text-sm text-gray-500">
+            ¿No tenés cuenta? Pedísela al administrador del sistema.
+        </p>
     </form>
 
 </x-guest-layout>
