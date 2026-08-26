@@ -97,11 +97,19 @@ Para los demás comandos, abrí **otra** terminal.
 Abrí el navegador en `http://sistema.test` (si no anda, probá
 `http://localhost/sistema/public`).
 
-Usuario y contraseña para entrar:
+Usuario y contraseña para entrar (las creadas por el seeder del proyecto):
 
-| Email                | Contraseña |
-| -------------------- | ----------- |
-| `jefe@example.com` | `1234`    |
+| Email                   | Contraseña | Rol         |
+| ----------------------- | ----------- | ----------- |
+| `jefe@example.com`    | `1234`    | Jefe        |
+| `pm@example.com`      | `1234`    | PM          |
+| `po@example.com`      | `1234`    | PO          |
+| `dev@example.com`     | `1234`    | Programador |
+| `cliente@example.com` | `1234`    | Cliente     |
+
+> Las credenciales de prueba son solo para desarrollo. Usá `1234` solo en este entorno local.
+
+> ⚠️ Si el login falla, revisá que estés usando la misma versión del proyecto que está corriendo en Laravel y que la base haya sido sembrada con `php artisan migrate:fresh --seed`. El problema más común fue una copia desincronizada del proyecto.
 
 ### 5. Creá tu rama
 
