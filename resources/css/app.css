@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Evita que los elementos con x-show aparezcan un instante antes de que
+   Alpine termine de cargar (por ejemplo el ojito de las contraseñas). */
+[x-cloak] {
+    display: none !important;
+}

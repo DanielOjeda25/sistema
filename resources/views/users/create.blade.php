@@ -59,14 +59,14 @@
 
                     <div class="pt-4 border-t">
                         <x-input-label for="password" value="Contraseña provisional" />
-                        <x-text-input id="password" name="password" type="password" class="mt-1 block w-full" required placeholder="••••••••" />
+                        <x-password-input id="password" name="password" class="mt-1" required placeholder="••••••••" />
                         <x-input-error class="mt-2" :messages="$errors->get('password')" />
                         <p class="mt-1 text-xs text-gray-500">Mínimo 8 caracteres.</p>
                     </div>
 
                     <div>
                         <x-input-label for="password_confirmation" value="Repetir contraseña" />
-                        <x-text-input id="password_confirmation" name="password_confirmation" type="password" class="mt-1 block w-full" required placeholder="••••••••" />
+                        <x-password-input id="password_confirmation" name="password_confirmation" class="mt-1" required placeholder="••••••••" />
                         <x-input-error class="mt-2" :messages="$errors->get('password_confirmation')" />
                     </div>
 
