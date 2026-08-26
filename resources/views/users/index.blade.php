@@ -9,9 +9,20 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 border-b border-gray-200">
                 
+                @if (session('success'))
+                    <div class="mb-4 p-4 bg-green-100 text-green-700 rounded-lg">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-lg font-medium text-gray-900">Listado de Usuarios</h3>
-                    </div>
+                    @hasrole('Jefe')
+                        <a href="{{ route('users.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+                            + Nuevo Usuario
+                        </a>
+                    @endhasrole
+                </div>
 
                 <div class="overflow-x-auto shadow-md sm:rounded-lg">
                     <table class="w-full text-sm text-left text-gray-500">

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 
@@ -48,7 +50,9 @@ class UserController extends Controller
      */
     public function create()
     {
-        //
+        $roles = Role::orderBy('name')->get();
+
+        return view('users.create', compact('roles'));
     }
 
     /**
@@ -56,7 +60,29 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'apellido' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
+            'estado' => 'required|in:activo,inactivo',
+            // La contraseña es provisional: se la damos a la persona y ella la
+            // cambia desde su perfil cuando entra por primera vez.
+            'password' => ['required', 'confirmed', Password::min(8)],
+            'rol' => 'required|exists:roles,name',
+        ]);
+
+        $user = User::create([
+            'name' => $data['name'],
+            'apellido' => $data['apellido'],
+            'email' => $data['email'],
+            'estado' => $data['estado'],
+            'password' => Hash::make($data['password']),
+        ]);
+
+        $user->syncRoles([$data['rol']]);
+
+        return redirect()->route('users.index')
+            ->with('success', 'Usuario creado. Pasale la contraseña provisional para que entre y la cambie desde su perfil.');
     }
 
     /**

@@ -49,6 +49,12 @@ Route::middleware(['auth', 'role:Jefe|PM'])->group(function () {
  * sola persona para evitar escaladas de permisos.
  */
 Route::middleware(['auth', 'role:Jefe'])->group(function () {
+    // Alta de usuarios. No hay registro público: las cuentas se crean acá y se
+    // les asigna un rol. La contraseña que se pone es provisional; la persona
+    // la cambia desde su perfil cuando entra.
+    Route::get('/usuarios/crear', [UserController::class, 'create'])->name('users.create');
+    Route::post('/usuarios', [UserController::class, 'store'])->name('users.store');
+
     Route::get('/usuarios/{user}/roles', [UserController::class, 'editRoles'])->name('users.roles.edit');
     Route::put('/usuarios/{user}/roles', [UserController::class, 'updateRoles'])->name('users.roles.update');
 });
