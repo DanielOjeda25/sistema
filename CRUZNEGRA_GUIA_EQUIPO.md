@@ -2177,10 +2177,10 @@ pegá esto:
 
 ### Jesús: comprobá que funciona
 
-- [ ] Arriba de la pantalla aparecen los 7 módulos nuevos
-- [ ] Hacés clic en cada uno y te lleva a su listado
-- [ ] El que estás viendo aparece resaltado
-- [ ] Achicás la ventana del navegador hasta que aparezca el menú de tres rayitas
+- [X] Arriba de la pantalla aparecen los 7 módulos nuevos
+- [X] Hacés clic en cada uno y te lleva a su listado
+- [X] El que estás viendo aparece resaltado
+- [X] Achicás la ventana del navegador hasta que aparezca el menú de tres rayitas
   → adentro también están los 7
 
 ---

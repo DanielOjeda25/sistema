@@ -24,9 +24,27 @@
                     <x-nav-link :href="route('tutorial')" :active="request()->routeIs('tutorial')">
                         {{ __('Guía Técnica') }}
                     </x-nav-link>
-
-
-
+                    <x-nav-link :href="route('clientes.index')" :active="request()->routeIs('clientes.*')">
+    {{ __('Clientes') }}
+</x-nav-link>
+<x-nav-link :href="route('proyectos.index')" :active="request()->routeIs('proyectos.*')">
+    {{ __('Proyectos') }}
+</x-nav-link>
+<x-nav-link :href="route('tareas.index')" :active="request()->routeIs('tareas.*')">
+    {{ __('Tareas') }}
+</x-nav-link>
+<x-nav-link :href="route('hitos.index')" :active="request()->routeIs('hitos.*')">
+    {{ __('Hitos') }}
+</x-nav-link>
+<x-nav-link :href="route('solicitudes-cambio.index')" :active="request()->routeIs('solicitudes-cambio.*')">
+    {{ __('Cambios') }}
+</x-nav-link>
+<x-nav-link :href="route('entregables.index')" :active="request()->routeIs('entregables.*')">
+    {{ __('Entregables') }}
+</x-nav-link>
+<x-nav-link :href="route('facturas.index')" :active="request()->routeIs('facturas.*')">
+    {{ __('Facturas') }}
+</x-nav-link>
 
                 </div>
             </div>
@@ -89,6 +107,35 @@
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
+            </x-responsive-nav-link>
+            @hasanyrole('Jefe|PM')
+            <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
+                {{ __('Usuarios y Roles') }}
+            </x-responsive-nav-link>
+            @endhasanyrole
+            <x-responsive-nav-link :href="route('tutorial')" :active="request()->routeIs('tutorial')">
+                {{ __('Guía Técnica') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('clientes.index')" :active="request()->routeIs('clientes.*')">
+                {{ __('Clientes') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('proyectos.index')" :active="request()->routeIs('proyectos.*')">
+                {{ __('Proyectos') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('tareas.index')" :active="request()->routeIs('tareas.*')">
+                {{ __('Tareas') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('hitos.index')" :active="request()->routeIs('hitos.*')">
+                {{ __('Hitos') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('solicitudes-cambio.index')" :active="request()->routeIs('solicitudes-cambio.*')">
+                {{ __('Cambios') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('entregables.index')" :active="request()->routeIs('entregables.*')">
+                {{ __('Entregables') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('facturas.index')" :active="request()->routeIs('facturas.*')">
+                {{ __('Facturas') }}
             </x-responsive-nav-link>
         </div>
 
