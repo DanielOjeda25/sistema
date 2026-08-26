@@ -15,7 +15,7 @@
         <!-- Password -->
         <div class="mt-4">
             <x-input-label for="password" :value="__('Password')" />
-            <x-password-input id="password" name="password" class="mt-1" required autocomplete="new-password" />
+            <x-password-input id="password" name="password" :minimo="8" required autocomplete="new-password" />
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
@@ -23,7 +23,7 @@
         <div class="mt-4">
             <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
 
-            <x-password-input id="password_confirmation" name="password_confirmation" class="mt-1"
+            <x-password-input id="password_confirmation" name="password_confirmation" confirma-de="password"
                                 required autocomplete="new-password" />
 
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
