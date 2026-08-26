@@ -4,9 +4,11 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Listado de Proyectos
             </h2>
-            <a href="{{ route('proyectos.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700">
+            @hasanyrole('Jefe|PM')
+                <a href="{{ route('proyectos.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
                 + Nuevo Proyecto
             </a>
+            @endhasanyrole
         </div>
     </x-slot>
 
@@ -42,7 +44,9 @@
                                     <td class="px-6 py-4">{{ $proyecto->fecha_inicio?->format('d/m/Y') ?? 'N/A' }}</td>
                                     <td class="px-6 py-4 text-sm font-medium">
                                         <a href="{{ route('proyectos.show', $proyecto) }}" class="text-blue-600 hover:underline">Ver</a>
-                                        <a href="{{ route('proyectos.edit', $proyecto) }}" class="text-yellow-600 hover:underline ml-3">Editar</a>
+                                        @hasanyrole('Jefe|PM')
+                                            <a href="{{ route('proyectos.edit', $proyecto) }}" class="text-yellow-600 hover:underline ml-3">Editar</a>
+                                        @endhasanyrole
                                     </td>
                                 </tr>
                             @empty
