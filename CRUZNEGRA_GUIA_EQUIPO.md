@@ -2261,10 +2261,10 @@ Hoy es la pantalla vacía que viene por defecto. Abrilo, **borrá todo** y pegá
 
 ### Dante: comprobá que funciona
 
-- [ ] Entrás al Dashboard y ves 6 tarjetas con números
-- [ ] Los números coinciden con lo que hay en cada listado
-- [ ] Hacés clic en una tarjeta y te lleva a ese módulo
-- [ ] Creás un cliente nuevo, volvés al Dashboard y el número de Clientes subió en 1
+- [X] Entrás al Dashboard y ves 6 tarjetas con números
+- [X] Los números coinciden con lo que hay en cada listado
+- [X] Hacés clic en una tarjeta y te lleva a ese módulo
+- [X] Creás un cliente nuevo, volvés al Dashboard y el número de Clientes subió en 1
 
 ---
 
