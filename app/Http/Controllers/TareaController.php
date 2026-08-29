@@ -10,11 +10,56 @@ use Illuminate\Http\Request;
 
 class TareaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $tareas = Tarea::with(['proyecto', 'asignado'])->latest()->paginate(10);
+        $tareas = Tarea::visiblePara($request->user())
+            ->with(['proyecto', 'asignado'])
+            ->latest()
+            ->paginate(10);
 
         return view('tareas.index', compact('tareas'));
+    }
+
+    public function tablero(Request $request)
+    {
+        $proyectos = Proyecto::orderBy('nombre')->get();
+        $proyectoId = $request->query('proyecto');
+
+        $tareas = Tarea::visiblePara($request->user())
+            ->with(['proyecto', 'asignado'])
+            ->when($proyectoId, fn ($q) => $q->where('proyecto_id', $proyectoId))
+            ->orderBy('orden')
+            ->orderBy('id')
+            ->get();
+
+        // Solo los roles que pueden editar tareas pueden arrastrar tarjetas;
+        // para el resto (Programador, Cliente) el tablero es de solo lectura.
+        $puedeMover = $request->user()->hasAnyRole('Jefe', 'PM', 'PO');
+
+        return view('tareas.tablero', compact('tareas', 'proyectos', 'proyectoId', 'puedeMover'));
+    }
+
+    public function mover(Request $request)
+    {
+        $data = $request->validate([
+            'columnas' => ['required', 'array'],
+            'columnas.*.estado' => ['required', 'in:pendiente,en_progreso,completada,cancelada'],
+            'columnas.*.ids' => ['required', 'array'],
+            'columnas.*.ids.*' => ['integer', 'exists:tareas,id'],
+        ]);
+
+        // El frontend manda las columnas que cambiaron con sus tareas en el
+        // orden final. La posición es el índice dentro de la columna.
+        foreach ($data['columnas'] as $columna) {
+            foreach ($columna['ids'] as $posicion => $id) {
+                Tarea::find($id)?->update([
+                    'estado' => $columna['estado'],
+                    'orden' => $posicion,
+                ]);
+            }
+        }
+
+        return response()->json(['ok' => true]);
     }
 
     public function create()
@@ -44,8 +89,10 @@ class TareaController extends Controller
         return redirect()->route('tareas.index')->with('success', 'Tarea creada correctamente.');
     }
 
-    public function show(Tarea $tarea)
+    public function show(Request $request, Tarea $tarea)
     {
+        abort_unless($request->user()->puedeVer($tarea), 403);
+
         $tarea->load(['proyecto', 'asignado', 'solicitudCambio']);
 
         return view('tareas.show', compact('tarea'));

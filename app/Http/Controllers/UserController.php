@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use App\Models\Cliente;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 
@@ -39,7 +40,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::latest()->paginate(10);
+        $users = User::with('cliente')->latest()->paginate(10);
     
     // IMPORTANTE: Asegurate que diga 'users.index' y que tenga el return
     return view('users.index', compact('users'));
@@ -51,8 +52,9 @@ class UserController extends Controller
     public function create()
     {
         $roles = Role::orderBy('name')->get();
+        $clientes = Cliente::orderBy('nombre')->get();
 
-        return view('users.create', compact('roles'));
+        return view('users.create', compact('roles', 'clientes'));
     }
 
     /**
@@ -69,6 +71,9 @@ class UserController extends Controller
             // cambia desde su perfil cuando entra por primera vez.
             'password' => ['required', 'confirmed', Password::min(8)],
             'rol' => 'required|exists:roles,name',
+            // La empresa solo aplica a cuentas de Cliente: es lo que define
+            // qué proyectos, tareas y facturas va a ver.
+            'cliente_id' => 'nullable|exists:clientes,id|required_if:rol,Cliente',
         ]);
 
         $user = User::create([
@@ -77,6 +82,9 @@ class UserController extends Controller
             'email' => $data['email'],
             'estado' => $data['estado'],
             'password' => Hash::make($data['password']),
+            // Un rol interno nunca queda vinculado a una empresa, venga lo
+            // que venga del formulario.
+            'cliente_id' => $data['rol'] === 'Cliente' ? $data['cliente_id'] : null,
         ]);
 
         $user->syncRoles([$data['rol']]);

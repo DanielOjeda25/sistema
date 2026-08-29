@@ -27,4 +27,12 @@ class Cliente extends Model implements Auditable
     {
         return $this->hasMany(Proyecto::class);
     }
+
+    /**
+     * Cuentas de usuario que representan a este cliente (rol Cliente).
+     */
+    public function usuarios(): HasMany
+    {
+        return $this->hasMany(User::class);
+    }
 }

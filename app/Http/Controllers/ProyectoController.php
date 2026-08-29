@@ -9,9 +9,12 @@ use Illuminate\Http\Request;
 
 class ProyectoController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $proyectos = Proyecto::with(['cliente', 'pm'])->latest()->paginate(10);
+        $proyectos = Proyecto::visiblePara($request->user())
+            ->with(['cliente', 'pm'])
+            ->latest()
+            ->paginate(10);
 
         return view('proyectos.index', compact('proyectos'));
     }
@@ -41,8 +44,10 @@ class ProyectoController extends Controller
         return redirect()->route('proyectos.index')->with('success', 'Proyecto creado correctamente.');
     }
 
-    public function show(Proyecto $proyecto)
+    public function show(Request $request, Proyecto $proyecto)
     {
+        abort_unless($request->user()->puedeVer($proyecto), 403);
+
         $proyecto->load(['cliente', 'pm', 'tareas', 'hitos', 'facturas']);
 
         return view('proyectos.show', compact('proyecto'));

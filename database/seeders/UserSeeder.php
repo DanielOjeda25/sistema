@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Cliente;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -38,5 +39,12 @@ class UserSeeder extends Seeder
             ['name' => 'Juan', 'apellido' => 'Perez', 'password' => bcrypt('1234')]
         );
         $cliente->syncRoles(['Cliente']);
+
+        // El usuario Cliente queda vinculado a su empresa: es lo que define
+        // qué proyectos, tareas, hitos y facturas puede ver.
+        $clienteLR = Cliente::where('email', 'mariana@constructoraLR.com')->first();
+        if ($clienteLR && $cliente->cliente_id !== $clienteLR->id) {
+            $cliente->update(['cliente_id' => $clienteLR->id]);
+        }
     }
 }

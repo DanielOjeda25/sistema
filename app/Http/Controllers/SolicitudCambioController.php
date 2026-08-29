@@ -9,9 +9,12 @@ use Illuminate\Http\Request;
 
 class SolicitudCambioController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $solicitudes = SolicitudCambio::with(['proyecto', 'solicitante'])->latest()->paginate(10);
+        $solicitudes = SolicitudCambio::visiblePara($request->user())
+            ->with(['proyecto', 'solicitante'])
+            ->latest()
+            ->paginate(10);
 
         return view('solicitudes_cambio.index', compact('solicitudes'));
     }
@@ -40,8 +43,10 @@ class SolicitudCambioController extends Controller
         return redirect()->route('solicitudes-cambio.index')->with('success', 'Solicitud de cambio creada correctamente.');
     }
 
-    public function show(SolicitudCambio $solicitudes_cambio)
+    public function show(Request $request, SolicitudCambio $solicitudes_cambio)
     {
+        abort_unless($request->user()->puedeVer($solicitudes_cambio), 403);
+
         $solicitudes_cambio->load(['proyecto', 'solicitante', 'tareas']);
 
         return view('solicitudes_cambio.show', ['solicitud' => $solicitudes_cambio]);

@@ -8,9 +8,9 @@ use Illuminate\Http\Request;
 
 class HitoController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $hitos = Hito::with('proyecto')->latest()->paginate(10);
+        $hitos = Hito::visiblePara($request->user())->with('proyecto')->latest()->paginate(10);
 
         return view('hitos.index', compact('hitos'));
     }
@@ -37,8 +37,10 @@ class HitoController extends Controller
         return redirect()->route('hitos.index')->with('success', 'Hito creado correctamente.');
     }
 
-    public function show(Hito $hito)
+    public function show(Request $request, Hito $hito)
     {
+        abort_unless($request->user()->puedeVer($hito), 403);
+
         $hito->load('proyecto');
 
         return view('hitos.show', compact('hito'));

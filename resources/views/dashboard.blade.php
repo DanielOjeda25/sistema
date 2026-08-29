@@ -1,10 +1,14 @@
 @php
-    $totalClientes = \App\Models\Cliente::count();
-    $totalProyectos = \App\Models\Proyecto::count();
-    $tareasPendientes = \App\Models\Tarea::where('estado', 'pendiente')->count();
-    $facturasPendientes = \App\Models\Factura::where('estado', 'pendiente')->count();
-    $totalHitos = \App\Models\Hito::count();
-    $totalEntregables = \App\Models\EntregableIA::count();
+    // Los conteos se acotan con los mismos scopes que los listados: un
+    // usuario con rol Cliente solo ve los números de su propia empresa.
+    $usuario = auth()->user();
+    $esCliente = $usuario->esCliente();
+    $totalClientes = $esCliente ? null : \App\Models\Cliente::count();
+    $totalProyectos = \App\Models\Proyecto::visiblePara($usuario)->count();
+    $tareasPendientes = \App\Models\Tarea::visiblePara($usuario)->where('estado', 'pendiente')->count();
+    $facturasPendientes = \App\Models\Factura::visiblePara($usuario)->where('estado', 'pendiente')->count();
+    $totalHitos = \App\Models\Hito::visiblePara($usuario)->count();
+    $totalEntregables = \App\Models\EntregableIA::visiblePara($usuario)->count();
 @endphp
 
 <x-app-layout>
@@ -25,10 +29,12 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
+                @unless ($esCliente)
                 <a href="{{ route('clientes.index') }}" class="block bg-white shadow-sm rounded-lg p-6 hover:shadow-md transition">
                     <div class="text-3xl font-bold text-gray-900">{{ $totalClientes }}</div>
                     <div class="text-sm text-gray-500 mt-1">Clientes</div>
                 </a>
+                @endunless
 
                 <a href="{{ route('proyectos.index') }}" class="block bg-white shadow-sm rounded-lg p-6 hover:shadow-md transition">
                     <div class="text-3xl font-bold text-gray-900">{{ $totalProyectos }}</div>

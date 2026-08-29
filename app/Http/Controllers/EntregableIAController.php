@@ -9,9 +9,12 @@ use Illuminate\Http\Request;
 
 class EntregableIAController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $entregables = EntregableIA::with(['proyecto', 'generador'])->latest()->paginate(10);
+        $entregables = EntregableIA::visiblePara($request->user())
+            ->with(['proyecto', 'generador'])
+            ->latest()
+            ->paginate(10);
 
         return view('entregables.index', compact('entregables'));
     }
@@ -40,8 +43,10 @@ class EntregableIAController extends Controller
         return redirect()->route('entregables.index')->with('success', 'Entregable creado correctamente.');
     }
 
-    public function show(EntregableIA $entregable)
+    public function show(Request $request, EntregableIA $entregable)
     {
+        abort_unless($request->user()->puedeVer($entregable), 403);
+
         $entregable->load(['proyecto', 'generador']);
 
         return view('entregables.show', compact('entregable'));

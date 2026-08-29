@@ -5,6 +5,8 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -29,6 +31,7 @@ class User extends Authenticatable implements Auditable
         'email',
         'estado',
         'password',
+        'cliente_id',
     ];
 
     /**
@@ -56,6 +59,37 @@ class User extends Authenticatable implements Auditable
 
     // ===== Relaciones inversas =====
     // Cada FK que apunta a "users" en otras tablas tiene aca su hasMany.
+
+    /**
+     * El cliente de la empresa que este usuario representa (solo usuarios con
+     * rol Cliente; los internos lo tienen en NULL).
+     */
+    public function cliente(): BelongsTo
+    {
+        return $this->belongsTo(Cliente::class);
+    }
+
+    public function esCliente(): bool
+    {
+        return $this->hasRole('Cliente');
+    }
+
+    /**
+     * Puede este usuario ver el registro dado? Los roles internos ven todo;
+     * un Cliente solo ve los registros cuyo proyecto pertenece a su empresa.
+     */
+    public function puedeVer(Model $modelo): bool
+    {
+        if (! $this->esCliente()) {
+            return true;
+        }
+
+        $clienteId = $modelo instanceof Proyecto
+            ? $modelo->cliente_id
+            : $modelo->proyecto?->cliente_id;
+
+        return $clienteId !== null && $clienteId === $this->cliente_id;
+    }
 
     public function proyectosComoPm(): HasMany
     {

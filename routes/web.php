@@ -95,6 +95,9 @@ Route::middleware(['auth', 'role:Jefe|PM'])->group(function () {
  * cambios se aceptan. Tareas e hitos salen de esa definición.
  */
 Route::middleware(['auth', 'role:Jefe|PM|PO'])->group(function () {
+    // Movimiento de tarjetas del tablero (drag & drop): recibe el estado y la
+    // posición final de cada tarea movida.
+    Route::patch('tareas/mover', [TareaController::class, 'mover'])->name('tareas.mover');
     Route::resource('tareas', TareaController::class)->except(['index', 'show']);
     Route::resource('hitos', HitoController::class)->except(['index', 'show']);
     Route::resource('solicitudes-cambio', SolicitudCambioController::class)->except(['index', 'show']);
@@ -113,9 +116,25 @@ Route::middleware(['auth', 'role:Jefe|PM|PO|Programador'])->group(function () {
  * El Cliente entra a seguir el avance de sus proyectos; el Programador, a ver
  * sus tareas. Ninguno de los dos puede modificar nada.
  */
-Route::middleware('auth')->group(function () {
+/*
+ * LECTURA — el módulo de Clientes es la cartera de la empresa: no tiene
+ * sentido que un Cliente vea la lista de otros clientes, así que queda
+ * limitado a los roles internos.
+ */
+Route::middleware(['auth', 'role:Jefe|PM|PO|Programador'])->group(function () {
     Route::resource('clientes', ClienteController::class)->only(['index', 'show']);
+});
+
+/*
+ * LECTURA — cualquiera con sesión iniciada.
+ * El Cliente entra a seguir el avance de SUS proyectos: los listados y las
+ * fichas se filtran por su empresa en cada controller (scope visiblePara);
+ * si intentara abrir por URL algo de otro cliente, recibe 403 (puedeVer).
+ */
+Route::middleware('auth')->group(function () {
     Route::resource('proyectos', ProyectoController::class)->only(['index', 'show']);
+    // Va antes del resource para que "tablero" no se tome como un id de tarea.
+    Route::get('tareas/tablero', [TareaController::class, 'tablero'])->name('tareas.tablero');
     Route::resource('tareas', TareaController::class)->only(['index', 'show']);
     Route::resource('hitos', HitoController::class)->only(['index', 'show']);
     Route::resource('solicitudes-cambio', SolicitudCambioController::class)->only(['index', 'show']);

@@ -9,9 +9,12 @@ use Illuminate\Http\Request;
 
 class FacturaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $facturas = Factura::with(['proyecto', 'emisor'])->latest()->paginate(10);
+        $facturas = Factura::visiblePara($request->user())
+            ->with(['proyecto', 'emisor'])
+            ->latest()
+            ->paginate(10);
 
         return view('facturas.index', compact('facturas'));
     }
@@ -42,8 +45,10 @@ class FacturaController extends Controller
         return redirect()->route('facturas.index')->with('success', 'Factura creada correctamente.');
     }
 
-    public function show(Factura $factura)
+    public function show(Request $request, Factura $factura)
     {
+        abort_unless($request->user()->puedeVer($factura), 403);
+
         $factura->load(['proyecto', 'emisor']);
 
         return view('facturas.show', compact('factura'));

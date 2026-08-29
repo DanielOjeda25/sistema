@@ -24,14 +24,19 @@
                     <x-nav-link :href="route('tutorial')" :active="request()->routeIs('tutorial')">
                         {{ __('Guía Técnica') }}
                     </x-nav-link>
+                    @hasanyrole('Jefe|PM|PO|Programador')
                     <x-nav-link :href="route('clientes.index')" :active="request()->routeIs('clientes.*')">
     {{ __('Clientes') }}
 </x-nav-link>
+@endhasanyrole
 <x-nav-link :href="route('proyectos.index')" :active="request()->routeIs('proyectos.*')">
     {{ __('Proyectos') }}
 </x-nav-link>
-<x-nav-link :href="route('tareas.index')" :active="request()->routeIs('tareas.*')">
+<x-nav-link :href="route('tareas.index')" :active="request()->routeIs('tareas.*') && ! request()->routeIs('tareas.tablero')">
     {{ __('Tareas') }}
+</x-nav-link>
+<x-nav-link :href="route('tareas.tablero')" :active="request()->routeIs('tareas.tablero')">
+    {{ __('Tablero') }}
 </x-nav-link>
 <x-nav-link :href="route('hitos.index')" :active="request()->routeIs('hitos.*')">
     {{ __('Hitos') }}
@@ -116,14 +121,19 @@
             <x-responsive-nav-link :href="route('tutorial')" :active="request()->routeIs('tutorial')">
                 {{ __('Guía Técnica') }}
             </x-responsive-nav-link>
+            @hasanyrole('Jefe|PM|PO|Programador')
             <x-responsive-nav-link :href="route('clientes.index')" :active="request()->routeIs('clientes.*')">
                 {{ __('Clientes') }}
             </x-responsive-nav-link>
+            @endhasanyrole
             <x-responsive-nav-link :href="route('proyectos.index')" :active="request()->routeIs('proyectos.*')">
                 {{ __('Proyectos') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('tareas.index')" :active="request()->routeIs('tareas.*')">
+            <x-responsive-nav-link :href="route('tareas.index')" :active="request()->routeIs('tareas.*') && ! request()->routeIs('tareas.tablero')">
                 {{ __('Tareas') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('tareas.tablero')" :active="request()->routeIs('tareas.tablero')">
+                {{ __('Tablero') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('hitos.index')" :active="request()->routeIs('hitos.*')">
                 {{ __('Hitos') }}
