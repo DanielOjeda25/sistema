@@ -31,6 +31,7 @@
                                 <th scope="col" class="px-6 py-3">Nombre</th>
                                 <th scope="col" class="px-6 py-3">Email</th>
                                 <th scope="col" class="px-6 py-3">Roles Actuales</th>
+                                <th scope="col" class="px-6 py-3">Empresa</th>
                                 <th scope="col" class="px-6 py-3 text-center">Acciones</th>
                             </tr>
                         </thead>
@@ -51,6 +52,15 @@
                                     @empty
                                         <span class="text-red-500 text-xs italic">Sin rol asignado</span>
                                     @endforelse
+                                </td>
+                                <td class="px-6 py-4">
+                                    @if ($user->cliente)
+                                        <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+                                            {{ $user->cliente->empresa ?? $user->cliente->nombre }}
+                                        </span>
+                                    @else
+                                        <span class="text-gray-400">—</span>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 text-center">
                                     @can('editar_roles')

@@ -14,7 +14,7 @@
                     junto con su correo: cuando entre, la cambia desde su perfil.
                 </p>
 
-                <form method="POST" action="{{ route('users.store') }}" class="space-y-5">
+                <form method="POST" action="{{ route('users.store') }}" class="space-y-5" x-data="{ rol: '{{ old('rol', '') }}' }">
                     @csrf
 
                     <div>
@@ -38,7 +38,7 @@
 
                     <div>
                         <x-input-label for="rol" value="Rol" />
-                        <select id="rol" name="rol" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+                        <select id="rol" name="rol" x-model="rol" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
                             <option value="">— Seleccioná un rol —</option>
                             @foreach ($roles as $rol)
                                 <option value="{{ $rol->name }}" @selected(old('rol') === $rol->name)>{{ $rol->name }}</option>
@@ -46,6 +46,21 @@
                         </select>
                         <x-input-error class="mt-2" :messages="$errors->get('rol')" />
                         <p class="mt-1 text-xs text-gray-500">Define a qué partes del sistema puede entrar.</p>
+                    </div>
+
+                    <div x-show="rol === 'Cliente'" x-cloak class="bg-indigo-50 border border-indigo-100 rounded-lg p-4">
+                        <x-input-label for="cliente_id" value="Empresa del cliente" />
+                        <select id="cliente_id" name="cliente_id" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                            <option value="">— Seleccioná la empresa —</option>
+                            @foreach ($clientes as $c)
+                                <option value="{{ $c->id }}" @selected(old('cliente_id') == $c->id)>{{ $c->nombre }} {{ $c->apellido }}@if($c->empresa) · {{ $c->empresa }}@endif</option>
+                            @endforeach
+                        </select>
+                        <x-input-error class="mt-2" :messages="$errors->get('cliente_id')" />
+                        <p class="mt-1 text-xs text-gray-500">
+                            Obligatorio para cuentas de Cliente: define de qué empresa es y, por lo
+                            tanto, qué proyectos, tareas y facturas va a ver.
+                        </p>
                     </div>
 
                     <div>
