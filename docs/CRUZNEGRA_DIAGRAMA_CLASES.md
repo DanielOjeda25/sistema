@@ -17,8 +17,12 @@ id: 26c23357-88a0-4b99-8f3e-647b0b694548
 classDiagram
     class Cliente {
         +proyectos() HasMany
+        +usuarios() HasMany
     }
     class User {
+        +cliente() BelongsTo
+        +esCliente() bool
+        +puedeVer(Model modelo) bool
         +proyectosComoPm() HasMany
         +tareasAsignadas() HasMany
         +solicitudesRealizadas() HasMany
@@ -41,6 +45,7 @@ classDiagram
     }
     class Tarea {
         +proyecto() BelongsTo
+        +scopeVisiblePara(Builder, User) Builder
         +asignado() BelongsTo
         +solicitudCambio() BelongsTo
     }
@@ -57,6 +62,7 @@ classDiagram
     }
 
     Cliente "1" --> "*" Proyecto : proyectos [cliente_id]
+    Cliente "1" --> "*" User : usuarios [cliente_id]
     User "1" --> "*" Proyecto : proyectosComoPm [pm_id]
     User "1" --> "*" Tarea : tareasAsignadas [asignado_a]
     User "1" --> "*" SolicitudCambio : solicitudesRealizadas [solicitado_por]
@@ -74,8 +80,8 @@ classDiagram
 
 | Clase | belongsTo (lado N) | hasMany (lado 1) |
 |---|---|---|
-| `Cliente` | — | `proyectos` |
-| `User` | — | `proyectosComoPm`, `tareasAsignadas`, `solicitudesRealizadas`, `entregablesGenerados`, `facturasEmitidas` |
+| `Cliente` | — | `proyectos`, `usuarios` |
+| `User` | `cliente` | `proyectosComoPm`, `tareasAsignadas`, `solicitudesRealizadas`, `entregablesGenerados`, `facturasEmitidas` |
 | `Proyecto` | `cliente`, `pm` | `tareas`, `hitos`, `entregablesIa`, `facturas`, `solicitudesCambio` |
 | `SolicitudCambio` | `proyecto`, `solicitante` | `tareas` |
 | `Tarea` | `proyecto`, `asignado`, `solicitudCambio` | — |
@@ -85,3 +91,13 @@ classDiagram
 
 > Todos los modelos usan además los traits `HasFactory` y `Auditable` (registro de
 > cambios). `User` suma `Notifiable` y `HasRoles` (Spatie) para el manejo de roles.
+
+## Scoping por cliente (agosto 2026)
+
+- `User::cliente()` — la empresa que representa el usuario (solo rol Cliente;
+  los internos tienen `cliente_id` en `NULL`).
+- `User::esCliente()` / `User::puedeVer($modelo)` — los roles internos ven todo;
+  un Cliente solo ve los registros cuyo proyecto pertenece a su empresa. Si intenta
+  abrir por URL algo de otro cliente, el controller responde 403.
+- `Tarea::scopeVisiblePara()` (y sus equivalentes en los demás modelos) — filtra
+  los listados por la empresa del usuario en cada query de `index`.

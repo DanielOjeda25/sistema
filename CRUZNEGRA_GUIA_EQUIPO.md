@@ -58,6 +58,23 @@ Cada uno hace **4 archivos** por fase. Los 4 archivos son siempre lo mismo:
 - `edit.blade.php` → el formulario para editar
 - `show.blade.php` → la ficha con el detalle
 
+## Estado de las fases (agosto 2026)
+
+| Fase | Estado |
+| ---- | ------ |
+| FASE 1 | Casi completa — faltan los 4 archivos de **Hitos** (Marcos). Proyectos y Tareas ya están |
+| FASE 2 | Casi completa — faltan los 4 archivos de **Facturas** (Marcos). Solicitudes y Entregables ya están |
+| FASE 3 | **Completa** — menú (Jesús) y dashboard (Dante) subidos a `main` |
+| FASE 4 | Pendiente — repaso final, recién cuando Hitos y Facturas estén en `main` |
+
+> ⚠️ El menú ya enlaza a `/hitos` y `/facturas`, pero esas vistas no existen:
+> entrar a esas direcciones tira error hasta que se creen los archivos.
+>
+> **Sprint actual (31/08 – 11/09):** mientras Marcos termina Hitos y Facturas,
+> Jesús y Dante trabajan en mejoras del sistema (buscador y filtros, panel de
+> reportes, limpieza y tests). Las tarjetas están en `tareas_sprint_jesus_dante.txt`
+> y en Trello.
+
 ---
 
 ## PASO 0 — Preparar la máquina (todos, una sola vez)

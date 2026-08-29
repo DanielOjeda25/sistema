@@ -41,10 +41,14 @@ si hace falta, no para leer ahora.
 ## Estado del proyecto
 
 - ✅ Base de datos, modelos, controllers y rutas de los 7 módulos
-- ✅ Login, roles y permisos
+- ✅ Login, roles y permisos (sin registro público: el Jefe crea las cuentas y les asigna rol)
 - ✅ Datos de prueba (seeders)
-- ✅ Módulo de **Clientes** con sus 4 pantallas
-- ⬜ Vistas de los 6 módulos restantes — **en curso, ver la guía del equipo**
+- ✅ Vistas de 5 de 7 módulos: **Clientes, Proyectos, Tareas, Solicitudes de Cambio y Entregables IA**
+- ✅ Menú de navegación y dashboard
+- ✅ Tablero de tareas tipo Trello con drag & drop (`/tareas/tablero`)
+- ✅ Scoping por cliente: un usuario con rol Cliente solo ve los proyectos de su empresa
+- ⬜ Vistas de **Hitos** y **Facturas** — pendientes de Marcos, ver la guía del equipo (Fases 1 y 2)
+- 🔜 Sprint 31/08–11/09 (Jesús y Dante): buscador y filtros en listados, panel de reportes del Jefe, limpieza y tests — ver `tareas_sprint_jesus_dante.txt`
 
 ---
 

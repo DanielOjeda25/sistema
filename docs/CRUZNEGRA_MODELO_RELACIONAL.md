@@ -1,8 +1,7 @@
 # CRUZNEGRA — Modelo Relacional (según migraciones)
 
 > Diagrama entidad-relación que refleja el esquema **realmente implementado** en la base
-> de datos `cruznegra` (las 8 migraciones de negocio). Versión simple, sin los campos
-> extra del documento de análisis.
+> de datos `cruznegra` (las migraciones de negocio, incluidas las de agosto 2026).
 >
 > **Cómo verlo en VS Code:** instalá la extensión *"Markdown Preview Mermaid Support"*
 > y abrí la vista previa (Ctrl+Shift+V). Para el código puro, copiá el bloque `mermaid`
@@ -16,6 +15,7 @@
 ```mermaid
 erDiagram
     clientes ||--o{ proyectos          : "cliente_id"
+    clientes ||--o{ users              : "cliente_id (nullable, solo rol Cliente)"
     users    ||--o{ proyectos          : "pm_id"
 
     proyectos ||--o{ solicitudes_cambio : "proyecto_id"
@@ -49,6 +49,7 @@ erDiagram
         string   apellido
         string   email       UK
         string   estado      "activo | inactivo"
+        int      cliente_id  FK "nullable — empresa que representa"
         string   password
     }
 
@@ -83,6 +84,7 @@ erDiagram
         string   estado               "pendiente | en_progreso | completada | cancelada"
         string   prioridad            "baja | media | alta"
         date     fecha_limite
+        int      orden                "posición en el tablero"
     }
 
     hitos {
@@ -120,9 +122,17 @@ erDiagram
 ## Relaciones e integridad referencial
 
 - `proyectos` referencia un `clientes` (`cliente_id`) y un usuario PM (`pm_id`).
+- `users.cliente_id` es **nullable**: vincula la cuenta de un usuario con rol Cliente
+  con la empresa que representa. Los usuarios internos (Jefe, PM, PO, Programador) lo
+  dejan en `NULL`. Es la base del scoping: cada controller filtra los listados por la
+  empresa del usuario con el scope `visiblePara`.
 - `solicitudes_cambio`, `hitos`, `entregables_ia` y `facturas` cuelgan de `proyectos`.
 - `tareas.solicitud_cambio_id` es **nullable**: solo se completa cuando la tarea surge
   de una solicitud de cambio.
-- Las FK hacia `proyectos`, `clientes` y `users` son `ON DELETE CASCADE`, salvo
-  `tareas.solicitud_cambio_id`, que es `ON DELETE SET NULL`.
+- `tareas.orden` guarda la posición de la tarjeta en el tablero (drag & drop) dentro
+  de su columna.
+- Las FK hacia `proyectos` y `users` son `ON DELETE CASCADE`, salvo
+  `tareas.solicitud_cambio_id` (`ON DELETE SET NULL`) y `users.cliente_id`
+  (`ON DELETE SET NULL`: borrar un cliente no borra las cuentas de usuario, solo
+  desvincula el `cliente_id`).
 - Todas las relaciones son **1 : N**; no hay tablas pivote (N:N) entre entidades de negocio.

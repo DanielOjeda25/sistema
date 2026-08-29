@@ -11,17 +11,20 @@
 
 | Paso | Estado | Quién |
 |------|--------|-------|
-| PASO 1 — Actualizar `RoleSeeder` (roles operativos) | Pendiente | — |
-| PASO 2 — Actualizar `UserSeeder` (usuarios de prueba por rol) | Pendiente | — |
-| PASO 3 — Crear `ClienteSeeder` | Pendiente | — |
-| PASO 4 — Crear `ProyectoSeeder` | Pendiente | — |
-| PASO 5 — Crear `HitoSeeder` | Pendiente | — |
-| PASO 6 — Crear `SolicitudCambioSeeder` | Pendiente | — |
-| PASO 7 — Crear `TareaSeeder` | Pendiente | — |
-| PASO 8 — Crear `EntregableIASeeder` | Pendiente | — |
-| PASO 9 — Crear `FacturaSeeder` | Pendiente | — |
-| PASO 10 — Registrar todo en `DatabaseSeeder` | Pendiente | — |
-| PASO 11 — Ejecutar el seed | Pendiente | — |
+| PASO 1 — Actualizar `RoleSeeder` (roles operativos) | **HECHO** (2026-06-01) | Daniel |
+| PASO 2 — Actualizar `UserSeeder` (usuarios de prueba por rol) | **HECHO** (2026-06-01) | Daniel |
+| PASO 3 — Crear `ClienteSeeder` | **HECHO** (2026-06-01) | Daniel |
+| PASO 4 — Crear `ProyectoSeeder` | **HECHO** (2026-06-01) | Daniel |
+| PASO 5 — Crear `HitoSeeder` | **HECHO** (2026-06-01) | Daniel |
+| PASO 6 — Crear `SolicitudCambioSeeder` | **HECHO** (2026-06-01) | Daniel |
+| PASO 7 — Crear `TareaSeeder` | **HECHO** (2026-06-01) | Daniel |
+| PASO 8 — Crear `EntregableIASeeder` | **HECHO** (2026-06-01) | Daniel |
+| PASO 9 — Crear `FacturaSeeder` | **HECHO** (2026-06-01) | Daniel |
+| PASO 10 — Registrar todo en `DatabaseSeeder` | **HECHO** (2026-06-01) | Daniel |
+| PASO 11 — Ejecutar el seed | **HECHO** (2026-06-01) | Daniel |
+
+> Los 10 seeders ya viven en `database/seeders/` y `DatabaseSeeder` los llama a
+> todos en orden. Esta guía queda como referencia de cómo se armó cada uno.
 
 ---
 

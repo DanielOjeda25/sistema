@@ -1,0 +1,174 @@
+================================================================
+SPRINT 2 — TARJETAS PARA TRELLO
+Jesús y Dante | 31/08/2026 al 11/09/2026
+(Marcos termina Hitos y Facturas por fuera de este tablero:
+son sus fases 1 y 2 de la guía del equipo)
+================================================================
+
+Cómo usar este archivo: cada tarjeta tiene Título, Descripción,
+Checklist, Etiquetas, Responsable y Fechas. En Trello:
+- Título        -> frente de la tarjeta
+- Descripción   -> dorso de la tarjeta
+- Checklist     -> sección "Checklist" (un ítem por línea)
+- Etiquetas     -> labels de la tarjeta
+- Responsable   -> miembro asignado
+- Fecha fin     -> "Fecha de vencimiento"; Fecha inicio -> fecha de
+                   inicio (Trello la muestra junto al vencimiento)
+
+
+----------------------------------------------------------------
+TARJETA 1 de 3
+----------------------------------------------------------------
+
+TITULO:
+Buscador y filtros en los listados
+
+RESPONSABLE:
+Jesús
+
+FECHA INICIO: 31/08/2026
+FECHA FIN:    04/09/2026
+
+ETIQUETAS:
+frontend, backend, filtros, sprint-2, media
+
+DESCRIPCION:
+Hoy los index de los módulos muestran todo de golpe. Agregarles un
+buscador por texto y un filtro por estado para poder encontrar
+registros sin scrollear.
+
+Módulos a cubrir: Proyectos, Tareas, Solicitudes de Cambio y
+Facturas (si Marcos ya subió sus vistas; si no, dejar Facturas para
+el repaso y avisar).
+
+Cómo se hace (mismo patrón en los 4):
+- En el controller del index: si llega ?q= o ?estado= por GET,
+  filtrar la query con ->when() antes del paginate. Mantener el
+  scope visiblePara que ya está.
+- En el index.blade.php: arriba de la tabla, un <form method="GET">
+  con un input de texto (name="q") y un <select> de estados
+  (name="estado"), más el botón Filtrar y un link para limpiar.
+- Paginar los resultados con ->paginate(15) y mostrar
+  {{ $registros->links() }} debajo de la tabla.
+
+Referencia: el módulo Clientes (resources/views/clientes/) es el
+ejemplo de estilo; respetar el formato de tabla y clases Tailwind
+que ya se usan.
+
+CHECKLIST:
+- Rama sprint2-buscador-jesus
+- Buscador + filtro de estado en Proyectos (index y controller)
+- Buscador + filtro de estado en Tareas (index y controller)
+- Buscador + filtro de estado en Solicitudes de Cambio
+- Buscador + filtro de estado en Facturas (si las vistas de Marcos ya están en main)
+- Paginación (paginate 15) en los 4 listados
+- Probar como jefe@example.com y como cliente@example.com
+  (el cliente sigue viendo solo lo suyo al filtrar)
+- git commit y push de la rama
+
+
+----------------------------------------------------------------
+TARJETA 2 de 3
+----------------------------------------------------------------
+
+TITULO:
+Panel de reportes del Jefe en el Dashboard
+
+RESPONSABLE:
+Dante
+
+FECHA INICIO: 31/08/2026
+FECHA FIN:    04/09/2026
+
+ETIQUETAS:
+frontend, dashboard, reportes, sprint-2, media
+
+DESCRIPCION:
+Extender el dashboard que ya hizo Dante en la Fase 3 con un panel
+de números para el Jefe, visible solo para roles internos (Jefe,
+PM, PO, Programador). El Cliente sigue viendo el dashboard actual
+de su empresa, sin los números globales.
+
+Qué mostrar (tarjetas arriba de lo que ya hay):
+- Proyectos por estado: cuántos pendientes, en progreso,
+  completados y cancelados.
+- Tareas por estado: pendientes, en progreso, completadas y
+  canceladas.
+- Facturación: total facturado y total pendiente de cobro
+  (sumando el campo monto según estado de la factura).
+- Tareas vencidas: cantidad de tareas con fecha_limite anterior a
+  hoy y estado distinto de completada/cancelada.
+
+Cómo se hace:
+- Los conteos van en la closure de la ruta /dashboard
+  (routes/web.php) o en un controller dedicado, con count() y
+  sum() de Eloquent — no loops en la vista.
+- En dashboard.blade.php, envolver el panel con
+  @if(auth()->user()->esCliente() === false) para ocultárselo al
+  Cliente.
+- Reusar las clases de tarjetas que ya usa el dashboard actual.
+
+CHECKLIST:
+- Rama sprint2-reportes-dante
+- Tarjetas de proyectos por estado
+- Tarjetas de tareas por estado
+- Total facturado y pendiente de cobro
+- Contador de tareas vencidas
+- Panel oculto para el usuario con rol Cliente
+- Probar como jefe@example.com (ve todo) y cliente@example.com (no ve el panel)
+- git commit y push de la rama
+
+
+----------------------------------------------------------------
+TARJETA 3 de 3
+----------------------------------------------------------------
+
+TITULO:
+Limpieza de código y pruebas automáticas
+
+RESPONSABLE:
+Jesús y Dante (tarjeta compartida)
+
+FECHA INICIO: 07/09/2026
+FECHA FIN:    11/09/2026
+
+ETIQUETAS:
+cleanup, tests, calidad, sprint-2, baja
+
+DESCRIPCION:
+Dejar el proyecto ordenado y con una red de seguridad básica antes
+del repaso final (Fase 4). Reparto sugerido: Jesús hace la parte 1
+(limpieza) y Dante la parte 2 (tests); después revisan lo del otro.
+
+Parte 1 — Limpieza:
+- resources/views/areas/index.blade.php es una copia vieja del
+  listado de tareas que ya no tiene ruta: borrar la carpeta areas.
+- Recorrer resources/views/tutorial/index.blade.php (la "Guía
+  Técnica" del menú) y actualizarlo con los 7 módulos y el tablero
+  de tareas; si está desactualizado, corregirlo.
+
+Parte 2 — Pruebas (tests/Feature/):
+- Un test de scoping: logueado como cliente@example.com, GET a
+  /proyectos no devuelve proyectos de otras empresas, y abrir por
+  URL un proyecto ajeno da 403.
+- Un test de permisos de escritura: como dev@example.com
+  (Programador), GET a /clientes/create da 403; como
+  pm@example.com pasa.
+- Un test del tablero: como pm@example.com, PATCH a /tareas/mover
+  con una tarea propia cambia su estado y su orden.
+- Correr php artisan test y dejar todo en verde.
+
+Los usuarios y datos los crea el seeder, así que los tests pueden
+usarlos directo (RefreshDatabase + seed si hace falta).
+
+CHECKLIST:
+- Borrar la carpeta resources/views/areas/
+- Actualizar la Guía Técnica (tutorial) con los 7 módulos y el tablero
+- Test: cliente solo ve proyectos de su empresa
+- Test: cliente recibe 403 al abrir un proyecto ajeno por URL
+- Test: Programador recibe 403 en /clientes/create, PM no
+- Test: PATCH /tareas/mover cambia estado y orden
+- php artisan test todo en verde
+- Revisión cruzada: cada uno revisa la parte del otro
+- git commit y push de la rama
+================================================================
