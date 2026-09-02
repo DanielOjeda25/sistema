@@ -1,0 +1,158 @@
+CRUZNEGRA - INSTRUCCIONES PARA CREAR LOS USUARIOS DE PRUEBA
+================================================================
+
+Estas instrucciones se deben ejecutar en CADA computadora, porque cada
+compañero tiene su propia base de datos MySQL local.
+
+
+1. ABRIR UNA TERMINAL EN LA CARPETA CORRECTA
+--------------------------------------------
+
+La ubicación del proyecto puede ser diferente en cada computadora. Puede estar
+en C:, E:, dentro de Laragon o en cualquier otra carpeta. NO hay que copiar
+literalmente una ruta de otro compañero.
+
+La carpeta correcta es la raíz del proyecto: allí deben verse estos archivos:
+
+    artisan
+    composer.json
+    package.json
+    .env
+
+Formas de abrir una terminal en la ubicación correcta:
+
+Opción A - Desde el Explorador de Windows
+
+    1. Abrir la carpeta donde cada uno clonó el proyecto.
+    2. Comprobar que dentro se encuentre el archivo "artisan".
+    3. Hacer clic en la barra donde aparece la ruta de la carpeta.
+    4. Escribir "powershell" y presionar Enter.
+
+Opción B - Desde una terminal existente
+
+Usar "cd" con la ubicación real del proyecto. Si la ruta contiene espacios,
+debe ir entre comillas.
+
+Ejemplos solamente orientativos:
+
+    cd C:\laragon\www\sistema
+    cd E:\laragon\www\sistema
+    cd "D:\Proyectos de facultad\sistema"
+
+Opción C - Desde Laragon
+
+Abrir Laragon, elegir Terminal y entrar con "cd" a la carpeta donde se clonó
+el repositorio.
+
+Antes de continuar, ejecutar:
+
+    dir artisan, composer.json, package.json
+
+Los tres archivos deben aparecer. Si alguno no aparece, la terminal está en
+la carpeta equivocada y NO se deben ejecutar todavía los siguientes comandos.
+
+
+2. REVISAR LA BASE DE DATOS
+---------------------------
+
+Abrir el archivo .env y verificar que tenga una configuración similar a esta:
+
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=sistema
+    DB_USERNAME=root
+    DB_PASSWORD=
+
+La base indicada en DB_DATABASE debe existir en MySQL y MySQL debe estar
+iniciado en Laragon.
+
+
+3. ACTUALIZAR Y CREAR LOS USUARIOS
+----------------------------------
+
+Ejecutar estos comandos dentro del proyecto:
+
+    git pull
+    composer install
+    npm install
+    php artisan migrate
+    php artisan db:seed
+    php artisan optimize:clear
+    npm run build
+
+El comando "php artisan db:seed" carga los roles, usuarios y datos de prueba.
+No alcanza con ejecutar solamente "php artisan migrate".
+
+
+4. USUARIOS DISPONIBLES
+-----------------------
+
+Jefe
+    Email:      jefe@example.com
+    Contraseña: 1234
+
+Project Manager (PM)
+    Email:      pm@example.com
+    Contraseña: 1234
+
+Product Owner (PO)
+    Email:      po@example.com
+    Contraseña: 1234
+
+Programador
+    Email:      dev@example.com
+    Contraseña: 1234
+
+Cliente
+    Email:      cliente@example.com
+    Contraseña: 1234
+
+
+5. INICIAR EL SISTEMA
+---------------------
+
+Opción recomendada para desarrollo:
+
+    composer run dev
+
+Luego abrir:
+
+    http://127.0.0.1:8000
+
+También se puede iniciar Laravel por separado:
+
+    php artisan serve
+
+
+6. SI LOS USUARIOS SIGUEN SIN FUNCIONAR
+---------------------------------------
+
+Primero comprobar:
+
+    - Que se esté usando exactamente el email indicado arriba.
+    - Que la contraseña sea 1234.
+    - Que MySQL esté iniciado.
+    - Que el .env apunte a la base de datos correcta.
+    - Que se haya ejecutado "php artisan db:seed" sin errores.
+
+Si la base local contiene usuarios viejos o datos inconsistentes, se puede
+reiniciar completamente con:
+
+    php artisan migrate:fresh --seed
+    php artisan optimize:clear
+
+IMPORTANTE: "migrate:fresh" BORRA TODAS LAS TABLAS Y TODOS LOS DATOS de la
+base configurada en .env. Solo debe utilizarse en una base local de desarrollo
+y cuando no haya información que se necesite conservar.
+
+
+7. SI APARECE "VITE MANIFEST NOT FOUND"
+----------------------------------------
+
+Ejecutar:
+
+    npm install
+    npm run build
+
+Después volver a iniciar el servidor.
