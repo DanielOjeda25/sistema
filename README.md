@@ -28,6 +28,7 @@ Sistema interno para gestión de clientes, proyectos, tareas, hitos, entregables
 | [CRUZNEGRA_DATOS_PRUEBA.md](docs/CRUZNEGRA_DATOS_PRUEBA.md) | Cómo cargar roles operativos, usuarios y datos de prueba vía seeders |
 | [CRUZNEGRA_MODELO_RELACIONAL.md](docs/CRUZNEGRA_MODELO_RELACIONAL.md) | Diagrama entidad-relación de la base de datos |
 | [CRUZNEGRA_DIAGRAMA_CLASES.md](docs/CRUZNEGRA_DIAGRAMA_CLASES.md) | Diagrama de clases de los modelos Eloquent |
+| [INTEGRACION_IA.md](docs/INTEGRACION_IA.md) | Punto de integración para el modelo que genera informes de avance |
 
 ## Empezar acá
 

@@ -34,6 +34,9 @@ Copiás, pegás, guardás y funciona.
 | [FASE 1](#fase-1)                                                              | Marcos: Hitos · Jesús: Proyectos · Dante: Tareas             |
 | [FASE 2](#fase-2)                                                              | Marcos: Facturas · Jesús: Solicitudes · Dante: Entregables   |
 | [FASE 3](#fase-3)                                                              | Jesús: Menú · Dante: Dashboard · Marcos: probar             |
+| [SPRINT 2 — Buscador](#sprint-2--jesús-buscador-y-filtros-en-los-listados)      | Jesús: búsqueda, filtro por estado y paginación                 |
+| [SPRINT 2 — Reportes](#sprint-2--dante-panel-de-reportes-del-jefe)              | Dante: panel global de reportes por estado y facturación       |
+| [SPRINT 2 — Testing](#sprint-2--testing-del-sistema)                            | Equipo: recorrido E2E, roles y pruebas automáticas              |
 | [FASE 4](#fase-4--repaso-final-entre-los-tres)                                 | Repaso final entre los tres                                     |
 | [Si algo sale mal](#si-algo-sale-mal--soluciones-rápidas)                     | Tabla de errores y cómo resolverlos                            |
 
@@ -2289,6 +2292,712 @@ Hoy es la pantalla vacía que viene por defecto. Abrilo, **borrá todo** y pegá
 
 Igual que siempre: commit, push, avisar, merge a `main`, y todos
 `git pull` + `php artisan migrate:fresh --seed`.
+
+---
+
+# SPRINT 2 — JESÚS: Buscador y filtros en los listados
+
+> Esta sección corresponde a la tarjeta **“Buscador y filtros en los
+> listados”**. No cambies ni crees otra rama: trabajá sobre la misma rama que
+> ya usa el equipo.
+
+## Qué vas a lograr
+
+Vas a agregar búsqueda por texto, filtro de estado y paginación de 15 registros
+en estos módulos:
+
+1. Proyectos.
+2. Tareas.
+3. Solicitudes de Cambio.
+4. Facturas, solamente si Marcos ya creó `resources/views/facturas/index.blade.php`.
+
+Antes de editar, ejecutá `git pull`. No borres el scope `visiblePara`: ese scope
+impide que un Cliente encuentre registros pertenecientes a otra empresa.
+
+---
+
+## Paso 1 — Modificar `ProyectoController`
+
+Abrí `app/Http/Controllers/ProyectoController.php` y reemplazá solamente el
+método `index` por este:
+
+```php
+public function index(Request $request)
+{
+    $proyectos = Proyecto::visiblePara($request->user())
+        ->with(['cliente', 'pm'])
+        ->when($request->filled('q'), function ($query) use ($request) {
+            $texto = $request->string('q')->trim()->toString();
+
+            $query->where(function ($subquery) use ($texto) {
+                $subquery->where('nombre', 'like', "%{$texto}%")
+                    ->orWhere('descripcion', 'like', "%{$texto}%");
+            });
+        })
+        ->when($request->filled('estado'), fn ($query) =>
+            $query->where('estado', $request->string('estado')->toString())
+        )
+        ->latest()
+        ->paginate(15)
+        ->withQueryString();
+
+    return view('proyectos.index', compact('proyectos'));
+}
+```
+
+Después, en `resources/views/proyectos/index.blade.php`, pegá este formulario
+después del mensaje `session('success')` y antes de la tabla:
+
+```blade
+<form method="GET" action="{{ route('proyectos.index') }}"
+      class="mb-6 grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+    <div class="md:col-span-2">
+        <label for="q" class="block text-sm font-medium text-gray-700">Buscar</label>
+        <input id="q" name="q" type="text" value="{{ request('q') }}"
+               placeholder="Nombre o descripción"
+               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+    </div>
+    <div>
+        <label for="estado" class="block text-sm font-medium text-gray-700">Estado</label>
+        <select id="estado" name="estado"
+                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+            <option value="">Todos</option>
+            <option value="pendiente" @selected(request('estado') === 'pendiente')>Pendiente</option>
+            <option value="en_progreso" @selected(request('estado') === 'en_progreso')>En progreso</option>
+            <option value="completado" @selected(request('estado') === 'completado')>Completado</option>
+            <option value="cancelado" @selected(request('estado') === 'cancelado')>Cancelado</option>
+        </select>
+    </div>
+    <div class="flex gap-3">
+        <button type="submit"
+                class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+            Filtrar
+        </button>
+        <a href="{{ route('proyectos.index') }}"
+           class="px-4 py-2 text-gray-600 hover:underline">Limpiar</a>
+    </div>
+</form>
+```
+
+---
+
+## Paso 2 — Modificar `TareaController`
+
+Abrí `app/Http/Controllers/TareaController.php` y reemplazá solamente el método
+`index` por este:
+
+```php
+public function index(Request $request)
+{
+    $tareas = Tarea::visiblePara($request->user())
+        ->with(['proyecto', 'asignado'])
+        ->when($request->filled('q'), function ($query) use ($request) {
+            $texto = $request->string('q')->trim()->toString();
+
+            $query->where(function ($subquery) use ($texto) {
+                $subquery->where('titulo', 'like', "%{$texto}%")
+                    ->orWhere('descripcion', 'like', "%{$texto}%");
+            });
+        })
+        ->when($request->filled('estado'), fn ($query) =>
+            $query->where('estado', $request->string('estado')->toString())
+        )
+        ->latest()
+        ->paginate(15)
+        ->withQueryString();
+
+    return view('tareas.index', compact('tareas'));
+}
+```
+
+En `resources/views/tareas/index.blade.php`, pegá antes de la tabla el mismo
+formulario del paso anterior, pero cambiá la ruta por `tareas.index`, el texto
+de ayuda por `Título o descripción` y usá estas opciones:
+
+```blade
+<option value="">Todos</option>
+<option value="pendiente" @selected(request('estado') === 'pendiente')>Pendiente</option>
+<option value="en_progreso" @selected(request('estado') === 'en_progreso')>En progreso</option>
+<option value="completada" @selected(request('estado') === 'completada')>Completada</option>
+<option value="cancelada" @selected(request('estado') === 'cancelada')>Cancelada</option>
+```
+
+---
+
+## Paso 3 — Modificar `SolicitudCambioController`
+
+Abrí `app/Http/Controllers/SolicitudCambioController.php` y reemplazá solamente
+el método `index` por este:
+
+```php
+public function index(Request $request)
+{
+    $solicitudes = SolicitudCambio::visiblePara($request->user())
+        ->with(['proyecto', 'solicitante'])
+        ->when($request->filled('q'), function ($query) use ($request) {
+            $texto = $request->string('q')->trim()->toString();
+
+            $query->where(function ($subquery) use ($texto) {
+                $subquery->where('titulo', 'like', "%{$texto}%")
+                    ->orWhere('descripcion', 'like', "%{$texto}%");
+            });
+        })
+        ->when($request->filled('estado'), fn ($query) =>
+            $query->where('estado', $request->string('estado')->toString())
+        )
+        ->latest()
+        ->paginate(15)
+        ->withQueryString();
+
+    return view('solicitudes_cambio.index', compact('solicitudes'));
+}
+```
+
+En `resources/views/solicitudes_cambio/index.blade.php`, pegá antes de la tabla
+el formulario del paso 1, cambiando la ruta por `solicitudes-cambio.index`, el
+texto de ayuda por `Título o descripción` y usando estas opciones:
+
+```blade
+<option value="">Todos</option>
+<option value="pendiente" @selected(request('estado') === 'pendiente')>Pendiente</option>
+<option value="aprobada" @selected(request('estado') === 'aprobada')>Aprobada</option>
+<option value="rechazada" @selected(request('estado') === 'rechazada')>Rechazada</option>
+```
+
+---
+
+## Paso 4 — Facturas, solamente si la vista ya existe
+
+Primero verificá si existe `resources/views/facturas/index.blade.php`.
+
+- Si no existe, no inventes la vista: avisá al grupo y dejá Facturas para el
+  repaso posterior.
+- Si existe, reemplazá el método `index` de `FacturaController` aplicando el
+  mismo patrón. Buscá en `numero` y `detalle`, filtrá por `estado`, usá
+  `paginate(15)` y terminá con `withQueryString()`.
+- Las opciones de estado son `pendiente`, `pagada` y `vencida`.
+- Conservá `Factura::visiblePara($request->user())` al comienzo de la consulta.
+
+---
+
+## Paso 5 — Pruebas de Jesús
+
+Ejecutá:
+
+```bash
+php artisan optimize:clear
+php artisan view:cache
+php artisan test
+```
+
+Después probá en el navegador:
+
+- buscar por una palabra completa y por una parte del nombre;
+- combinar texto y estado;
+- usar **Limpiar** y comprobar que vuelvan todos los resultados permitidos;
+- avanzar de página y confirmar que `q` y `estado` sigan en la URL;
+- entrar como `jefe@example.com` y luego como `cliente@example.com`;
+- confirmar que el Cliente jamás vea registros de otra empresa, aunque filtre.
+
+Checklist:
+
+- [ ] Buscador y filtro en Proyectos.
+- [ ] Buscador y filtro en Tareas.
+- [ ] Buscador y filtro en Solicitudes de Cambio.
+- [ ] Facturas agregadas o informadas como pendientes porque falta su vista.
+- [ ] Paginación de 15 con filtros conservados.
+- [ ] Scoping del Cliente conservado.
+
+Para subir sobre la misma rama del equipo:
+
+```bash
+git add app/Http/Controllers resources/views
+git commit -m "Agregar buscador y filtros a los listados"
+git push
+```
+
+---
+
+# SPRINT 2 — DANTE: Panel de reportes del Jefe
+
+> Esta sección corresponde a la tarjeta **“Panel de reportes del Jefe en el
+> Dashboard”** de `tareas_sprint_jesus_dante.txt`.
+
+## Qué vas a lograr
+
+Vas a agregar arriba de las tarjetas actuales un panel con números globales:
+
+- proyectos pendientes, en progreso, completados y cancelados;
+- tareas pendientes, en progreso, completadas y canceladas;
+- total facturado y total pendiente de cobro;
+- cantidad de tareas vencidas.
+
+El panel lo ven los roles internos `Jefe`, `PM`, `PO` y `Programador`. El rol
+`Cliente` **no lo ve** y continúa viendo solamente los números de su empresa.
+
+Para esta tarea vas a modificar solamente:
+
+1. `routes/web.php`
+2. `resources/views/dashboard.blade.php`
+
+> **Excepción a la regla general:** en esta tarea sí está permitido modificar
+> `routes/web.php`, porque ahí se calcularán los reportes. No modifiques ninguna
+> otra ruta.
+
+---
+
+## Paso 1 — Actualizar la rama de trabajo
+
+Abrí una terminal en la raíz de tu copia del proyecto. La ubicación puede ser
+distinta en cada computadora; estás en la carpeta correcta si allí aparecen
+`artisan`, `composer.json` y `package.json`.
+
+Ejecutá:
+
+```bash
+git pull
+```
+
+> **No cambies ni crees otra rama.** Esta tarea se hace sobre la misma rama que
+> ya usa el equipo. Antes de editar, `git pull` trae los últimos cambios de tus
+> compañeros.
+
+---
+
+## Paso 2 — Calcular los datos fuera de la vista
+
+Abrí `routes/web.php` y buscá este bloque cerca del principio:
+
+```php
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+```
+
+Reemplazá **todo ese bloque** por este código:
+
+```php
+Route::get('/dashboard', function () {
+    $usuario = auth()->user();
+    $esCliente = $usuario->esCliente();
+
+    // Números del dashboard actual. Para Cliente se limitan a su empresa.
+    $datos = [
+        'esCliente' => $esCliente,
+        'totalClientes' => $esCliente ? null : \App\Models\Cliente::count(),
+        'totalProyectos' => \App\Models\Proyecto::visiblePara($usuario)->count(),
+        'tareasPendientes' => \App\Models\Tarea::visiblePara($usuario)
+            ->where('estado', 'pendiente')->count(),
+        'facturasPendientes' => \App\Models\Factura::visiblePara($usuario)
+            ->where('estado', 'pendiente')->count(),
+        'totalHitos' => \App\Models\Hito::visiblePara($usuario)->count(),
+        'totalEntregables' => \App\Models\EntregableIA::visiblePara($usuario)->count(),
+    ];
+
+    // Los reportes son globales y nunca se calculan para el rol Cliente.
+    if (! $esCliente) {
+        $datos['proyectosPorEstado'] = [
+            'pendiente' => \App\Models\Proyecto::where('estado', 'pendiente')->count(),
+            'en_progreso' => \App\Models\Proyecto::where('estado', 'en_progreso')->count(),
+            'completado' => \App\Models\Proyecto::where('estado', 'completado')->count(),
+            'cancelado' => \App\Models\Proyecto::where('estado', 'cancelado')->count(),
+        ];
+
+        $datos['tareasPorEstado'] = [
+            'pendiente' => \App\Models\Tarea::where('estado', 'pendiente')->count(),
+            'en_progreso' => \App\Models\Tarea::where('estado', 'en_progreso')->count(),
+            'completada' => \App\Models\Tarea::where('estado', 'completada')->count(),
+            'cancelada' => \App\Models\Tarea::where('estado', 'cancelada')->count(),
+        ];
+
+        $datos['totalFacturado'] = \App\Models\Factura::sum('monto');
+
+        // Pendiente de cobro incluye facturas pendientes y vencidas: ninguna
+        // de las dos fue pagada todavía.
+        $datos['totalPendienteCobro'] = \App\Models\Factura::whereIn(
+            'estado',
+            ['pendiente', 'vencida']
+        )->sum('monto');
+
+        $datos['tareasVencidas'] = \App\Models\Tarea::whereDate('fecha_limite', '<', today())
+            ->whereNotIn('estado', ['completada', 'cancelada'])
+            ->count();
+    }
+
+    return view('dashboard', $datos);
+})->middleware(['auth', 'verified'])->name('dashboard');
+```
+
+Esto cumple una regla importante: las consultas se hacen con Eloquent en la
+ruta y no con loops dentro del archivo Blade.
+
+---
+
+## Paso 3 — Quitar las consultas viejas del Dashboard
+
+Abrí `resources/views/dashboard.blade.php`.
+
+Al principio del archivo hay un bloque que comienza con `@php` y termina con
+`@endphp`. Borrá **todo ese bloque**, porque esos datos ahora llegan desde la
+ruta y no deben consultarse dentro de la vista.
+
+Después de borrarlo, la primera línea del archivo debe ser:
+
+```blade
+<x-app-layout>
+```
+
+---
+
+## Paso 4 — Agregar el panel de reportes
+
+En el mismo `dashboard.blade.php`, buscá el bloque de bienvenida que termina
+así:
+
+```blade
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+```
+
+Pegá el siguiente panel **entre esos dos bloques**, justo antes de la grilla de
+tarjetas que ya existía:
+
+```blade
+@if (! $esCliente)
+    <section class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 space-y-6">
+        <div>
+            <h3 class="text-lg font-semibold text-gray-900">Reportes generales</h3>
+            <p class="text-sm text-gray-500">Resumen global para los roles internos.</p>
+        </div>
+
+        <div>
+            <h4 class="font-semibold text-gray-700 mb-3">Proyectos por estado</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <div class="text-2xl font-bold text-gray-900">{{ $proyectosPorEstado['pendiente'] }}</div>
+                    <div class="text-sm text-gray-500">Pendientes</div>
+                </div>
+                <div class="bg-blue-50 rounded-lg p-4">
+                    <div class="text-2xl font-bold text-blue-700">{{ $proyectosPorEstado['en_progreso'] }}</div>
+                    <div class="text-sm text-gray-500">En progreso</div>
+                </div>
+                <div class="bg-green-50 rounded-lg p-4">
+                    <div class="text-2xl font-bold text-green-700">{{ $proyectosPorEstado['completado'] }}</div>
+                    <div class="text-sm text-gray-500">Completados</div>
+                </div>
+                <div class="bg-red-50 rounded-lg p-4">
+                    <div class="text-2xl font-bold text-red-700">{{ $proyectosPorEstado['cancelado'] }}</div>
+                    <div class="text-sm text-gray-500">Cancelados</div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h4 class="font-semibold text-gray-700 mb-3">Tareas por estado</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <div class="text-2xl font-bold text-gray-900">{{ $tareasPorEstado['pendiente'] }}</div>
+                    <div class="text-sm text-gray-500">Pendientes</div>
+                </div>
+                <div class="bg-blue-50 rounded-lg p-4">
+                    <div class="text-2xl font-bold text-blue-700">{{ $tareasPorEstado['en_progreso'] }}</div>
+                    <div class="text-sm text-gray-500">En progreso</div>
+                </div>
+                <div class="bg-green-50 rounded-lg p-4">
+                    <div class="text-2xl font-bold text-green-700">{{ $tareasPorEstado['completada'] }}</div>
+                    <div class="text-sm text-gray-500">Completadas</div>
+                </div>
+                <div class="bg-red-50 rounded-lg p-4">
+                    <div class="text-2xl font-bold text-red-700">{{ $tareasPorEstado['cancelada'] }}</div>
+                    <div class="text-sm text-gray-500">Canceladas</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="bg-indigo-50 rounded-lg p-4">
+                <div class="text-2xl font-bold text-indigo-700">
+                    $ {{ number_format($totalFacturado, 2, ',', '.') }}
+                </div>
+                <div class="text-sm text-gray-500">Total facturado</div>
+            </div>
+            <div class="bg-yellow-50 rounded-lg p-4">
+                <div class="text-2xl font-bold text-yellow-700">
+                    $ {{ number_format($totalPendienteCobro, 2, ',', '.') }}
+                </div>
+                <div class="text-sm text-gray-500">Pendiente de cobro</div>
+            </div>
+            <div class="bg-red-50 rounded-lg p-4">
+                <div class="text-2xl font-bold text-red-700">{{ $tareasVencidas }}</div>
+                <div class="text-sm text-gray-500">Tareas vencidas</div>
+            </div>
+        </div>
+    </section>
+@endif
+```
+
+No borres la grilla anterior: el nuevo panel debe quedar **arriba de lo que ya
+había**, tal como pide la tarjeta.
+
+---
+
+## Paso 5 — Limpiar caché y comprobar el código
+
+Ejecutá:
+
+```bash
+php artisan optimize:clear
+php artisan view:cache
+php artisan test
+```
+
+Si las dos pruebas viejas de `RegistrationTest` fallan porque `/register`
+devuelve 404, no corresponde a esta tarea: el registro público está desactivado
+a propósito.
+
+---
+
+## Paso 6 — Probar los roles en el navegador
+
+### Prueba 1 — Jefe
+
+1. Iniciá sesión con `jefe@example.com` / `1234`.
+2. Entrá al Dashboard.
+3. Comprobá que aparezca el título **Reportes generales**.
+4. Verificá los cuatro estados de proyectos y los cuatro estados de tareas.
+5. Verificá total facturado, pendiente de cobro y tareas vencidas.
+
+### Prueba 2 — Cliente
+
+1. Cerrá la sesión del Jefe.
+2. Iniciá sesión con `cliente@example.com` / `1234`.
+3. Entrá al Dashboard.
+4. Comprobá que **no aparezca** el título **Reportes generales**.
+5. Comprobá que el Cliente siga viendo las tarjetas normales con los datos de
+   su propia empresa.
+
+### Prueba 3 — Roles internos restantes
+
+Repetí la entrada con `pm@example.com`, `po@example.com` y `dev@example.com`.
+Los tres deben ver el panel de reportes generales.
+
+Checklist final:
+
+- [ ] Tarjetas de proyectos por estado.
+- [ ] Tarjetas de tareas por estado.
+- [ ] Total facturado y pendiente de cobro.
+- [ ] Contador de tareas vencidas.
+- [ ] El Cliente no ve el panel global.
+- [ ] Jefe, PM, PO y Programador sí ven el panel global.
+- [ ] El dashboard anterior sigue visible y funcionando.
+
+---
+
+## Paso 7 — Commit y push
+
+Ejecutá exactamente:
+
+```bash
+git add routes/web.php resources/views/dashboard.blade.php
+git commit -m "Agregar panel de reportes al dashboard"
+git push
+```
+
+Después avisá al grupo para que otra persona haga `git pull` y pruebe el
+Dashboard como Jefe y como Cliente.
+
+---
+
+# SPRINT 2 — Testing del sistema
+
+> Esta es una tarea compartida. Dante realiza las pruebas y Jesús revisa los
+> resultados; después pueden invertir los roles para la revisión cruzada. No
+> cambien ni creen otra rama.
+
+## Objetivo
+
+Hacer un recorrido E2E (de punta a punta) como una persona real y dejar una red
+básica de pruebas automáticas. El checklist de la tarjeta pide:
+
+- probar el login;
+- probar la creación de usuarios;
+- detectar y corregir bugs;
+- confirmar el renderizado condicional por rol.
+
+Una prueba no se marca como terminada solo porque la pantalla abre: hay que
+anotar qué usuario se usó, qué se esperaba y qué ocurrió.
+
+---
+
+## Paso 1 — Preparar cada computadora
+
+Desde la raíz del proyecto:
+
+```bash
+git pull
+composer install
+npm install
+php artisan migrate
+php artisan db:seed
+php artisan optimize:clear
+npm run build
+php artisan test
+```
+
+No uses `migrate:fresh` si tenés información local que quieras conservar. Si
+los usuarios de prueba no existen y `db:seed` falla, mandá la captura completa
+al grupo antes de borrar la base.
+
+---
+
+## Paso 2 — Probar el login
+
+Probá las cinco cuentas, una por una:
+
+| Rol | Email | Contraseña |
+| --- | --- | --- |
+| Jefe | `jefe@example.com` | `1234` |
+| PM | `pm@example.com` | `1234` |
+| PO | `po@example.com` | `1234` |
+| Programador | `dev@example.com` | `1234` |
+| Cliente | `cliente@example.com` | `1234` |
+
+Para cada cuenta:
+
+1. Abrí `/login`.
+2. Ingresá email y contraseña.
+3. Confirmá que redirija al Dashboard sin error 403, 404 o 500.
+4. Verificá que arriba aparezca el nombre del usuario correcto.
+5. Cerrá sesión antes de probar la cuenta siguiente.
+6. Probá una contraseña incorrecta y confirmá que el sistema no permita entrar.
+
+---
+
+## Paso 3 — Probar la creación de usuarios
+
+1. Entrá como `jefe@example.com`.
+2. Abrí **Usuarios y Roles**.
+3. Creá un usuario de prueba con un email que no exista.
+4. Asignale un rol y comprobá que aparezca en el listado.
+5. Cerrá sesión e iniciá sesión con la cuenta recién creada.
+6. Confirmá que vea solamente las opciones correspondientes a su rol.
+7. Volvé a entrar como Jefe y eliminá o desactivá el dato de prueba si el
+   sistema ofrece esa acción. No borres usuarios directamente desde MySQL.
+
+También hay que probar que PM, PO, Programador y Cliente no puedan abrir
+`/usuarios/crear` escribiendo la URL manualmente. Deben recibir 403.
+
+---
+
+## Paso 4 — Confirmar el renderizado condicional por rol
+
+Usá esta matriz como resultado esperado:
+
+| Acción visible | Jefe | PM | PO | Programador | Cliente |
+| --- | :---: | :---: | :---: | :---: | :---: |
+| Usuarios y Roles | Sí | Sí, lectura | No | No | No |
+| Crear usuarios / gestionar roles | Sí | No | No | No | No |
+| Editar clientes y proyectos | Sí | Sí | No | No | No |
+| Editar tareas y solicitudes | Sí | Sí | Sí | No | No |
+| Editar entregables | Sí | Sí | Sí | Sí | No |
+| Panel global de reportes | Sí | Sí | Sí | Sí | No |
+
+Además:
+
+- Cliente no debe ver el módulo Clientes.
+- Cliente solo debe ver proyectos y registros de su propia empresa.
+- Ocultar un botón no es suficiente: al escribir una URL no autorizada también
+  debe aparecer 403.
+- Si aparece un botón que lleva a 403, anotarlo como bug de renderizado.
+
+---
+
+## Paso 5 — Pruebas automáticas obligatorias
+
+Crear pruebas dentro de `tests/Feature/` que cubran como mínimo:
+
+1. Cliente ve sus proyectos, pero no proyectos de otras empresas.
+2. Cliente recibe 403 al abrir directamente un proyecto ajeno.
+3. Programador recibe 403 en `/clientes/create` y PM puede entrar.
+4. Un PATCH válido a `/tareas/mover` realizado por PM actualiza `estado` y
+   `orden`.
+5. Jefe ve el texto `Reportes generales` en el Dashboard y Cliente no lo ve.
+
+Los tests deben usar:
+
+```php
+use Illuminate\Foundation\Testing\RefreshDatabase;
+```
+
+Dentro de cada clase se pueden cargar los datos conocidos con:
+
+```php
+use RefreshDatabase;
+
+protected function setUp(): void
+{
+    parent::setUp();
+    $this->seed();
+}
+```
+
+Para autenticar una cuenta sembrada:
+
+```php
+$usuario = \App\Models\User::where('email', 'cliente@example.com')->firstOrFail();
+$this->actingAs($usuario);
+```
+
+Al final ejecutá:
+
+```bash
+php artisan test
+```
+
+Todas las pruebas relacionadas con el comportamiento actual deben quedar en
+verde. Si `RegistrationTest` espera que `/register` exista, hay que actualizar
+ese test: el registro público está desactivado a propósito y las cuentas las
+crea el Jefe.
+
+---
+
+## Paso 6 — Registrar y corregir bugs
+
+Por cada error encontrado, anoten:
+
+```text
+Usuario/rol usado:
+URL o módulo:
+Acción realizada:
+Resultado esperado:
+Resultado obtenido:
+Mensaje de error:
+```
+
+Después de corregirlo, repetir exactamente los mismos pasos y marcarlo como
+resuelto solamente si ya produce el resultado esperado. También ejecutar otra
+vez `php artisan test` para comprobar que la corrección no rompió otra parte.
+
+Checklist final de Testing:
+
+- [ ] Login correcto e incorrecto probado.
+- [ ] Creación de usuarios probada.
+- [ ] Permisos por URL probados.
+- [ ] Renderizado condicional comprobado con los cinco roles.
+- [ ] Scoping del Cliente comprobado.
+- [ ] Bugs encontrados, documentados y corregidos.
+- [ ] Pruebas automáticas agregadas.
+- [ ] `php artisan test` completamente en verde.
+- [ ] Revisión cruzada realizada.
+
+Para subir sobre la misma rama:
+
+```bash
+git add tests app resources routes
+git commit -m "Agregar pruebas y corregir regresiones"
+git push
+```
 
 ---
 
