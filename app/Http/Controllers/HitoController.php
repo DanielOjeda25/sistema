@@ -10,7 +10,26 @@ class HitoController extends Controller
 {
     public function index(Request $request)
     {
-        $hitos = Hito::visiblePara($request->user())->with('proyecto')->latest()->paginate(10);
+        $hitos = Hito::visiblePara($request->user())
+            ->with('proyecto')
+            ->when($request->filled('q'), function ($query) use ($request) {
+                $texto = $request->string('q')->trim()->toString();
+
+                $query->where(function ($subquery) use ($texto) {
+                    $subquery->where('nombre', 'like', "%{$texto}%")
+                        ->orWhere('descripcion', 'like', "%{$texto}%");
+                });
+            })
+            ->when($request->filled('estado'), function ($query) use ($request) {
+                if ($request->string('estado')->toString() === 'completado') {
+                    $query->where('completado', true);
+                } elseif ($request->string('estado')->toString() === 'pendiente') {
+                    $query->where('completado', false);
+                }
+            })
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
 
         return view('hitos.index', compact('hitos'));
     }

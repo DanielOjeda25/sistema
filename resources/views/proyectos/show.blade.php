@@ -53,7 +53,9 @@
 
                 <div class="pt-4 flex gap-4 border-t">
                     @hasanyrole('Jefe|PM')
-                    <a href="{{ route('proyectos.edit', $proyecto) }}" class="text-yellow-600 hover:underline">Editar</a>
+                    <a href="{{ route('proyectos.edit', $proyecto) }}" class="text-yellow-600 hover:text-yellow-800 inline-flex" title="Editar" aria-label="Editar">
+                        <x-heroicon-o-pencil-square class="w-5 h-5" />
+                    </a>
                     @endhasanyrole
                     <a href="{{ route('proyectos.index') }}" class="text-gray-600 hover:underline">Volver al listado</a>
             </div>
@@ -165,7 +167,8 @@
                             @hasanyrole('Jefe|PM|PO')
                                 <div class="flex flex-wrap gap-4">
                                 <a href="{{ route('entregables.edit', $informe) }}"
-                                   class="text-indigo-600 hover:underline">Editar borrador</a>
+                                   class="text-indigo-600 hover:text-indigo-800 inline-flex items-center gap-1">
+                                    <x-heroicon-o-pencil-square class="w-4 h-4" /> Editar borrador</a>
                                 @if ($informe->visible_cliente)
                                     <form method="POST" action="{{ route('informes-ia.unpublish', $informe) }}">
                                         @csrf

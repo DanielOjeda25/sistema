@@ -13,8 +13,20 @@ class EntregableIAController extends Controller
     {
         $entregables = EntregableIA::visiblePara($request->user())
             ->with(['proyecto', 'generador'])
+            ->when($request->filled('q'), function ($query) use ($request) {
+                $texto = $request->string('q')->trim()->toString();
+
+                $query->where(function ($subquery) use ($texto) {
+                    $subquery->where('titulo', 'like', "%{$texto}%")
+                        ->orWhere('tipo', 'like', "%{$texto}%");
+                });
+            })
+            ->when($request->filled('estado'), fn ($query) =>
+                $query->where('estado', $request->string('estado')->toString())
+            )
             ->latest()
-            ->paginate(10);
+            ->paginate(15)
+            ->withQueryString();
 
         return view('entregables.index', compact('entregables'));
     }

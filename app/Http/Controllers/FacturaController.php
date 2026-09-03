@@ -13,8 +13,20 @@ class FacturaController extends Controller
     {
         $facturas = Factura::visiblePara($request->user())
             ->with(['proyecto', 'emisor'])
+            ->when($request->filled('q'), function ($query) use ($request) {
+                $texto = $request->string('q')->trim()->toString();
+
+                $query->where(function ($subquery) use ($texto) {
+                    $subquery->where('numero', 'like', "%{$texto}%")
+                        ->orWhere('detalle', 'like', "%{$texto}%");
+                });
+            })
+            ->when($request->filled('estado'), fn ($query) =>
+                $query->where('estado', $request->string('estado')->toString())
+            )
             ->latest()
-            ->paginate(10);
+            ->paginate(15)
+            ->withQueryString();
 
         return view('facturas.index', compact('facturas'));
     }

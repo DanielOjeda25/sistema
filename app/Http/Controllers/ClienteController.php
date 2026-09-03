@@ -7,9 +7,25 @@ use Illuminate\Http\Request;
 
 class ClienteController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $clientes = Cliente::latest()->paginate(10);
+        $clientes = Cliente::query()
+            ->when($request->filled('q'), function ($query) use ($request) {
+                $texto = $request->string('q')->trim()->toString();
+
+                $query->where(function ($subquery) use ($texto) {
+                    $subquery->where('nombre', 'like', "%{$texto}%")
+                        ->orWhere('apellido', 'like', "%{$texto}%")
+                        ->orWhere('email', 'like', "%{$texto}%")
+                        ->orWhere('empresa', 'like', "%{$texto}%");
+                });
+            })
+            ->when($request->filled('estado'), fn ($query) =>
+                $query->where('estado', $request->string('estado')->toString())
+            )
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
 
         return view('clientes.index', compact('clientes'));
     }
