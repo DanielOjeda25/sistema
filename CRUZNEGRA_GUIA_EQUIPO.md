@@ -34,9 +34,9 @@ Copiás, pegás, guardás y funciona.
 | [FASE 1](#fase-1)                                                              | Marcos: Hitos · Jesús: Proyectos · Dante: Tareas             |
 | [FASE 2](#fase-2)                                                              | Marcos: Facturas · Jesús: Solicitudes · Dante: Entregables   |
 | [FASE 3](#fase-3)                                                              | Jesús: Menú · Dante: Dashboard · Marcos: probar             |
-| [SPRINT 2 — Buscador](#sprint-2--jesús-buscador-y-filtros-en-los-listados)      | Jesús: búsqueda, filtro por estado y paginación                 |
-| [SPRINT 2 — Reportes](#sprint-2--dante-panel-de-reportes-del-jefe)              | Dante: panel global de reportes por estado y facturación       |
-| [SPRINT 2 — Testing](#sprint-2--testing-del-sistema)                            | Equipo: recorrido E2E, roles y pruebas automáticas              |
+| [SPRINT 2 — Buscador](#sprint-2--jesús-buscador-y-filtros-en-los-listados)   | Jesús: búsqueda, filtro por estado y paginación              |
+| [SPRINT 2 — Reportes](#sprint-2--dante-panel-de-reportes-del-jefe)            | Dante: panel global de reportes por estado y facturación       |
+| [SPRINT 2 — Testing](#sprint-2--testing-del-sistema)                          | Equipo: recorrido E2E, roles y pruebas automáticas             |
 | [FASE 4](#fase-4--repaso-final-entre-los-tres)                                 | Repaso final entre los tres                                     |
 | [Si algo sale mal](#si-algo-sale-mal--soluciones-rápidas)                     | Tabla de errores y cómo resolverlos                            |
 
@@ -2855,13 +2855,13 @@ al grupo antes de borrar la base.
 
 Probá las cinco cuentas, una por una:
 
-| Rol | Email | Contraseña |
-| --- | --- | --- |
-| Jefe | `jefe@example.com` | `1234` |
-| PM | `pm@example.com` | `1234` |
-| PO | `po@example.com` | `1234` |
-| Programador | `dev@example.com` | `1234` |
-| Cliente | `cliente@example.com` | `1234` |
+| Rol         | Email                   | Contraseña |
+| ----------- | ----------------------- | ----------- |
+| Jefe        | `jefe@example.com`    | `1234`    |
+| PM          | `pm@example.com`      | `1234`    |
+| PO          | `po@example.com`      | `1234`    |
+| Programador | `dev@example.com`     | `1234`    |
+| Cliente     | `cliente@example.com` | `1234`    |
 
 Para cada cuenta:
 
@@ -2894,14 +2894,14 @@ También hay que probar que PM, PO, Programador y Cliente no puedan abrir
 
 Usá esta matriz como resultado esperado:
 
-| Acción visible | Jefe | PM | PO | Programador | Cliente |
-| --- | :---: | :---: | :---: | :---: | :---: |
-| Usuarios y Roles | Sí | Sí, lectura | No | No | No |
-| Crear usuarios / gestionar roles | Sí | No | No | No | No |
-| Editar clientes y proyectos | Sí | Sí | No | No | No |
-| Editar tareas y solicitudes | Sí | Sí | Sí | No | No |
-| Editar entregables | Sí | Sí | Sí | Sí | No |
-| Panel global de reportes | Sí | Sí | Sí | Sí | No |
+| Acción visible                  | Jefe |      PM      | PO | Programador | Cliente |
+| -------------------------------- | :--: | :----------: | :-: | :---------: | :-----: |
+| Usuarios y Roles                 | Sí | Sí, lectura | No |     No     |   No   |
+| Crear usuarios / gestionar roles | Sí |      No      | No |     No     |   No   |
+| Editar clientes y proyectos      | Sí |     Sí     | No |     No     |   No   |
+| Editar tareas y solicitudes      | Sí |     Sí     | Sí |     No     |   No   |
+| Editar entregables               | Sí |     Sí     | Sí |     Sí     |   No   |
+| Panel global de reportes         | Sí |     Sí     | Sí |     Sí     |   No   |
 
 Además:
 

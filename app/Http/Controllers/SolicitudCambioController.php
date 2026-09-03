@@ -10,14 +10,26 @@ use Illuminate\Http\Request;
 class SolicitudCambioController extends Controller
 {
     public function index(Request $request)
-    {
-        $solicitudes = SolicitudCambio::visiblePara($request->user())
-            ->with(['proyecto', 'solicitante'])
-            ->latest()
-            ->paginate(10);
+{
+    $solicitudes = SolicitudCambio::visiblePara($request->user())
+        ->with(['proyecto', 'solicitante'])
+        ->when($request->filled('q'), function ($query) use ($request) {
+            $texto = $request->string('q')->trim()->toString();
 
-        return view('solicitudes_cambio.index', compact('solicitudes'));
-    }
+            $query->where(function ($subquery) use ($texto) {
+                $subquery->where('titulo', 'like', "%{$texto}%")
+                    ->orWhere('descripcion', 'like', "%{$texto}%");
+            });
+        })
+        ->when($request->filled('estado'), fn ($query) =>
+            $query->where('estado', $request->string('estado')->toString())
+        )
+        ->latest()
+        ->paginate(15)
+        ->withQueryString();
+
+    return view('solicitudes_cambio.index', compact('solicitudes'));
+}
 
     public function create()
     {

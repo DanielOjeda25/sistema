@@ -12,13 +12,26 @@ use Illuminate\Http\Request;
 class ProyectoController extends Controller
 {
     public function index(Request $request)
-    {
-        $proyectos = Proyecto::visiblePara($request->user())
-            ->with(['cliente', 'pm'])
-            ->latest()
-            ->paginate(10);
+{
+    $proyectos = Proyecto::visiblePara($request->user())
+        ->with(['cliente', 'pm'])
+        ->when($request->filled('q'), function ($query) use ($request) {
+            $texto = $request->string('q')->trim()->toString();
 
-        return view('proyectos.index', compact('proyectos'));
+            $query->where(function ($subquery) use ($texto) {
+                $subquery->where('nombre', 'like', "%{$texto}%")
+                    ->orWhere('descripcion', 'like', "%{$texto}%");
+            });
+        })
+        ->when($request->filled('estado'), fn ($query) =>
+            $query->where('estado', $request->string('estado')->toString())
+        )
+        ->latest()
+        ->paginate(15)
+        ->withQueryString();
+
+    return view('proyectos.index', compact('proyectos'));
+
     }
 
     public function create()

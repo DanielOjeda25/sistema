@@ -11,14 +11,26 @@ use Illuminate\Http\Request;
 class TareaController extends Controller
 {
     public function index(Request $request)
-    {
-        $tareas = Tarea::visiblePara($request->user())
-            ->with(['proyecto', 'asignado'])
-            ->latest()
-            ->paginate(10);
+{
+    $tareas = Tarea::visiblePara($request->user())
+        ->with(['proyecto', 'asignado'])
+        ->when($request->filled('q'), function ($query) use ($request) {
+            $texto = $request->string('q')->trim()->toString();
 
-        return view('tareas.index', compact('tareas'));
-    }
+            $query->where(function ($subquery) use ($texto) {
+                $subquery->where('titulo', 'like', "%{$texto}%")
+                    ->orWhere('descripcion', 'like', "%{$texto}%");
+            });
+        })
+        ->when($request->filled('estado'), fn ($query) =>
+            $query->where('estado', $request->string('estado')->toString())
+        )
+        ->latest()
+        ->paginate(15)
+        ->withQueryString();
+
+    return view('tareas.index', compact('tareas'));
+}
 
     public function tablero(Request $request)
     {
