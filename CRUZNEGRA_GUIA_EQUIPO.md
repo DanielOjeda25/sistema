@@ -2501,12 +2501,12 @@ Después probá en el navegador:
 
 Checklist:
 
-- [ ] Buscador y filtro en Proyectos.
-- [ ] Buscador y filtro en Tareas.
-- [ ] Buscador y filtro en Solicitudes de Cambio.
-- [ ] Facturas agregadas o informadas como pendientes porque falta su vista.
-- [ ] Paginación de 15 con filtros conservados.
-- [ ] Scoping del Cliente conservado.
+- [X] Buscador y filtro en Proyectos.
+- [X] Buscador y filtro en Tareas.
+- [X] Buscador y filtro en Solicitudes de Cambio.
+- [X] Facturas agregadas o informadas como pendientes porque falta su vista.
+- [X] Paginación de 15 con filtros conservados.
+- [X] Scoping del Cliente conservado.
 
 Para subir sobre la misma rama del equipo:
 
