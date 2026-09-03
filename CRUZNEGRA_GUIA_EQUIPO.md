@@ -60,12 +60,12 @@ Cada uno hace **4 archivos** por fase. Los 4 archivos son siempre lo mismo:
 
 ## Estado de las fases (agosto 2026)
 
-| Fase | Estado |
-| ---- | ------ |
-| FASE 1 | Casi completa — faltan los 4 archivos de **Hitos** (Marcos). Proyectos y Tareas ya están |
-| FASE 2 | Casi completa — faltan los 4 archivos de **Facturas** (Marcos). Solicitudes y Entregables ya están |
-| FASE 3 | **Completa** — menú (Jesús) y dashboard (Dante) subidos a `main` |
-| FASE 4 | Pendiente — repaso final, recién cuando Hitos y Facturas estén en `main` |
+| Fase   | Estado                                                                                                    |
+| ------ | --------------------------------------------------------------------------------------------------------- |
+| FASE 1 | Casi completa — faltan los 4 archivos de**Hitos** (Marcos). Proyectos y Tareas ya están           |
+| FASE 2 | Casi completa — faltan los 4 archivos de**Facturas** (Marcos). Solicitudes y Entregables ya están |
+| FASE 3 | **Completa** — menú (Jesús) y dashboard (Dante) subidos a `main`                               |
+| FASE 4 | Pendiente — repaso final, recién cuando Hitos y Facturas estén en`main`                              |
 
 > ⚠️ El menú ya enlaza a `/hitos` y `/facturas`, pero esas vistas no existen:
 > entrar a esas direcciones tira error hasta que se creen los archivos.
