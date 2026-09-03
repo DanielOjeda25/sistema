@@ -24,7 +24,53 @@ Route::get('/', function () {
 // RUTAS BÁSICAS DE AUTENTICACIÓN (Cualquiera que inicie sesión)
 // -----------------------------------------------------------------------------
 Route::get('/dashboard', function () {
-    return view('dashboard');
+    $usuario = auth()->user();
+    $esCliente = $usuario->esCliente();
+
+    // Números del dashboard actual. Para Cliente se limitan a su empresa.
+    $datos = [
+        'esCliente' => $esCliente,
+        'totalClientes' => $esCliente ? null : \App\Models\Cliente::count(),
+        'totalProyectos' => \App\Models\Proyecto::visiblePara($usuario)->count(),
+        'tareasPendientes' => \App\Models\Tarea::visiblePara($usuario)
+            ->where('estado', 'pendiente')->count(),
+        'facturasPendientes' => \App\Models\Factura::visiblePara($usuario)
+            ->where('estado', 'pendiente')->count(),
+        'totalHitos' => \App\Models\Hito::visiblePara($usuario)->count(),
+        'totalEntregables' => \App\Models\EntregableIA::visiblePara($usuario)->count(),
+    ];
+
+    // Los reportes son globales y nunca se calculan para el rol Cliente.
+    if (! $esCliente) {
+        $datos['proyectosPorEstado'] = [
+            'pendiente' => \App\Models\Proyecto::where('estado', 'pendiente')->count(),
+            'en_progreso' => \App\Models\Proyecto::where('estado', 'en_progreso')->count(),
+            'completado' => \App\Models\Proyecto::where('estado', 'completado')->count(),
+            'cancelado' => \App\Models\Proyecto::where('estado', 'cancelado')->count(),
+        ];
+
+        $datos['tareasPorEstado'] = [
+            'pendiente' => \App\Models\Tarea::where('estado', 'pendiente')->count(),
+            'en_progreso' => \App\Models\Tarea::where('estado', 'en_progreso')->count(),
+            'completada' => \App\Models\Tarea::where('estado', 'completada')->count(),
+            'cancelada' => \App\Models\Tarea::where('estado', 'cancelada')->count(),
+        ];
+
+        $datos['totalFacturado'] = \App\Models\Factura::sum('monto');
+
+        // Pendiente de cobro incluye facturas pendientes y vencidas: ninguna
+        // de las dos fue pagada todavía.
+        $datos['totalPendienteCobro'] = \App\Models\Factura::whereIn(
+            'estado',
+            ['pendiente', 'vencida']
+        )->sum('monto');
+
+        $datos['tareasVencidas'] = \App\Models\Tarea::whereDate('fecha_limite', '<', today())
+            ->whereNotIn('estado', ['completada', 'cancelada'])
+            ->count();
+    }
+
+    return view('dashboard', $datos);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
