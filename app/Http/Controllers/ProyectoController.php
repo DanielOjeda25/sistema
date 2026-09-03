@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cliente;
+use App\Models\EntregableIA;
 use App\Models\Proyecto;
 use App\Models\User;
+use App\Services\AI\ProjectContextBuilder;
 use Illuminate\Http\Request;
 
 class ProyectoController extends Controller
@@ -44,13 +46,29 @@ class ProyectoController extends Controller
         return redirect()->route('proyectos.index')->with('success', 'Proyecto creado correctamente.');
     }
 
-    public function show(Request $request, Proyecto $proyecto)
+    public function show(Request $request, Proyecto $proyecto, ProjectContextBuilder $contextBuilder)
     {
         abort_unless($request->user()->puedeVer($proyecto), 403);
 
         $proyecto->load(['cliente', 'pm', 'tareas', 'hitos', 'facturas']);
 
-        return view('proyectos.show', compact('proyecto'));
+        $actualizaciones = $proyecto->actualizaciones()
+            ->with('autor')
+            ->when($request->user()->esCliente(), fn ($query) => $query->where('visible_cliente', true))
+            ->latest('fecha')
+            ->latest('id')
+            ->get();
+
+        $informes = EntregableIA::visiblePara($request->user())
+            ->where('proyecto_id', $proyecto->id)
+            ->where('origen', 'ia')
+            ->with(['generador', 'aprobador'])
+            ->latest('generado_en')
+            ->get();
+
+        $progreso = $contextBuilder->build($proyecto)['progreso'];
+
+        return view('proyectos.show', compact('proyecto', 'actualizaciones', 'informes', 'progreso'));
     }
 
     public function edit(Proyecto $proyecto)

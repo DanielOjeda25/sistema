@@ -77,6 +77,11 @@ class Proyecto extends Model implements Auditable
         return $this->hasMany(Factura::class);
     }
 
+    public function actualizaciones(): HasMany
+    {
+        return $this->hasMany(ActualizacionProyecto::class);
+    }
+
     public function solicitudesCambio(): HasMany
     {
         return $this->hasMany(SolicitudCambio::class);

@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\ActualizacionProyectoController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\EntregableIAController;
 use App\Http\Controllers\FacturaController;
 use App\Http\Controllers\HitoController;
+use App\Http\Controllers\InformeIAController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\SolicitudCambioController;
@@ -59,7 +61,6 @@ Route::middleware(['auth', 'role:Jefe'])->group(function () {
     Route::put('/usuarios/{user}/roles', [UserController::class, 'updateRoles'])->name('users.roles.update');
 });
 
-
 Route::get('/tutorial', function () {
     return view('tutorial.index');
 })->middleware(['auth'])->name('tutorial');
@@ -109,6 +110,17 @@ Route::middleware(['auth', 'role:Jefe|PM|PO'])->group(function () {
  */
 Route::middleware(['auth', 'role:Jefe|PM|PO|Programador'])->group(function () {
     Route::resource('entregables', EntregableIAController::class)->except(['index', 'show']);
+    Route::post('proyectos/{proyecto}/actualizaciones', [ActualizacionProyectoController::class, 'store'])
+        ->name('proyectos.actualizaciones.store');
+    Route::post('proyectos/{proyecto}/informes-ia', [InformeIAController::class, 'store'])
+        ->name('proyectos.informes-ia.store');
+});
+
+Route::middleware(['auth', 'role:Jefe|PM|PO'])->group(function () {
+    Route::patch('informes-ia/{entregable}/publicar', [InformeIAController::class, 'publish'])
+        ->name('informes-ia.publish');
+    Route::patch('informes-ia/{entregable}/retirar', [InformeIAController::class, 'unpublish'])
+        ->name('informes-ia.unpublish');
 });
 
 /*
