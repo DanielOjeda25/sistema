@@ -14,6 +14,78 @@
                 </p>
             </div>
 
+            @if (! $esCliente)
+    <section class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 space-y-6">
+        <div>
+            <h3 class="text-lg font-semibold text-gray-900">Reportes generales</h3>
+            <p class="text-sm text-gray-500">Resumen global para los roles internos.</p>
+        </div>
+
+        <div>
+            <h4 class="font-semibold text-gray-700 mb-3">Proyectos por estado</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <div class="text-2xl font-bold text-gray-900">{{ $proyectosPorEstado['pendiente'] }}</div>
+                    <div class="text-sm text-gray-500">Pendientes</div>
+                </div>
+                <div class="bg-blue-50 rounded-lg p-4">
+                    <div class="text-2xl font-bold text-blue-700">{{ $proyectosPorEstado['en_progreso'] }}</div>
+                    <div class="text-sm text-gray-500">En progreso</div>
+                </div>
+                <div class="bg-green-50 rounded-lg p-4">
+                    <div class="text-2xl font-bold text-green-700">{{ $proyectosPorEstado['completado'] }}</div>
+                    <div class="text-sm text-gray-500">Completados</div>
+                </div>
+                <div class="bg-red-50 rounded-lg p-4">
+                    <div class="text-2xl font-bold text-red-700">{{ $proyectosPorEstado['cancelado'] }}</div>
+                    <div class="text-sm text-gray-500">Cancelados</div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h4 class="font-semibold text-gray-700 mb-3">Tareas por estado</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <div class="text-2xl font-bold text-gray-900">{{ $tareasPorEstado['pendiente'] }}</div>
+                    <div class="text-sm text-gray-500">Pendientes</div>
+                </div>
+                <div class="bg-blue-50 rounded-lg p-4">
+                    <div class="text-2xl font-bold text-blue-700">{{ $tareasPorEstado['en_progreso'] }}</div>
+                    <div class="text-sm text-gray-500">En progreso</div>
+                </div>
+                <div class="bg-green-50 rounded-lg p-4">
+                    <div class="text-2xl font-bold text-green-700">{{ $tareasPorEstado['completada'] }}</div>
+                    <div class="text-sm text-gray-500">Completadas</div>
+                </div>
+                <div class="bg-red-50 rounded-lg p-4">
+                    <div class="text-2xl font-bold text-red-700">{{ $tareasPorEstado['cancelada'] }}</div>
+                    <div class="text-sm text-gray-500">Canceladas</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="bg-indigo-50 rounded-lg p-4">
+                <div class="text-2xl font-bold text-indigo-700">
+                    $ {{ number_format($totalFacturado, 2, ',', '.') }}
+                </div>
+                <div class="text-sm text-gray-500">Total facturado</div>
+            </div>
+            <div class="bg-yellow-50 rounded-lg p-4">
+                <div class="text-2xl font-bold text-yellow-700">
+                    $ {{ number_format($totalPendienteCobro, 2, ',', '.') }}
+                </div>
+                <div class="text-sm text-gray-500">Pendiente de cobro</div>
+            </div>
+            <div class="bg-red-50 rounded-lg p-4">
+                <div class="text-2xl font-bold text-red-700">{{ $tareasVencidas }}</div>
+                <div class="text-sm text-gray-500">Tareas vencidas</div>
+            </div>
+        </div>
+    </section>
+@endif
+
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 
                 @unless ($esCliente)
