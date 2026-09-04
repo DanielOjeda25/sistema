@@ -35,6 +35,7 @@ class TareaController extends Controller
     public function tablero(Request $request)
     {
         $proyectos = Proyecto::orderBy('nombre')->get();
+        $usuarios = User::orderBy('name')->get();
         $proyectoId = $request->query('proyecto');
 
         $tareas = Tarea::visiblePara($request->user())
@@ -48,7 +49,7 @@ class TareaController extends Controller
         // para el resto (Programador, Cliente) el tablero es de solo lectura.
         $puedeMover = $request->user()->hasAnyRole('Jefe', 'PM', 'PO');
 
-        return view('tareas.tablero', compact('tareas', 'proyectos', 'proyectoId', 'puedeMover'));
+        return view('tareas.tablero', compact('tareas', 'proyectos', 'usuarios', 'proyectoId', 'puedeMover'));
     }
 
     public function mover(Request $request)
@@ -94,9 +95,18 @@ class TareaController extends Controller
             'proyecto_id' => 'required|exists:proyectos,id',
             'asignado_a' => 'required|exists:users,id',
             'solicitud_cambio_id' => 'nullable|exists:solicitudes_cambio,id',
+            'orden' => 'nullable|integer',
         ]);
 
-        Tarea::create($data);
+        // Las tarjetas nuevas del tablero se agregan al final de su columna,
+        // como en Trello; el orden explícito gana si viene en la petición.
+        $data['orden'] ??= ((int) Tarea::where('estado', $data['estado'])->max('orden') + 1);
+
+        $tarea = Tarea::create($data);
+
+        if ($request->wantsJson()) {
+            return response()->json($tarea->load(['proyecto', 'asignado']), 201);
+        }
 
         return redirect()->route('tareas.index')->with('success', 'Tarea creada correctamente.');
     }
@@ -134,12 +144,20 @@ class TareaController extends Controller
 
         $tarea->update($data);
 
+        if ($request->wantsJson()) {
+            return response()->json($tarea->load(['proyecto', 'asignado']));
+        }
+
         return redirect()->route('tareas.index')->with('success', 'Tarea actualizada correctamente.');
     }
 
-    public function destroy(Tarea $tarea)
+    public function destroy(Request $request, Tarea $tarea)
     {
         $tarea->delete();
+
+        if ($request->wantsJson()) {
+            return response()->json(['ok' => true]);
+        }
 
         return redirect()->route('tareas.index')->with('success', 'Tarea eliminada correctamente.');
     }
