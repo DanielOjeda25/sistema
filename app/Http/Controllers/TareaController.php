@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Proyecto;
 use App\Models\SolicitudCambio;
+use App\Models\Sprint;
 use App\Models\Tarea;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -37,10 +38,24 @@ class TareaController extends Controller
         $proyectos = Proyecto::orderBy('nombre')->get();
         $usuarios = User::orderBy('name')->get();
         $proyectoId = $request->query('proyecto');
+        $sprintId = $request->query('sprint');
+
+        // Los sprints son por proyecto: el selector solo tiene sentido cuando
+        // hay un proyecto elegido; con "todos los proyectos" no se filtra.
+        $sprints = $proyectoId
+            ? Sprint::where('proyecto_id', $proyectoId)->orderBy('fecha_inicio')->orderBy('id')->get()
+            : collect();
+
+        // Si cambia el proyecto desde el filtro, el sprint viejo puede quedar
+        // seleccionado y no pertenecer al proyecto nuevo: se ignora en ese caso.
+        if ($sprintId && ! $sprints->contains('id', (int) $sprintId)) {
+            $sprintId = null;
+        }
 
         $tareas = Tarea::visiblePara($request->user())
-            ->with(['proyecto', 'asignado'])
+            ->with(['proyecto', 'asignado', 'sprint'])
             ->when($proyectoId, fn ($q) => $q->where('proyecto_id', $proyectoId))
+            ->when($sprintId, fn ($q) => $q->where('sprint_id', $sprintId))
             ->orderBy('orden')
             ->orderBy('id')
             ->get();
@@ -49,7 +64,13 @@ class TareaController extends Controller
         // para el resto (Programador, Cliente) el tablero es de solo lectura.
         $puedeMover = $request->user()->hasAnyRole('Jefe', 'PM', 'PO');
 
-        return view('tareas.tablero', compact('tareas', 'proyectos', 'usuarios', 'proyectoId', 'puedeMover'));
+        // El modal de edición puede abrir tarjetas de cualquier proyecto, así
+        // que necesita todos los sprints agrupados por proyecto.
+        $sprintsPorProyecto = Sprint::with('proyecto')->get()
+            ->sortBy(fn ($s) => [$s->proyecto?->nombre, $s->fecha_inicio?->format('Y-m-d'), $s->id])
+            ->groupBy('proyecto.nombre');
+
+        return view('tareas.tablero', compact('tareas', 'proyectos', 'usuarios', 'proyectoId', 'sprints', 'sprintId', 'sprintsPorProyecto', 'puedeMover'));
     }
 
     public function mover(Request $request)
@@ -80,8 +101,9 @@ class TareaController extends Controller
         $proyectos = Proyecto::orderBy('nombre')->get();
         $usuarios = User::orderBy('name')->get();
         $solicitudes = SolicitudCambio::orderBy('titulo')->get();
+        $sprints = Sprint::with('proyecto')->orderBy('proyecto_id')->orderBy('fecha_inicio')->get();
 
-        return view('tareas.create', compact('proyectos', 'usuarios', 'solicitudes'));
+        return view('tareas.create', compact('proyectos', 'usuarios', 'solicitudes', 'sprints'));
     }
 
     public function store(Request $request)
@@ -93,6 +115,7 @@ class TareaController extends Controller
             'prioridad' => 'required|in:baja,media,alta',
             'fecha_limite' => 'nullable|date',
             'proyecto_id' => 'required|exists:proyectos,id',
+            'sprint_id' => 'nullable|exists:sprints,id',
             'asignado_a' => 'required|exists:users,id',
             'solicitud_cambio_id' => 'nullable|exists:solicitudes_cambio,id',
             'orden' => 'nullable|integer',
@@ -105,7 +128,7 @@ class TareaController extends Controller
         $tarea = Tarea::create($data);
 
         if ($request->wantsJson()) {
-            return response()->json($tarea->load(['proyecto', 'asignado']), 201);
+            return response()->json($tarea->load(['proyecto', 'asignado', 'sprint']), 201);
         }
 
         return redirect()->route('tareas.index')->with('success', 'Tarea creada correctamente.');
@@ -125,8 +148,9 @@ class TareaController extends Controller
         $proyectos = Proyecto::orderBy('nombre')->get();
         $usuarios = User::orderBy('name')->get();
         $solicitudes = SolicitudCambio::orderBy('titulo')->get();
+        $sprints = Sprint::with('proyecto')->orderBy('proyecto_id')->orderBy('fecha_inicio')->get();
 
-        return view('tareas.edit', compact('tarea', 'proyectos', 'usuarios', 'solicitudes'));
+        return view('tareas.edit', compact('tarea', 'proyectos', 'usuarios', 'solicitudes', 'sprints'));
     }
 
     public function update(Request $request, Tarea $tarea)
@@ -138,6 +162,7 @@ class TareaController extends Controller
             'prioridad' => 'required|in:baja,media,alta',
             'fecha_limite' => 'nullable|date',
             'proyecto_id' => 'required|exists:proyectos,id',
+            'sprint_id' => 'nullable|exists:sprints,id',
             'asignado_a' => 'required|exists:users,id',
             'solicitud_cambio_id' => 'nullable|exists:solicitudes_cambio,id',
         ]);
@@ -145,7 +170,7 @@ class TareaController extends Controller
         $tarea->update($data);
 
         if ($request->wantsJson()) {
-            return response()->json($tarea->load(['proyecto', 'asignado']));
+            return response()->json($tarea->load(['proyecto', 'asignado', 'sprint']));
         }
 
         return redirect()->route('tareas.index')->with('success', 'Tarea actualizada correctamente.');

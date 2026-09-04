@@ -33,6 +33,16 @@
                             <option value="{{ $p->id }}" @selected($proyectoId == $p->id)>{{ $p->nombre }}</option>
                         @endforeach
                     </select>
+                    @if ($proyectoId)
+                        {{-- Los sprints son por proyecto: el selector aparece solo con un proyecto elegido. --}}
+                        <select name="sprint" onchange="this.form.submit()"
+                                class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm">
+                            <option value="">— Todos los sprints —</option>
+                            @foreach ($sprints as $s)
+                                <option value="{{ $s->id }}" @selected($sprintId == $s->id)>{{ $s->nombre }}</option>
+                            @endforeach
+                        </select>
+                    @endif
                 </form>
                 <a href="{{ route('tareas.index') }}"
                    class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50">
@@ -69,8 +79,9 @@
                                         && ! in_array($tarea->estado, ['completada', 'cancelada']);
 
                                     // Lo que consume el modal de edición al hacer clic en la tarjeta.
-                                    $payload = $tarea->only(['id', 'titulo', 'descripcion', 'estado', 'prioridad', 'fecha_limite', 'proyecto_id', 'asignado_a']);
+                                    $payload = $tarea->only(['id', 'titulo', 'descripcion', 'estado', 'prioridad', 'fecha_limite', 'proyecto_id', 'sprint_id', 'asignado_a']);
                                     $payload['proyecto'] = ['nombre' => $tarea->proyecto?->nombre];
+                                    $payload['sprint'] = ['nombre' => $tarea->sprint?->nombre];
                                     $payload['asignado'] = ['name' => $tarea->asignado?->name];
                                 @endphp
                                 <article class="tarjeta bg-white rounded-lg shadow-sm p-3 {{ $puedeMover ? 'cursor-grab active:cursor-grabbing' : '' }} hover:shadow-md transition-shadow"
@@ -87,6 +98,10 @@
                                             <span class="px-2 py-0.5 rounded-full font-medium {{ $vencida ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-600' }}">
                                                 {{ $tarea->fecha_limite->format('d/m') }}
                                             </span>
+                                        @endif
+                                        @if ($tarea->sprint)
+                                            <span class="px-2 py-0.5 rounded-full font-medium bg-indigo-100 text-indigo-700"
+                                                  title="Sprint">{{ $tarea->sprint->nombre }}</span>
                                         @endif
                                     </div>
                                     <div class="mt-2 text-xs text-gray-500 flex justify-between gap-2">
@@ -124,6 +139,15 @@
                                             <option value="{{ $p->id }}" @selected($proyectoId == $p->id)>{{ $p->nombre }}</option>
                                         @endforeach
                                     </select>
+                                    @if ($proyectoId && $sprints->isNotEmpty())
+                                        {{-- Con un proyecto filtrado, la tarjeta nueva puede asignarse directo a un sprint suyo. --}}
+                                        <select name="sprint_id" class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-xs">
+                                            <option value="">Sin sprint</option>
+                                            @foreach ($sprints as $s)
+                                                <option value="{{ $s->id }}">{{ $s->nombre }}</option>
+                                            @endforeach
+                                        </select>
+                                    @endif
                                     <div class="flex items-center justify-between gap-2">
                                         <button type="submit"
                                                 class="px-3 py-1.5 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700">
@@ -165,8 +189,8 @@
 
     @if ($puedeMover)
         {{-- Modal de edición rápida (clic en una tarjeta) --}}
-        <div id="modal-tarea" class="hidden fixed inset-0 overflow-y-auto" role="dialog" aria-modal="true">
-            <div class="fixed inset-0 bg-gray-900/50" data-cerrar-modal></div>
+        <div id="modal-tarea" class="hidden fixed inset-0 overflow-y-auto" style="z-index: 9999" role="dialog" aria-modal="true">
+            <div class="fixed inset-0 bg-gray-900/50" style="z-index: -1" data-cerrar-modal></div>
 
             <div class="min-h-full flex items-center justify-center p-4">
                 <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-6">
@@ -230,6 +254,20 @@
                             </select>
                         </div>
 
+                        <div>
+                            <x-input-label for="editar-sprint" value="Sprint (opcional)" />
+                            <select id="editar-sprint" name="sprint_id" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                <option value="">Sin sprint</option>
+                                @foreach ($sprintsPorProyecto as $nombreProyecto => $sprintsProyecto)
+                                    <optgroup label="{{ $nombreProyecto }}">
+                                        @foreach ($sprintsProyecto as $s)
+                                            <option value="{{ $s->id }}">{{ $s->nombre }}</option>
+                                        @endforeach
+                                    </optgroup>
+                                @endforeach
+                            </select>
+                        </div>
+
                         <p class="error hidden text-sm text-red-600"></p>
 
                         <div class="flex items-center justify-between pt-2 border-t border-gray-200">
@@ -240,6 +278,55 @@
                             <x-primary-button>Guardar</x-primary-button>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+
+        {{-- Modal de error (reemplaza al alert nativo) --}}
+        <div id="modal-error" class="hidden fixed inset-0 overflow-y-auto" style="z-index: 10000" role="alertdialog" aria-modal="true">
+            <div class="fixed inset-0 bg-gray-900/50" style="z-index: -1"></div>
+
+            <div class="min-h-full flex items-center justify-center p-4">
+                <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+                    <div class="flex items-start gap-3">
+                        <div class="shrink-0 w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-xl">!</div>
+                        <div>
+                            <h3 class="font-semibold text-lg text-gray-800 leading-tight">Algo salió mal</h3>
+                            <p id="modal-error-mensaje" class="mt-1 text-sm text-gray-600"></p>
+                        </div>
+                    </div>
+                    <div class="mt-5 flex justify-end gap-2">
+                        <button type="button" data-cerrar-error
+                                class="px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50">
+                            Cerrar
+                        </button>
+                        <button type="button" id="btn-error-recargar"
+                                class="px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700">
+                            Recargar página
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Modal de confirmación (reemplaza al confirm nativo) --}}
+        <div id="modal-confirmar" class="hidden fixed inset-0 overflow-y-auto" style="z-index: 10001" role="dialog" aria-modal="true">
+            <div class="fixed inset-0 bg-gray-900/50" style="z-index: -1"></div>
+
+            <div class="min-h-full flex items-center justify-center p-4">
+                <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+                    <h3 class="font-semibold text-lg text-gray-800">Confirmar eliminación</h3>
+                    <p id="modal-confirmar-mensaje" class="mt-1 text-sm text-gray-600"></p>
+                    <div class="mt-5 flex justify-end gap-2">
+                        <button type="button" id="btn-confirmar-cancelar"
+                                class="px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50">
+                            Cancelar
+                        </button>
+                        <button type="button" id="btn-confirmar-aceptar"
+                                class="px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700">
+                            Eliminar
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

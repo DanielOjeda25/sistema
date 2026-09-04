@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             HitoSeeder::class,
             SolicitudCambioSeeder::class,
             TareaSeeder::class,
+            SprintSeeder::class,
             EntregableIASeeder::class,
             FacturaSeeder::class,
         ]);

@@ -73,6 +73,9 @@
                                             <a href="{{ route('proyectos.show', $proyecto) }}" class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
                                                 <x-heroicon-o-eye class="w-5 h-5" />
                                             </a>
+                                            <a href="{{ route('tareas.tablero', ['proyecto' => $proyecto->id]) }}" class="text-indigo-600 hover:text-indigo-800" title="Ver tablero de tareas" aria-label="Ver tablero de tareas">
+                                                <x-heroicon-o-squares-2x2 class="w-5 h-5" />
+                                            </a>
                                             @hasanyrole('Jefe|PM')
                                                 <a href="{{ route('proyectos.edit', $proyecto) }}" class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
                                                     <x-heroicon-o-pencil-square class="w-5 h-5" />

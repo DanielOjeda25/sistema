@@ -80,6 +80,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const prioridad = cfg.prioridades[tarea.prioridad] ?? cfg.prioridades.media;
         const fecha = fechaFormateada(tarea);
         const asignado = esc(tarea.asignado?.name ?? 'Sin asignar');
+        const sprint = tarea.sprint?.nombre
+            ? `<span class="px-2 py-0.5 rounded-full font-medium bg-indigo-100 text-indigo-700" title="Sprint">${esc(tarea.sprint.nombre)}</span>`
+            : '';
         const proyecto = cfg.proyectoFiltrado ? '' : `
             <span class="truncate max-w-[120px]" title="${esc(tarea.proyecto?.nombre)}">${esc(tarea.proyecto?.nombre)}</span>`;
 
@@ -89,6 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="mt-2 flex flex-wrap items-center gap-1.5 text-xs">
                     <span class="px-2 py-0.5 rounded-full font-medium ${prioridad}">${esc(tarea.prioridad.charAt(0).toUpperCase() + tarea.prioridad.slice(1))}</span>
                     ${fecha ? `<span class="px-2 py-0.5 rounded-full font-medium ${fecha.vencida ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-600'}">${fecha.texto}</span>` : ''}
+                    ${sprint}
                 </div>
                 <div class="mt-2 text-xs text-gray-500 flex justify-between gap-2">
                     <span class="truncate">${asignado}</span>
@@ -117,6 +121,56 @@ document.addEventListener('DOMContentLoaded', () => {
         elemento.classList.add('hidden');
     }
 
+    // ------------------------------------------------ modales de error/confirmación
+
+    // Reemplazan a alert() y confirm(): mismo propósito, pero con modales
+    // propios del sistema en vez de los diálogos nativos del navegador.
+    // Solo existen en la vista cuando el usuario puede editar; sin esto el
+    // tablero de solo lectura rompería al intentar enganchar los listeners.
+    const modalError = document.getElementById('modal-error');
+    const modalConfirmar = document.getElementById('modal-confirmar');
+    let resolverConfirmacion = null;
+
+    function mostrarError(mensaje) {
+        if (!modalError) return;
+        document.getElementById('modal-error-mensaje').textContent = mensaje;
+        document.body.appendChild(modalError);
+        modalError.classList.remove('hidden');
+    }
+
+    function cerrarError() {
+        modalError?.classList.add('hidden');
+    }
+
+    function confirmarAccion(mensaje) {
+        if (!modalConfirmar) return Promise.resolve(false);
+        document.getElementById('modal-confirmar-mensaje').textContent = mensaje;
+        document.body.appendChild(modalConfirmar);
+        modalConfirmar.classList.remove('hidden');
+
+        return new Promise(resolver => { resolverConfirmacion = resolver; });
+    }
+
+    function responderConfirmacion(aceptado) {
+        modalConfirmar?.classList.add('hidden');
+        if (resolverConfirmacion) {
+            resolverConfirmacion(aceptado);
+            resolverConfirmacion = null;
+        }
+    }
+
+    if (modalError) {
+        document.querySelectorAll('[data-cerrar-error]').forEach(el =>
+            el.addEventListener('click', cerrarError));
+        document.getElementById('btn-error-recargar').addEventListener('click', () => location.reload());
+    }
+
+    if (modalConfirmar) {
+        document.getElementById('btn-confirmar-cancelar').addEventListener('click', () => responderConfirmacion(false));
+        document.getElementById('btn-confirmar-aceptar').addEventListener('click', () => responderConfirmacion(true));
+        modalConfirmar.querySelector('.fixed.inset-0').addEventListener('click', () => responderConfirmacion(false));
+    }
+
     // ----------------------------------------------------------- drag & drop
 
     function idsDe(estado) {
@@ -129,9 +183,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         enviar(cfg.urls.mover, 'PATCH', { columnas })
             .then(actualizarContadores)
-            .catch(() => {
-                alert('No se pudo guardar el movimiento. La página se va a recargar para mostrar el estado real.');
-                location.reload();
+            .catch(e => {
+                // 419 = sesión/CSRF vencido: la página se quedó abierta mucho
+                // tiempo y el token ya no sirve; hay que recargar sí o sí.
+                const detalle = e.estado === 419
+                    ? 'Tu sesión expiró. Recargá la página e intentá de nuevo.'
+                    : 'El movimiento no quedó guardado. Recargá la página para ver el estado real de las tareas.';
+                mostrarError(detalle);
             });
     }
 
@@ -200,6 +258,10 @@ document.addEventListener('DOMContentLoaded', () => {
         tarjetaAbierta = tarjetaEl;
         const tarea = JSON.parse(tarjetaEl.dataset.tarea);
 
+        // El modal se porta al final del <body> para que ningún elemento del
+        // tablero o del layout quede por encima del overlay.
+        document.body.appendChild(modal);
+
         formEditar.reset();
         formEditar.action = cfg.urls.update.replace(':id:', tarea.id);        formEditar.titulo.value = tarea.titulo;
         formEditar.descripcion.value = tarea.descripcion ?? '';
@@ -207,6 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formEditar.prioridad.value = tarea.prioridad;
         formEditar.fecha_limite.value = soloFecha(tarea.fecha_limite);
         formEditar.proyecto_id.value = tarea.proyecto_id;
+        formEditar.sprint_id.value = tarea.sprint_id ?? '';
         formEditar.asignado_a.value = tarea.asignado_a ?? '';
         formEditar.querySelector('.ver-detalle').href = cfg.urls.show.replace(':id:', tarea.id);
 
@@ -236,7 +299,10 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.querySelectorAll('[data-cerrar-modal]').forEach(el =>
             el.addEventListener('click', cerrarModal));
         document.addEventListener('keydown', evento => {
-            if (evento.key === 'Escape' && !modal.classList.contains('hidden')) cerrarModal();
+            if (evento.key !== 'Escape') return;
+            if (!modal.classList.contains('hidden')) cerrarModal();
+            if (modalError && !modalError.classList.contains('hidden')) cerrarError();
+            if (modalConfirmar && !modalConfirmar.classList.contains('hidden')) responderConfirmacion(false);
         });
 
         formEditar.addEventListener('submit', async evento => {
@@ -266,7 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         formEditar.querySelector('.eliminar-tarea').addEventListener('click', async () => {
-            if (!confirm('¿Eliminar esta tarea? Esta acción no se puede deshacer.')) return;
+            if (!await confirmarAccion('¿Eliminar esta tarea? Esta acción no se puede deshacer.')) return;
 
             ocultarError(errorEditar);
             try {

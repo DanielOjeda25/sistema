@@ -6,33 +6,28 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use OwenIt\Auditing\Contracts\Auditable;
 
-class Tarea extends Model implements Auditable
+class Sprint extends Model implements Auditable
 {
     use HasFactory;
     use \OwenIt\Auditing\Auditable;
 
-    protected $table = 'tareas';
+    protected $table = 'sprints';
 
     protected $fillable = [
-        'titulo',
-        'descripcion',
-        'estado',
-        'prioridad',
-        'fecha_limite',
         'proyecto_id',
-        'sprint_id',
-        'asignado_a',
-        'solicitud_cambio_id',
-        'orden',
+        'nombre',
+        'fecha_inicio',
+        'fecha_fin',
     ];
 
     protected function casts(): array
     {
         return [
-            'fecha_limite' => 'date',
-            'orden' => 'integer',
+            'fecha_inicio' => 'date',
+            'fecha_fin' => 'date',
         ];
     }
 
@@ -41,14 +36,9 @@ class Tarea extends Model implements Auditable
         return $this->belongsTo(Proyecto::class);
     }
 
-    public function sprint(): BelongsTo
-    {
-        return $this->belongsTo(Sprint::class);
-    }
-
     /**
-     * Tareas visibles para el usuario: todas para los roles internos, solo las
-     * de los proyectos de su empresa para un usuario con rol Cliente.
+     * Sprints visibles para el usuario: todos para los roles internos, solo
+     * los de los proyectos de su empresa para un usuario con rol Cliente.
      */
     public function scopeVisiblePara(Builder $query, User $usuario): Builder
     {
@@ -59,13 +49,8 @@ class Tarea extends Model implements Auditable
         return $query;
     }
 
-    public function asignado(): BelongsTo
+    public function tareas(): HasMany
     {
-        return $this->belongsTo(User::class, 'asignado_a');
-    }
-
-    public function solicitudCambio(): BelongsTo
-    {
-        return $this->belongsTo(SolicitudCambio::class, 'solicitud_cambio_id');
+        return $this->hasMany(Tarea::class);
     }
 }
