@@ -28,7 +28,11 @@ class EntregableIAController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        return view('entregables.index', compact('entregables'));
+        // Listas para los modales de crear/editar del listado.
+        $proyectos = Proyecto::orderBy('nombre')->get();
+        $usuarios = User::orderBy('name')->get();
+
+        return view('entregables.index', compact('entregables', 'proyectos', 'usuarios'));
     }
 
     public function create()
@@ -52,7 +56,7 @@ class EntregableIAController extends Controller
 
         EntregableIA::create($data);
 
-        return redirect()->route('entregables.index')->with('success', 'Entregable creado correctamente.');
+        return ($request->input('desde_modal') ? redirect()->back() : redirect()->route('entregables.index'))->with('success', 'Entregable creado correctamente.');
     }
 
     public function show(Request $request, EntregableIA $entregable)
@@ -85,7 +89,7 @@ class EntregableIAController extends Controller
 
         $entregable->update($data);
 
-        return redirect()->route('entregables.index')->with('success', 'Entregable actualizado correctamente.');
+        return ($request->input('desde_modal') ? redirect()->back() : redirect()->route('entregables.index'))->with('success', 'Entregable actualizado correctamente.');
     }
 
     public function destroy(EntregableIA $entregable)

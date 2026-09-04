@@ -28,7 +28,11 @@ class FacturaController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        return view('facturas.index', compact('facturas'));
+        // Listas para los modales de crear/editar del listado.
+        $proyectos = Proyecto::orderBy('nombre')->get();
+        $usuarios = User::orderBy('name')->get();
+
+        return view('facturas.index', compact('facturas', 'proyectos', 'usuarios'));
     }
 
     public function create()
@@ -54,7 +58,7 @@ class FacturaController extends Controller
 
         Factura::create($data);
 
-        return redirect()->route('facturas.index')->with('success', 'Factura creada correctamente.');
+        return ($request->input('desde_modal') ? redirect()->back() : redirect()->route('facturas.index'))->with('success', 'Factura creada correctamente.');
     }
 
     public function show(Request $request, Factura $factura)
@@ -89,7 +93,7 @@ class FacturaController extends Controller
 
         $factura->update($data);
 
-        return redirect()->route('facturas.index')->with('success', 'Factura actualizada correctamente.');
+        return ($request->input('desde_modal') ? redirect()->back() : redirect()->route('facturas.index'))->with('success', 'Factura actualizada correctamente.');
     }
 
     public function destroy(Factura $factura)

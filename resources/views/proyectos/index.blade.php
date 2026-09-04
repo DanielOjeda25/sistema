@@ -5,9 +5,9 @@
                 Listado de Proyectos
             </h2>
             @hasanyrole('Jefe|PM')
-                <a href="{{ route('proyectos.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+                <button type="button" data-abrir-modal="modal-proyecto-crear" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
                 + Nuevo Proyecto
-            </a>
+            </button>
             @endhasanyrole
         </div>
     </x-slot>
@@ -62,6 +62,7 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200 text-gray-700">
                             @forelse ($proyectos as $proyecto)
+                                @php($valoresProyecto = $proyecto->only(['nombre', 'descripcion', 'estado', 'cliente_id', 'pm_id']) + ['fecha_inicio' => $proyecto->fecha_inicio?->format('Y-m-d'), 'fecha_fin_estimada' => $proyecto->fecha_fin_estimada?->format('Y-m-d')])
                                 <tr>
                                     <td class="px-6 py-4">{{ $proyecto->nombre }}</td>
                                     <td class="px-6 py-4">{{ $proyecto->cliente?->nombre ?? 'N/A' }}</td>
@@ -77,9 +78,12 @@
                                                 <x-heroicon-o-squares-2x2 class="w-5 h-5" />
                                             </a>
                                             @hasanyrole('Jefe|PM')
-                                                <a href="{{ route('proyectos.edit', $proyecto) }}" class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
+                                                <button type="button" data-abrir-modal="modal-proyecto-crear"
+                                                        data-url="{{ route('proyectos.update', $proyecto) }}"
+                                                        data-valores='@json($valoresProyecto)'
+                                                        class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
                                                     <x-heroicon-o-pencil-square class="w-5 h-5" />
-                                                </a>
+                                                </button>
                                             @endhasanyrole
                                         </div>
                                     </td>
@@ -102,4 +106,29 @@
             </div>
         </div>
     </div>
+
+    <x-crud-modal id="modal-proyecto-crear" abrir-con-errores titulo="Nuevo Proyecto">
+        <form method="POST" action="{{ route('proyectos.store') }}" class="space-y-4">
+            @csrf
+            <input type="hidden" name="desde_modal" value="1">
+            @include('proyectos._campos', ['proyectoItem' => null])
+            <div class="flex items-center justify-end space-x-4 pt-2 border-t border-gray-200">
+                <button type="button" data-crud-cerrar class="text-sm text-gray-600 hover:underline">Cancelar</button>
+                <x-primary-button>Guardar Proyecto</x-primary-button>
+            </div>
+        </form>
+    </x-crud-modal>
+
+    <x-crud-modal id="modal-proyecto-editar" titulo="Editar Proyecto">
+        <form method="POST" action="{{ route('proyectos.store') }}" class="space-y-4">
+            @csrf
+            @method('PUT')
+            <input type="hidden" name="desde_modal" value="1">
+            @include('proyectos._campos', ['proyectoItem' => null])
+            <div class="flex items-center justify-end space-x-4 pt-2 border-t border-gray-200">
+                <button type="button" data-crud-cerrar class="text-sm text-gray-600 hover:underline">Cancelar</button>
+                <x-primary-button>Guardar Cambios</x-primary-button>
+            </div>
+        </form>
+    </x-crud-modal>
 </x-app-layout>

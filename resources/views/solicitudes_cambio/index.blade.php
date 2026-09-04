@@ -5,9 +5,10 @@
                 Listado de Solicitudes de Cambio
             </h2>
             @hasanyrole('Jefe|PM|PO')
-                <a href="{{ route('solicitudes-cambio.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+                <button type="button" data-abrir-modal="modal-solicitud-crear"
+                        class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
                 + Nueva Solicitud
-            </a>
+            </button>
             @endhasanyrole
         </div>
     </x-slot>
@@ -62,6 +63,7 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200 text-gray-700">
                             @forelse ($solicitudes as $solicitud)
+                                @php($valoresSolicitud = $solicitud->only(['titulo', 'descripcion', 'estado', 'prioridad', 'proyecto_id', 'solicitado_por']))
                                 <tr>
                                     <td class="px-6 py-4">{{ $solicitud->titulo }}</td>
                                     <td class="px-6 py-4">{{ $solicitud->proyecto?->nombre ?? 'N/A' }}</td>
@@ -74,9 +76,12 @@
                                                 <x-heroicon-o-eye class="w-5 h-5" />
                                             </a>
                                             @hasanyrole('Jefe|PM|PO')
-                                                <a href="{{ route('solicitudes-cambio.edit', $solicitud) }}" class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
+                                                <button type="button" data-abrir-modal="modal-solicitud-editar"
+                                                        data-url="{{ route('solicitudes-cambio.update', $solicitud) }}"
+                                                        data-valores='@json($valoresSolicitud)'
+                                                        class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
                                                     <x-heroicon-o-pencil-square class="w-5 h-5" />
-                                                </a>
+                                                </button>
                                             @endhasanyrole
                                         </div>
                                     </td>
@@ -99,4 +104,29 @@
             </div>
         </div>
     </div>
+
+    <x-crud-modal id="modal-solicitud-crear" abrir-con-errores titulo="Nueva Solicitud de Cambio">
+        <form method="POST" action="{{ route('solicitudes-cambio.store') }}" class="space-y-4">
+            @csrf
+            <input type="hidden" name="desde_modal" value="1">
+            @include('solicitudes_cambio._campos', ['solicitud' => null])
+            <div class="flex items-center justify-end space-x-4 pt-2 border-t border-gray-200">
+                <button type="button" data-crud-cerrar class="text-sm text-gray-600 hover:underline">Cancelar</button>
+                <x-primary-button>Guardar Solicitud</x-primary-button>
+            </div>
+        </form>
+    </x-crud-modal>
+
+    <x-crud-modal id="modal-solicitud-editar" titulo="Editar Solicitud de Cambio">
+        <form method="POST" action="{{ route('solicitudes-cambio.store') }}" class="space-y-4">
+            @csrf
+            @method('PUT')
+            <input type="hidden" name="desde_modal" value="1">
+            @include('solicitudes_cambio._campos', ['solicitud' => null])
+            <div class="flex items-center justify-end space-x-4 pt-2 border-t border-gray-200">
+                <button type="button" data-crud-cerrar class="text-sm text-gray-600 hover:underline">Cancelar</button>
+                <x-primary-button>Guardar Cambios</x-primary-button>
+            </div>
+        </form>
+    </x-crud-modal>
 </x-app-layout>
