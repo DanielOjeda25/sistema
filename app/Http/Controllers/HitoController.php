@@ -31,7 +31,9 @@ class HitoController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        return view('hitos.index', compact('hitos'));
+        $proyectos = Proyecto::orderBy('nombre')->get();
+
+        return view('hitos.index', compact('hitos', 'proyectos'));
     }
 
     public function create()
@@ -53,7 +55,7 @@ class HitoController extends Controller
 
         Hito::create($data);
 
-        return redirect()->route('hitos.index')->with('success', 'Hito creado correctamente.');
+        return ($request->input('desde_modal') ? redirect()->back() : redirect()->route('hitos.index'))->with('success', 'Hito creado correctamente.');
     }
 
     public function show(Request $request, Hito $hito)
@@ -84,7 +86,7 @@ class HitoController extends Controller
 
         $hito->update($data);
 
-        return redirect()->route('hitos.index')->with('success', 'Hito actualizado correctamente.');
+        return ($request->input('desde_modal') ? redirect()->back() : redirect()->route('hitos.index'))->with('success', 'Hito actualizado correctamente.');
     }
 
     public function destroy(Hito $hito)

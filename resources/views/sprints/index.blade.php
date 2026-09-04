@@ -5,9 +5,10 @@
                 Sprints
             </h2>
             @hasanyrole('Jefe|PM|PO')
-                <a href="{{ route('sprints.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+                <button type="button" data-abrir-modal="modal-sprint-crear"
+                        class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
                     + Nuevo Sprint
-                </a>
+                </button>
             @endhasanyrole
         </div>
     </x-slot>
@@ -48,6 +49,7 @@
                         </thead>
                         <tbody class="divide-y divide-gray-100">
                             @forelse ($sprints as $sprint)
+                                @php($valoresSprint = ['nombre' => $sprint->nombre, 'proyecto_id' => $sprint->proyecto_id, 'fecha_inicio' => $sprint->fecha_inicio?->format('Y-m-d'), 'fecha_fin' => $sprint->fecha_fin?->format('Y-m-d')])
                                 <tr>
                                     <td class="px-6 py-4 font-medium text-gray-800">{{ $sprint->nombre }}</td>
                                     <td class="px-6 py-4">{{ $sprint->proyecto?->nombre ?? 'N/A' }}</td>
@@ -61,9 +63,12 @@
                                                 <x-heroicon-o-squares-2x2 class="w-5 h-5" />
                                             </a>
                                             @hasanyrole('Jefe|PM|PO')
-                                                <a href="{{ route('sprints.edit', $sprint) }}" class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
+                                                <button type="button" data-abrir-modal="modal-sprint-editar"
+                                                        data-url="{{ route('sprints.update', $sprint) }}"
+                                                        data-valores='@json($valoresSprint)'
+                                                        class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
                                                     <x-heroicon-o-pencil-square class="w-5 h-5" />
-                                                </a>
+                                                </button>
                                                 <form method="POST" action="{{ route('sprints.destroy', $sprint) }}"
                                                       class="inline" data-confirmar-eliminar
                                                       data-mensaje="¿Eliminar el sprint “{{ $sprint->nombre }}”? Sus tareas quedan sin sprint, no se borran.">
@@ -94,6 +99,31 @@
             </div>
         </div>
     </div>
+
+    <x-crud-modal id="modal-sprint-crear" abrir-con-errores titulo="Nuevo Sprint">
+        <form method="POST" action="{{ route('sprints.store') }}" class="space-y-4">
+            @csrf
+            <input type="hidden" name="desde_modal" value="1">
+            @include('sprints._campos', ['sprint' => null])
+            <div class="flex items-center justify-end space-x-4 pt-2 border-t border-gray-200">
+                <button type="button" data-crud-cerrar class="text-sm text-gray-600 hover:underline">Cancelar</button>
+                <x-primary-button>Guardar Sprint</x-primary-button>
+            </div>
+        </form>
+    </x-crud-modal>
+
+    <x-crud-modal id="modal-sprint-editar" titulo="Editar Sprint">
+        <form method="POST" action="{{ route('sprints.store') }}" class="space-y-4">
+            @csrf
+            @method('PUT')
+            <input type="hidden" name="desde_modal" value="1">
+            @include('sprints._campos', ['sprint' => null])
+            <div class="flex items-center justify-end space-x-4 pt-2 border-t border-gray-200">
+                <button type="button" data-crud-cerrar class="text-sm text-gray-600 hover:underline">Cancelar</button>
+                <x-primary-button>Guardar Cambios</x-primary-button>
+            </div>
+        </form>
+    </x-crud-modal>
 
     {{-- Confirmación de eliminación: modal propio en vez del confirm() nativo --}}
     <div id="modal-eliminar-sprint" class="hidden fixed inset-0 overflow-y-auto" style="z-index: 9999" role="dialog" aria-modal="true">

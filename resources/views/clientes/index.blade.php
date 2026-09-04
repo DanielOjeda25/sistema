@@ -5,9 +5,10 @@
                 Listado de Clientes
             </h2>
             @hasanyrole('Jefe|PM')
-                <a href="{{ route('clientes.create') }}" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
-                + Nuevo Cliente
-            </a>
+                <button type="button" data-abrir-modal="modal-cliente-crear"
+                        class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+                    + Nuevo Cliente
+                </button>
             @endhasanyrole
         </div>
     </x-slot>
@@ -62,6 +63,7 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200 text-gray-700">
                             @forelse ($clientes as $cliente)
+                                @php($valoresCliente = $cliente->only(['nombre', 'apellido', 'email', 'telefono', 'empresa', 'estado']))
                                 <tr>
                                     <td class="px-6 py-4">{{ $cliente->nombre }} {{ $cliente->apellido }}</td>
                                     <td class="px-6 py-4">{{ $cliente->email }}</td>
@@ -74,9 +76,12 @@
                                                 <x-heroicon-o-eye class="w-5 h-5" />
                                             </a>
                                             @hasanyrole('Jefe|PM')
-                                                <a href="{{ route('clientes.edit', $cliente) }}" class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
+                                                <button type="button" data-abrir-modal="modal-cliente-editar"
+                                                        data-url="{{ route('clientes.update', $cliente) }}"
+                                                        data-valores='@json($valoresCliente)'
+                                                        class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
                                                     <x-heroicon-o-pencil-square class="w-5 h-5" />
-                                                </a>
+                                                </button>
                                             @endhasanyrole
                                         </div>
                                     </td>
@@ -99,4 +104,31 @@
             </div>
         </div>
     </div>
+
+    @hasanyrole('Jefe|PM')
+        <x-crud-modal id="modal-cliente-crear" abrir-con-errores titulo="Nuevo Cliente">
+            <form method="POST" action="{{ route('clientes.store') }}" class="space-y-4">
+                @csrf
+                <input type="hidden" name="desde_modal" value="1">
+                @include('clientes._campos', ['prefijo' => 'crear-'])
+                <div class="flex items-center justify-end space-x-4 pt-2 border-t border-gray-200">
+                    <button type="button" data-crud-cerrar class="text-sm text-gray-600 hover:underline">Cancelar</button>
+                    <x-primary-button>Guardar Cliente</x-primary-button>
+                </div>
+            </form>
+        </x-crud-modal>
+
+        <x-crud-modal id="modal-cliente-editar" titulo="Editar Cliente">
+            <form method="POST" action="{{ route('clientes.store') }}" class="space-y-4" data-crud-form>
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="desde_modal" value="1">
+                @include('clientes._campos', ['prefijo' => 'editar-'])
+                <div class="flex items-center justify-end space-x-4 pt-2 border-t border-gray-200">
+                    <button type="button" data-crud-cerrar class="text-sm text-gray-600 hover:underline">Cancelar</button>
+                    <x-primary-button>Guardar Cambios</x-primary-button>
+                </div>
+            </form>
+        </x-crud-modal>
+    @endhasanyrole
 </x-app-layout>

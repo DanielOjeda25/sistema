@@ -53,7 +53,7 @@ class SprintController extends Controller
 
         Sprint::create($data);
 
-        return redirect()->route('sprints.index')->with('success', 'Sprint creado correctamente.');
+        return ($request->input('desde_modal') ? redirect()->back() : redirect()->route('sprints.index'))->with('success', 'Sprint creado correctamente.');
     }
 
     public function edit(Sprint $sprint)
@@ -74,7 +74,7 @@ class SprintController extends Controller
 
         $sprint->update($data);
 
-        return redirect()->route('sprints.index')->with('success', 'Sprint actualizado correctamente.');
+        return ($request->input('desde_modal') ? redirect()->back() : redirect()->route('sprints.index'))->with('success', 'Sprint actualizado correctamente.');
     }
 
     public function destroy(Sprint $sprint)

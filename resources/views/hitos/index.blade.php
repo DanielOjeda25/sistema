@@ -4,9 +4,10 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Listado de Hitos
             </h2>
-            <a href="{{ route('hitos.create') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700">
+            <button type="button" data-abrir-modal="modal-hito-crear"
+                    class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
                 + Nuevo Hito
-            </a>
+            </button>
         </div>
     </x-slot>
 
@@ -59,6 +60,7 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200 text-gray-700">
                             @forelse ($hitos as $hito)
+                                @php($valoresHito = ['nombre' => $hito->nombre, 'descripcion' => $hito->descripcion, 'completado' => (string) $hito->completado, 'proyecto_id' => $hito->proyecto_id, 'fecha_objetivo' => $hito->fecha_objetivo?->format('Y-m-d')])
                                 <tr>
                                     <td class="px-6 py-4">{{ $hito->nombre }}</td>
                                     <td class="px-6 py-4">{{ $hito->proyecto?->nombre ?? 'N/A' }}</td>
@@ -69,9 +71,12 @@
                                             <a href="{{ route('hitos.show', $hito) }}" class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
                                                 <x-heroicon-o-eye class="w-5 h-5" />
                                             </a>
-                                            <a href="{{ route('hitos.edit', $hito) }}" class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
+                                            <button type="button" data-abrir-modal="modal-hito-editar"
+                                                    data-url="{{ route('hitos.update', $hito) }}"
+                                                    data-valores='@json($valoresHito)'
+                                                    class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
                                                 <x-heroicon-o-pencil-square class="w-5 h-5" />
-                                            </a>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -93,4 +98,29 @@
             </div>
         </div>
     </div>
+
+    <x-crud-modal id="modal-hito-crear" abrir-con-errores titulo="Nuevo Hito">
+        <form method="POST" action="{{ route('hitos.store') }}" class="space-y-4">
+            @csrf
+            <input type="hidden" name="desde_modal" value="1">
+            @include('hitos._campos', ['hito' => null])
+            <div class="flex items-center justify-end space-x-4 pt-2 border-t border-gray-200">
+                <button type="button" data-crud-cerrar class="text-sm text-gray-600 hover:underline">Cancelar</button>
+                <x-primary-button>Guardar Hito</x-primary-button>
+            </div>
+        </form>
+    </x-crud-modal>
+
+    <x-crud-modal id="modal-hito-editar" titulo="Editar Hito">
+        <form method="POST" action="{{ route('hitos.store') }}" class="space-y-4">
+            @csrf
+            @method('PUT')
+            <input type="hidden" name="desde_modal" value="1">
+            @include('hitos._campos', ['hito' => null])
+            <div class="flex items-center justify-end space-x-4 pt-2 border-t border-gray-200">
+                <button type="button" data-crud-cerrar class="text-sm text-gray-600 hover:underline">Cancelar</button>
+                <x-primary-button>Guardar Cambios</x-primary-button>
+            </div>
+        </form>
+    </x-crud-modal>
 </x-app-layout>
