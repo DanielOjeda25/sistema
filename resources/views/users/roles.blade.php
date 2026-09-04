@@ -24,7 +24,7 @@
                     <div class="mb-6 space-y-3">
                         @foreach($roles as $role)
                             <div class="flex items-center">
-                                <input class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 h-5 w-5" 
+                                <input class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 h-5 w-5" 
                                        type="checkbox" 
                                        name="roles[]" 
                                        value="{{ $role->name }}" 

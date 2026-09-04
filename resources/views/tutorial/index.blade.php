@@ -17,7 +17,7 @@
             <div>
                 <h3 class="text-2xl font-extrabold text-gray-900 mb-4">1. Arquitectura del Proyecto</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-lg shadow border-l-4 border-blue-500 hover:shadow-md transition">
+                    <div class="bg-white p-6 rounded-lg shadow border-l-4 border-indigo-500 hover:shadow-md transition">
                         <h4 class="font-bold text-lg mb-2 text-blue-700">El Modelo (Models)</h4>
                         <p class="text-gray-600 text-sm mb-4">Ubicación: <code class="bg-gray-100 p-1 text-red-600 rounded">app/Models/</code></p>
                         <p class="text-sm">Representa la tabla de la base de datos. Aquí definimos las relaciones y los campos que se pueden cargar masivamente (fillable).</p>
