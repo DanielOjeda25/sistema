@@ -22,6 +22,7 @@ class Tarea extends Model implements Auditable
         'prioridad',
         'fecha_limite',
         'proyecto_id',
+        'sprint_id',
         'asignado_a',
         'solicitud_cambio_id',
         'orden',
@@ -38,6 +39,11 @@ class Tarea extends Model implements Auditable
     public function proyecto(): BelongsTo
     {
         return $this->belongsTo(Proyecto::class);
+    }
+
+    public function sprint(): BelongsTo
+    {
+        return $this->belongsTo(Sprint::class);
     }
 
     /**

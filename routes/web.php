@@ -9,6 +9,7 @@ use App\Http\Controllers\InformeIAController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\SolicitudCambioController;
+use App\Http\Controllers\SprintSummaryController;
 use App\Http\Controllers\TareaController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -160,6 +161,8 @@ Route::middleware(['auth', 'role:Jefe|PM|PO|Programador'])->group(function () {
         ->name('proyectos.actualizaciones.store');
     Route::post('proyectos/{proyecto}/informes-ia', [InformeIAController::class, 'store'])
         ->name('proyectos.informes-ia.store');
+    Route::post('sprints/{sprint}/resumen-ia', [SprintSummaryController::class, 'store'])
+        ->name('sprints.resumen-ia.store');
 });
 
 Route::middleware(['auth', 'role:Jefe|PM|PO'])->group(function () {

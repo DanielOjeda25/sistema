@@ -62,6 +62,11 @@ class Proyecto extends Model implements Auditable
         return $this->hasMany(Tarea::class);
     }
 
+    public function sprints(): HasMany
+    {
+        return $this->hasMany(Sprint::class);
+    }
+
     public function hitos(): HasMany
     {
         return $this->hasMany(Hito::class);

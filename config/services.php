@@ -35,4 +35,17 @@ return [
         ],
     ],
 
+    'openrouter' => [
+        'enabled' => env('OPENROUTER_ENABLED', false),
+        'api_key' => env('OPENROUTER_API_KEY'),
+        'url' => env('OPENROUTER_URL', 'https://openrouter.ai/api/v1/chat/completions'),
+        'model' => env('OPENROUTER_MODEL', 'meta-llama/llama-3.3-70b-instruct:free'),
+        'fallback_model' => env('OPENROUTER_FALLBACK_MODEL', 'qwen/qwen-2.5-coder-32b-instruct:free'),
+        'referer' => env('OPENROUTER_REFERER', env('APP_URL', 'http://localhost')),
+        'title' => env('OPENROUTER_TITLE', 'CRUZNEGRA-Sprint-Analysis'),
+        'timeout' => env('OPENROUTER_TIMEOUT', 30),
+        'temperature' => env('OPENROUTER_TEMPERATURE', 0.4),
+        'max_tokens' => env('OPENROUTER_MAX_TOKENS', 900),
+    ],
+
 ];
