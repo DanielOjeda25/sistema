@@ -1,10 +1,10 @@
 # CRUZNEGRA — Sistema de Gestión
 
-Sistema interno para gestión de clientes, proyectos, tareas, hitos, entregables y facturación.
+Sistema interno para gestión de clientes, proyectos, sprints, tareas, hitos, entregables y facturación.
 
 ## Stack
 
-- Laravel 12 + PHP 8.2
+- Laravel 12 + PHP 8.3
 - Spatie Permission (roles y permisos)
 - Laravel Breeze (autenticación)
 - Laravel Auditing (registro de cambios)
@@ -19,6 +19,7 @@ Sistema interno para gestión de clientes, proyectos, tareas, hitos, entregables
 |-----------|----------|
 | **[CRUZNEGRA_GUIA_EQUIPO.md](CRUZNEGRA_GUIA_EQUIPO.md)** | **Trabajo actual del equipo:** las 4 fases de las vistas, con el código completo listo para copiar |
 | [docs/INSTALACION.md](docs/INSTALACION.md) | Cómo correr el proyecto desde cero en una máquina nueva |
+| [docs/INSTALACION_DOCKER.md](docs/INSTALACION_DOCKER.md) | Cómo levantar el proyecto con Docker |
 
 ### Consulta ocasional (carpeta `docs/`)
 
@@ -29,6 +30,7 @@ Sistema interno para gestión de clientes, proyectos, tareas, hitos, entregables
 | [CRUZNEGRA_MODELO_RELACIONAL.md](docs/CRUZNEGRA_MODELO_RELACIONAL.md) | Diagrama entidad-relación de la base de datos |
 | [CRUZNEGRA_DIAGRAMA_CLASES.md](docs/CRUZNEGRA_DIAGRAMA_CLASES.md) | Diagrama de clases de los modelos Eloquent |
 | [INTEGRACION_IA.md](docs/INTEGRACION_IA.md) | Punto de integración para el modelo que genera informes de avance |
+| [INTEGRACION_SPRINT_IA.md](docs/INTEGRACION_SPRINT_IA.md) | Endpoint de resumen de sprint con OpenRouter |
 
 ## Empezar acá
 
