@@ -1,6 +1,6 @@
 # CRUZNEGRA — Diagrama de Clases (Modelos Eloquent)
 
-> Las 8 clases del modelo (`app/Models/`) con sus métodos de relación
+> Las clases relevantes del modelo (`app/Models/`) con sus métodos de relación
 > `belongsTo` / `hasMany`, tal como están implementadas.
 >
 > **Cómo verlo en VS Code:** extensión *"Markdown Preview Mermaid Support"* +
@@ -33,6 +33,7 @@ classDiagram
         +cliente() BelongsTo
         +pm() BelongsTo
         +tareas() HasMany
+        +sprints() HasMany
         +hitos() HasMany
         +entregablesIa() HasMany
         +facturas() HasMany
@@ -45,12 +46,17 @@ classDiagram
     }
     class Tarea {
         +proyecto() BelongsTo
+        +sprint() BelongsTo
         +scopeVisiblePara(Builder, User) Builder
         +asignado() BelongsTo
         +solicitudCambio() BelongsTo
     }
     class Hito {
         +proyecto() BelongsTo
+    }
+    class Sprint {
+        +proyecto() BelongsTo
+        +tareas() HasMany
     }
     class EntregableIA {
         +proyecto() BelongsTo
@@ -69,6 +75,8 @@ classDiagram
     User "1" --> "*" EntregableIA : entregablesGenerados [generado_por]
     User "1" --> "*" Factura : facturasEmitidas [emitida_por]
     Proyecto "1" --> "*" Tarea : tareas [proyecto_id]
+    Proyecto "1" --> "*" Sprint : sprints [proyecto_id]
+    Sprint "1" --> "*" Tarea : tareas [sprint_id]
     Proyecto "1" --> "*" Hito : hitos [proyecto_id]
     Proyecto "1" --> "*" EntregableIA : entregablesIa [proyecto_id]
     Proyecto "1" --> "*" Factura : facturas [proyecto_id]
@@ -82,9 +90,10 @@ classDiagram
 |---|---|---|
 | `Cliente` | — | `proyectos`, `usuarios` |
 | `User` | `cliente` | `proyectosComoPm`, `tareasAsignadas`, `solicitudesRealizadas`, `entregablesGenerados`, `facturasEmitidas` |
-| `Proyecto` | `cliente`, `pm` | `tareas`, `hitos`, `entregablesIa`, `facturas`, `solicitudesCambio` |
+| `Proyecto` | `cliente`, `pm` | `tareas`, `sprints`, `hitos`, `entregablesIa`, `facturas`, `solicitudesCambio` |
 | `SolicitudCambio` | `proyecto`, `solicitante` | `tareas` |
-| `Tarea` | `proyecto`, `asignado`, `solicitudCambio` | — |
+| `Tarea` | `proyecto`, `sprint`, `asignado`, `solicitudCambio` | — |
+| `Sprint` | `proyecto` | `tareas` |
 | `Hito` | `proyecto` | — |
 | `EntregableIA` | `proyecto`, `generador` | — |
 | `Factura` | `proyecto`, `emisor` | — |
