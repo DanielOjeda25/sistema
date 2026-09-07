@@ -1,7 +1,7 @@
 # CRUZNEGRA — Modelo Relacional (según migraciones)
 
 > Diagrama entidad-relación que refleja el esquema **realmente implementado** en la base
-> de datos `cruznegra` (las migraciones de negocio, incluidas las de agosto 2026).
+> de datos `cruznegra` (las migraciones de negocio, incluidas las de septiembre 2026).
 >
 > **Cómo verlo en VS Code:** instalá la extensión *"Markdown Preview Mermaid Support"*
 > y abrí la vista previa (Ctrl+Shift+V). Para el código puro, copiá el bloque `mermaid`
@@ -22,6 +22,8 @@ erDiagram
     users     ||--o{ solicitudes_cambio : "solicitado_por"
 
     proyectos        ||--o{ tareas      : "proyecto_id"
+    proyectos        ||--o{ sprints     : "proyecto_id"
+    sprints          ||--o{ tareas      : "sprint_id (nullable)"
     users            ||--o{ tareas      : "asignado_a"
     solicitudes_cambio ||--o{ tareas    : "solicitud_cambio_id (nullable)"
 
@@ -77,6 +79,7 @@ erDiagram
     tareas {
         int      id                   PK
         int      proyecto_id          FK
+        int      sprint_id            FK "nullable"
         int      asignado_a           FK "users"
         int      solicitud_cambio_id  FK "nullable"
         string   titulo
@@ -85,6 +88,17 @@ erDiagram
         string   prioridad            "baja | media | alta"
         date     fecha_limite
         int      orden                "posición en el tablero"
+    }
+
+    sprints {
+        int      id              PK
+        int      proyecto_id     FK
+        string   nombre
+        text     descripcion
+        date     fecha_inicio
+        date     fecha_fin
+        string   estado          "planificado | en_progreso | completado | cancelado"
+        mediumtext resumen_ia    "nullable — caché del resumen"
     }
 
     hitos {
@@ -129,6 +143,11 @@ erDiagram
 - `solicitudes_cambio`, `hitos`, `entregables_ia` y `facturas` cuelgan de `proyectos`.
 - `tareas.solicitud_cambio_id` es **nullable**: solo se completa cuando la tarea surge
   de una solicitud de cambio.
+- `tareas.sprint_id` es **nullable**: permite asociar gradualmente las tarjetas a un
+  sprint sin romper las tareas existentes. Al eliminar un sprint, la tarjeta queda
+  en el proyecto y se desvincula del sprint (`ON DELETE SET NULL`).
+- `sprints.resumen_ia` guarda el último resumen generado para evitar llamadas
+  redundantes a OpenRouter.
 - `tareas.orden` guarda la posición de la tarjeta en el tablero (drag & drop) dentro
   de su columna.
 - Las FK hacia `proyectos` y `users` son `ON DELETE CASCADE`, salvo

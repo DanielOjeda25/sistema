@@ -19,8 +19,11 @@ class Sprint extends Model implements Auditable
     protected $fillable = [
         'proyecto_id',
         'nombre',
+        'descripcion',
         'fecha_inicio',
         'fecha_fin',
+        'estado',
+        'resumen_ia',
     ];
 
     protected function casts(): array
