@@ -30,7 +30,11 @@ class ProyectoController extends Controller
         ->paginate(15)
         ->withQueryString();
 
-    return view('proyectos.index', compact('proyectos'));
+    // Listas para los modales de crear/editar del listado.
+    $clientes = Cliente::orderBy('nombre')->get();
+    $usuarios = User::orderBy('name')->get();
+
+    return view('proyectos.index', compact('proyectos', 'clientes', 'usuarios'));
 
     }
 
@@ -56,7 +60,7 @@ class ProyectoController extends Controller
 
         Proyecto::create($data);
 
-        return redirect()->route('proyectos.index')->with('success', 'Proyecto creado correctamente.');
+        return ($request->input('desde_modal') ? redirect()->back() : redirect()->route('proyectos.index'))->with('success', 'Proyecto creado correctamente.');
     }
 
     public function show(Request $request, Proyecto $proyecto, ProjectContextBuilder $contextBuilder)
@@ -106,7 +110,7 @@ class ProyectoController extends Controller
 
         $proyecto->update($data);
 
-        return redirect()->route('proyectos.index')->with('success', 'Proyecto actualizado correctamente.');
+        return ($request->input('desde_modal') ? redirect()->back() : redirect()->route('proyectos.index'))->with('success', 'Proyecto actualizado correctamente.');
     }
 
     public function destroy(Proyecto $proyecto)

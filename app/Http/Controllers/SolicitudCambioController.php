@@ -28,7 +28,11 @@ class SolicitudCambioController extends Controller
         ->paginate(15)
         ->withQueryString();
 
-    return view('solicitudes_cambio.index', compact('solicitudes'));
+    // Listas para los modales de crear/editar del listado.
+    $proyectos = Proyecto::orderBy('nombre')->get();
+    $usuarios = User::orderBy('name')->get();
+
+    return view('solicitudes_cambio.index', compact('solicitudes', 'proyectos', 'usuarios'));
 }
 
     public function create()
@@ -52,7 +56,7 @@ class SolicitudCambioController extends Controller
 
         SolicitudCambio::create($data);
 
-        return redirect()->route('solicitudes-cambio.index')->with('success', 'Solicitud de cambio creada correctamente.');
+        return ($request->input('desde_modal') ? redirect()->back() : redirect()->route('solicitudes-cambio.index'))->with('success', 'Solicitud de cambio creada correctamente.');
     }
 
     public function show(Request $request, SolicitudCambio $solicitudes_cambio)
@@ -89,7 +93,7 @@ class SolicitudCambioController extends Controller
 
         $solicitudes_cambio->update($data);
 
-        return redirect()->route('solicitudes-cambio.index')->with('success', 'Solicitud de cambio actualizada correctamente.');
+        return ($request->input('desde_modal') ? redirect()->back() : redirect()->route('solicitudes-cambio.index'))->with('success', 'Solicitud de cambio actualizada correctamente.');
     }
 
     public function destroy(SolicitudCambio $solicitudes_cambio)

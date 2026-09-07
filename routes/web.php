@@ -9,6 +9,7 @@ use App\Http\Controllers\InformeIAController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProyectoController;
 use App\Http\Controllers\SolicitudCambioController;
+use App\Http\Controllers\SprintController;
 use App\Http\Controllers\TareaController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -148,6 +149,7 @@ Route::middleware(['auth', 'role:Jefe|PM|PO'])->group(function () {
     Route::resource('tareas', TareaController::class)->except(['index', 'show']);
     Route::resource('hitos', HitoController::class)->except(['index', 'show']);
     Route::resource('solicitudes-cambio', SolicitudCambioController::class)->except(['index', 'show']);
+    Route::resource('sprints', SprintController::class)->except(['index', 'show']);
 });
 
 /*
@@ -196,6 +198,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('tareas', TareaController::class)->only(['index', 'show']);
     Route::resource('hitos', HitoController::class)->only(['index', 'show']);
     Route::resource('solicitudes-cambio', SolicitudCambioController::class)->only(['index', 'show']);
+    Route::resource('sprints', SprintController::class)->only(['index']);
     Route::resource('entregables', EntregableIAController::class)->only(['index', 'show']);
     Route::resource('facturas', FacturaController::class)->only(['index', 'show']);
 });

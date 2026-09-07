@@ -38,12 +38,23 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::with('cliente')->latest()->paginate(10);
-    
-    // IMPORTANTE: Asegurate que diga 'users.index' y que tenga el return
-    return view('users.index', compact('users'));
+        $users = User::with('cliente')
+            ->when($request->filled('q'), function ($query) use ($request) {
+                $texto = $request->string('q')->trim()->toString();
+
+                $query->where(function ($subquery) use ($texto) {
+                    $subquery->where('name', 'like', "%{$texto}%")
+                        ->orWhere('apellido', 'like', "%{$texto}%")
+                        ->orWhere('email', 'like', "%{$texto}%");
+                });
+            })
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('users.index', compact('users'));
     }
 
     /**

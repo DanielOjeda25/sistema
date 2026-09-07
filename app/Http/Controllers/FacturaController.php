@@ -13,10 +13,26 @@ class FacturaController extends Controller
     {
         $facturas = Factura::visiblePara($request->user())
             ->with(['proyecto', 'emisor'])
-            ->latest()
-            ->paginate(10);
+            ->when($request->filled('q'), function ($query) use ($request) {
+                $texto = $request->string('q')->trim()->toString();
 
-        return view('facturas.index', compact('facturas'));
+                $query->where(function ($subquery) use ($texto) {
+                    $subquery->where('numero', 'like', "%{$texto}%")
+                        ->orWhere('detalle', 'like', "%{$texto}%");
+                });
+            })
+            ->when($request->filled('estado'), fn ($query) =>
+                $query->where('estado', $request->string('estado')->toString())
+            )
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+
+        // Listas para los modales de crear/editar del listado.
+        $proyectos = Proyecto::orderBy('nombre')->get();
+        $usuarios = User::orderBy('name')->get();
+
+        return view('facturas.index', compact('facturas', 'proyectos', 'usuarios'));
     }
 
     public function create()
@@ -42,7 +58,7 @@ class FacturaController extends Controller
 
         Factura::create($data);
 
-        return redirect()->route('facturas.index')->with('success', 'Factura creada correctamente.');
+        return ($request->input('desde_modal') ? redirect()->back() : redirect()->route('facturas.index'))->with('success', 'Factura creada correctamente.');
     }
 
     public function show(Request $request, Factura $factura)
@@ -77,7 +93,7 @@ class FacturaController extends Controller
 
         $factura->update($data);
 
-        return redirect()->route('facturas.index')->with('success', 'Factura actualizada correctamente.');
+        return ($request->input('desde_modal') ? redirect()->back() : redirect()->route('facturas.index'))->with('success', 'Factura actualizada correctamente.');
     }
 
     public function destroy(Factura $factura)

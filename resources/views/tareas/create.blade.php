@@ -63,6 +63,21 @@
                     </div>
 
                     <div>
+                        <x-input-label for="sprint_id" value="Sprint (opcional)" />
+                        <select id="sprint_id" name="sprint_id" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                            <option value="">Sin sprint</option>
+                            @foreach ($sprints->groupBy(fn ($s) => $s->proyecto?->nombre ?? 'Sin proyecto') as $nombreProyecto => $sprintsProyecto)
+                                <optgroup label="{{ $nombreProyecto }}">
+                                    @foreach ($sprintsProyecto as $s)
+                                        <option value="{{ $s->id }}" @selected(old('sprint_id') == $s->id)>{{ $s->nombre }}</option>
+                                    @endforeach
+                                </optgroup>
+                            @endforeach
+                        </select>
+                        <x-input-error class="mt-2" :messages="$errors->get('sprint_id')" />
+                    </div>
+
+                    <div>
                         <x-input-label for="asignado_a" value="Asignar a" />
                         <select id="asignado_a" name="asignado_a" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
                             <option value="">— Seleccioná un responsable —</option>

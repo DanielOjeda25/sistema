@@ -10,9 +10,30 @@ class HitoController extends Controller
 {
     public function index(Request $request)
     {
-        $hitos = Hito::visiblePara($request->user())->with('proyecto')->latest()->paginate(10);
+        $hitos = Hito::visiblePara($request->user())
+            ->with('proyecto')
+            ->when($request->filled('q'), function ($query) use ($request) {
+                $texto = $request->string('q')->trim()->toString();
 
-        return view('hitos.index', compact('hitos'));
+                $query->where(function ($subquery) use ($texto) {
+                    $subquery->where('nombre', 'like', "%{$texto}%")
+                        ->orWhere('descripcion', 'like', "%{$texto}%");
+                });
+            })
+            ->when($request->filled('estado'), function ($query) use ($request) {
+                if ($request->string('estado')->toString() === 'completado') {
+                    $query->where('completado', true);
+                } elseif ($request->string('estado')->toString() === 'pendiente') {
+                    $query->where('completado', false);
+                }
+            })
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+
+        $proyectos = Proyecto::orderBy('nombre')->get();
+
+        return view('hitos.index', compact('hitos', 'proyectos'));
     }
 
     public function create()
@@ -34,7 +55,7 @@ class HitoController extends Controller
 
         Hito::create($data);
 
-        return redirect()->route('hitos.index')->with('success', 'Hito creado correctamente.');
+        return ($request->input('desde_modal') ? redirect()->back() : redirect()->route('hitos.index'))->with('success', 'Hito creado correctamente.');
     }
 
     public function show(Request $request, Hito $hito)
@@ -65,7 +86,7 @@ class HitoController extends Controller
 
         $hito->update($data);
 
-        return redirect()->route('hitos.index')->with('success', 'Hito actualizado correctamente.');
+        return ($request->input('desde_modal') ? redirect()->back() : redirect()->route('hitos.index'))->with('success', 'Hito actualizado correctamente.');
     }
 
     public function destroy(Hito $hito)

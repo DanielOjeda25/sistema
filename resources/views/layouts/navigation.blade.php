@@ -38,6 +38,9 @@
 <x-nav-link :href="route('tareas.tablero')" :active="request()->routeIs('tareas.tablero')">
     {{ __('Tablero') }}
 </x-nav-link>
+<x-nav-link :href="route('sprints.index')" :active="request()->routeIs('sprints.*')">
+    {{ __('Sprints') }}
+</x-nav-link>
 <x-nav-link :href="route('hitos.index')" :active="request()->routeIs('hitos.*')">
     {{ __('Hitos') }}
 </x-nav-link>
@@ -134,6 +137,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('tareas.tablero')" :active="request()->routeIs('tareas.tablero')">
                 {{ __('Tablero') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('sprints.index')" :active="request()->routeIs('sprints.*')">
+                {{ __('Sprints') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('hitos.index')" :active="request()->routeIs('hitos.*')">
                 {{ __('Hitos') }}

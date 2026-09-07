@@ -20,7 +20,9 @@
 
                 <div class="pt-4 flex gap-4 border-t">
                     @hasanyrole('Jefe|PM|PO')
-                    <a href="{{ route('tareas.edit', $tarea) }}" class="text-yellow-600 hover:underline">Editar</a>
+                    <a href="{{ route('tareas.edit', $tarea) }}" class="text-yellow-600 hover:text-yellow-800 inline-flex" title="Editar" aria-label="Editar">
+                        <x-heroicon-o-pencil-square class="w-5 h-5" />
+                    </a>
                     @endhasanyrole
                     <a href="{{ route('tareas.index') }}" class="text-gray-600 hover:underline">Volver al listado</a>
                 </div>

@@ -24,6 +24,21 @@
                     @endhasrole
                 </div>
 
+                <form method="GET" action="{{ route('users.index') }}" class="mb-4 flex flex-wrap gap-3 items-end">
+                    <div class="flex-1 min-w-[200px]">
+                        <label for="q" class="block text-xs font-medium text-gray-500 uppercase mb-1">Buscar</label>
+                        <input type="text" name="q" id="q" value="{{ request('q') }}" placeholder="Nombre o email..."
+                               class="w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+                    </div>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 inline-flex items-center gap-1.5">
+                        <x-heroicon-o-magnifying-glass class="w-4 h-4" />
+                        Filtrar
+                    </button>
+                    @if (request()->filled('q'))
+                        <a href="{{ route('users.index') }}" class="text-xs text-gray-500 hover:text-gray-700 underline">Limpiar</a>
+                    @endif
+                </form>
+
                 <div class="overflow-x-auto shadow-md sm:rounded-lg">
                     <table class="w-full text-sm text-left text-gray-500">
                         <thead class="text-xs text-gray-700 uppercase bg-gray-50">
@@ -64,9 +79,10 @@
                                 </td>
                                 <td class="px-6 py-4 text-center">
                                     @can('editar_roles')
-                                    <a href="{{ route('users.roles.edit', $user->id) }}" 
-                                       class="font-medium text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-2 rounded-md transition">
-                                        Gestionar Roles
+                                    <a href="{{ route('users.roles.edit', $user->id) }}"
+                                       class="inline-flex items-center gap-1.5 font-medium text-indigo-600 hover:text-indigo-900 bg-indigo-50 px-3 py-2 rounded-md transition"
+                                       title="Gestionar Roles">
+                                        <x-heroicon-o-user-group class="w-4 h-4" /> Gestionar Roles
                                     </a>
                                     @else
                                         <span class="text-gray-400 italic">Solo lectura</span>
