@@ -2784,13 +2784,13 @@ Los tres deben ver el panel de reportes generales.
 
 Checklist final:
 
-- [ ] Tarjetas de proyectos por estado.
-- [ ] Tarjetas de tareas por estado.
-- [ ] Total facturado y pendiente de cobro.
-- [ ] Contador de tareas vencidas.
-- [ ] El Cliente no ve el panel global.
-- [ ] Jefe, PM, PO y Programador sí ven el panel global.
-- [ ] El dashboard anterior sigue visible y funcionando.
+- [X] Tarjetas de proyectos por estado.
+- [X] Tarjetas de tareas por estado.
+- [X] Total facturado y pendiente de cobro.
+- [X] Contador de tareas vencidas.
+- [X] El Cliente no ve el panel global.
+- [X] Jefe, PM, PO y Programador sí ven el panel global.
+- [X] El dashboard anterior sigue visible y funcionando.
 
 ---
 
