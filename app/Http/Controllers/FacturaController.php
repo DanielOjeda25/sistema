@@ -47,9 +47,9 @@ class FacturaController extends Controller
     {
         $data = $request->validate([
             'numero' => 'required|string|max:255|unique:facturas,numero',
-            'monto' => 'required|numeric|min:0',
-            'fecha_emision' => 'required|date',
-            'fecha_vencimiento' => 'nullable|date|after_or_equal:fecha_emision',
+            'monto' => 'required|numeric|min:0|max:10000000',
+            'fecha_emision' => 'required|date_format:Y-m-d',
+            'fecha_vencimiento' => 'nullable|date_format:Y-m-d|after_or_equal:fecha_emision',
             'estado' => 'required|in:pendiente,pagada,vencida',
             'detalle' => 'nullable|string',
             'proyecto_id' => 'required|exists:proyectos,id',
@@ -82,9 +82,9 @@ class FacturaController extends Controller
     {
         $data = $request->validate([
             'numero' => 'required|string|max:255|unique:facturas,numero,' . $factura->id,
-            'monto' => 'required|numeric|min:0',
-            'fecha_emision' => 'required|date',
-            'fecha_vencimiento' => 'nullable|date|after_or_equal:fecha_emision',
+            'monto' => 'required|numeric|min:0|max:10000000',
+            'fecha_emision' => 'required|date_format:Y-m-d',
+            'fecha_vencimiento' => 'nullable|date_format:Y-m-d|after_or_equal:fecha_emision',
             'estado' => 'required|in:pendiente,pagada,vencida',
             'detalle' => 'nullable|string',
             'proyecto_id' => 'required|exists:proyectos,id',
@@ -98,6 +98,8 @@ class FacturaController extends Controller
 
     public function destroy(Factura $factura)
     {
+        abort_unless(auth()->user()->hasAnyRole('Jefe', 'PO'), 403);
+
         $factura->delete();
 
         return redirect()->route('facturas.index')->with('success', 'Factura eliminada correctamente.');

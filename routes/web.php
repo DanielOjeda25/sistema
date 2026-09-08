@@ -135,7 +135,13 @@ Route::get('/tutorial', function () {
 Route::middleware(['auth', 'role:Jefe|PM'])->group(function () {
     Route::resource('clientes', ClienteController::class)->except(['index', 'show']);
     Route::resource('proyectos', ProyectoController::class)->except(['index', 'show']);
-    Route::resource('facturas', FacturaController::class)->except(['index', 'show']);
+    Route::resource('facturas', FacturaController::class)->except(['index', 'show', 'destroy']);
+});
+
+// Eliminar facturas es una operación excepcional: solo Jefe y PO.
+Route::middleware(['auth', 'role:Jefe|PO'])->group(function () {
+    Route::delete('facturas/{factura}', [FacturaController::class, 'destroy'])
+        ->name('facturas.destroy');
 });
 
 /*

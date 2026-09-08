@@ -78,6 +78,15 @@
                                                         class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
                                                     <x-heroicon-o-pencil-square class="w-5 h-5" />
                                                 </button>
+                                                @if (auth()->user()->hasAnyRole('Jefe', 'PO'))
+                                                    <form method="POST" action="{{ route('facturas.destroy', $factura) }}" onsubmit="return confirm('¿Querés eliminar esta factura? Esta acción no se puede deshacer.');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="text-red-600 hover:text-red-800" title="Eliminar" aria-label="Eliminar">
+                                                            <x-heroicon-o-trash class="w-5 h-5" />
+                                                        </button>
+                                                    </form>
+                                                @endif
                                         </div>
                                     </td>
                                 </tr>

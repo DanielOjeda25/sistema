@@ -20,20 +20,20 @@
                     </div>
 
                     <div>
-                        <x-input-label for="monto" value="Monto" />
-                        <x-text-input id="monto" name="monto" type="number" step="0.01" min="0" class="mt-1 block w-full" :value="old('monto', $factura->monto)" required />
+                        <x-input-label for="monto" value="Monto (máximo $10.000.000)" />
+                        <x-text-input id="monto" name="monto" type="number" step="0.01" min="0" max="10000000" class="mt-1 block w-full" :value="old('monto', $factura->monto)" required />
                         <x-input-error class="mt-2" :messages="$errors->get('monto')" />
                     </div>
 
                     <div>
-                        <x-input-label for="fecha_emision" value="Fecha de Emisión" />
-                        <x-text-input id="fecha_emision" name="fecha_emision" type="date" class="mt-1 block w-full" :value="old('fecha_emision', $factura->fecha_emision?->format('Y-m-d'))" required />
+                        <x-input-label for="fecha_emision" value="Fecha de Emisión (DD/MM/AAAA)" />
+                        <x-text-input id="fecha_emision" name="fecha_emision" type="date" lang="es-AR" autocomplete="off" class="mt-1 block w-full" :value="old('fecha_emision', $factura->fecha_emision?->format('Y-m-d'))" required />
                         <x-input-error class="mt-2" :messages="$errors->get('fecha_emision')" />
                     </div>
 
                     <div>
-                        <x-input-label for="fecha_vencimiento" value="Fecha de Vencimiento (opcional)" />
-                        <x-text-input id="fecha_vencimiento" name="fecha_vencimiento" type="date" class="mt-1 block w-full" :value="old('fecha_vencimiento', $factura->fecha_vencimiento?->format('Y-m-d'))" />
+                        <x-input-label for="fecha_vencimiento" value="Fecha de Vencimiento (DD/MM/AAAA, opcional)" />
+                        <x-text-input id="fecha_vencimiento" name="fecha_vencimiento" type="date" lang="es-AR" autocomplete="off" class="mt-1 block w-full" :value="old('fecha_vencimiento', $factura->fecha_vencimiento?->format('Y-m-d'))" />
                         <x-input-error class="mt-2" :messages="$errors->get('fecha_vencimiento')" />
                     </div>
 
