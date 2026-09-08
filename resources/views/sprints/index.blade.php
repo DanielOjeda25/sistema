@@ -62,6 +62,15 @@
                                                class="text-indigo-600 hover:text-indigo-800" title="Ver en el tablero" aria-label="Ver en el tablero">
                                                 <x-heroicon-o-squares-2x2 class="w-5 h-5" />
                                             </a>
+                                            @hasanyrole('Jefe|PM|PO|Programador')
+                                                <button type="button" data-abrir-resumen
+                                                        data-url="{{ route('sprints.resumen-ia.store', $sprint) }}"
+                                                        data-nombre="{{ $sprint->nombre }}"
+                                                        data-cacheado="{{ $sprint->resumen_ia ? '1' : '' }}"
+                                                        class="text-purple-600 hover:text-purple-800" title="Resumen IA" aria-label="Resumen IA">
+                                                    <x-heroicon-o-sparkles class="w-5 h-5" />
+                                                </button>
+                                            @endhasanyrole
                                             @hasanyrole('Jefe|PM|PO')
                                                 <button type="button" data-abrir-modal="modal-sprint-editar"
                                                         data-url="{{ route('sprints.update', $sprint) }}"
@@ -126,6 +135,35 @@
     </x-crud-modal>
 
     {{-- Confirmación de eliminación: modal propio en vez del confirm() nativo --}}
+    {{-- Resumen de sprint generado con IA (OpenRouter) --}}
+    <div id="modal-resumen-sprint" class="hidden fixed inset-0 overflow-y-auto" style="z-index: 9999" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-gray-900/50" style="z-index: -1" data-cerrar-resumen></div>
+
+        <div class="min-h-full flex items-center justify-center p-4">
+            <div class="bg-white rounded-xl shadow-xl w-full max-w-xl p-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-semibold text-lg text-gray-800">Resumen IA — <span id="resumen-sprint-nombre"></span></h3>
+                    <button type="button" data-cerrar-resumen class="text-gray-400 hover:text-gray-600" aria-label="Cerrar">✕</button>
+                </div>
+
+                <div id="resumen-sprint-cuerpo" class="mt-4 text-sm text-gray-700 whitespace-pre-wrap leading-relaxed min-h-[80px]"></div>
+                <p id="resumen-sprint-pie" class="mt-3 text-xs text-gray-400"></p>
+
+                <div class="mt-5 flex justify-end gap-2">
+                    <button type="button" id="btn-resumen-regenerar"
+                            class="px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50">
+                        Regenerar
+                    </button>
+                    <button type="button" data-cerrar-resumen
+                            class="px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Confirmación de eliminación --}}
     <div id="modal-eliminar-sprint" class="hidden fixed inset-0 overflow-y-auto" style="z-index: 9999" role="dialog" aria-modal="true">
         <div class="fixed inset-0 bg-gray-900/50" style="z-index: -1" data-cancelar></div>
 
@@ -173,6 +211,61 @@
                 document.getElementById('btn-eliminar-sprint').addEventListener('click', () => {
                     formularioPendiente?.submit();
                     cerrar();
+                });
+
+                // ----- Resumen IA del sprint (endpoint de OpenRouter) -----
+                const modalResumen = document.getElementById('modal-resumen-sprint');
+                const cuerpoResumen = document.getElementById('resumen-sprint-cuerpo');
+                const pieResumen = document.getElementById('resumen-sprint-pie');
+                let urlResumen = null;
+
+                const abrirResumen = () => document.body.appendChild(modalResumen) || modalResumen.classList.remove('hidden');
+                const cerrarResumen = () => modalResumen.classList.add('hidden');
+                modalResumen.querySelectorAll('[data-cerrar-resumen]').forEach(el => el.addEventListener('click', cerrarResumen));
+                document.addEventListener('keydown', e => {
+                    if (e.key === 'Escape' && !modalResumen.classList.contains('hidden')) cerrarResumen();
+                });
+
+                async function pedirResumen(forzar) {
+                    cuerpoResumen.textContent = forzar ? 'Regenerando el resumen con IA…' : 'Generando el resumen con IA, esperá unos segundos…';
+                    pieResumen.textContent = '';
+
+                    try {
+                        const respuesta = await fetch(urlResumen, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                                'X-Requested-With': 'XMLHttpRequest',
+                            },
+                            body: JSON.stringify({ forzar }),
+                        });
+
+                        const datos = await respuesta.json().catch(() => ({}));
+                        if (!respuesta.ok) throw new Error(datos.message || 'Error inesperado');
+
+                        cuerpoResumen.textContent = datos.resumen;
+                        pieResumen.textContent = datos.cacheado
+                            ? 'Resumen guardado previamente.'
+                            : `Generado con ${datos.modelo}.`;
+                    } catch (e) {
+                        cuerpoResumen.textContent = e.message;
+                        pieResumen.textContent = '';
+                    }
+                }
+
+                document.querySelectorAll('[data-abrir-resumen]').forEach(boton => {
+                    boton.addEventListener('click', () => {
+                        urlResumen = boton.dataset.url;
+                        document.getElementById('resumen-sprint-nombre').textContent = boton.dataset.nombre;
+                        abrirResumen();
+                        pedirResumen(false);
+                    });
+                });
+
+                document.getElementById('btn-resumen-regenerar').addEventListener('click', () => {
+                    if (urlResumen) pedirResumen(true);
                 });
             });
         </script>
