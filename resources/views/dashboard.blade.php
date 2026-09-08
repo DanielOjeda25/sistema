@@ -102,7 +102,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach ($accesos as $acceso)
                     <a href="{{ route($acceso['route']) }}" class="block bg-white shadow-sm rounded-lg p-6 hover:shadow-md transition">
-                        <div class="text-3xl font-bold {{ $accesos['color'] ?? 'text-gray-900' }}">{{ $acceso['cifra'] }}</div>
+                        <div class="text-3xl font-bold {{ $acceso['color'] ?? 'text-gray-900' }}">{{ $acceso['cifra'] }}</div>
                         <div class="text-sm text-gray-500 mt-1">{{ $acceso['etiqueta'] }}</div>
                     </a>
                 @endforeach

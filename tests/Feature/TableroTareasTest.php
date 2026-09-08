@@ -42,6 +42,19 @@ class TableroTareasTest extends TestCase
             ->assertDontSee('modal-tarea');
     }
 
+    public function test_cliente_solo_ve_los_proyectos_de_su_empresa_en_el_tablero(): void
+    {
+        $cliente = User::role('Cliente')->firstOrFail();
+        $proyectoVisible = Proyecto::where('cliente_id', $cliente->cliente_id)->firstOrFail();
+        $proyectoOculto = Proyecto::where('cliente_id', '!=', $cliente->cliente_id)->firstOrFail();
+
+        $this->actingAs($cliente)
+            ->get(route('tareas.tablero'))
+            ->assertOk()
+            ->assertSee($proyectoVisible->nombre)
+            ->assertDontSee($proyectoOculto->nombre);
+    }
+
     public function test_crear_tarjeta_ajax_la_agrega_al_final_de_su_columna(): void
     {
         $jefe = User::where('email', 'jefe@example.com')->firstOrFail();

@@ -185,7 +185,13 @@
             },
         };
     </script>
-    @vite('resources/js/tablero.js')
+    @php
+        $manifestViteExiste = file_exists(public_path('build/manifest.json'));
+    @endphp
+
+    @if ($manifestViteExiste)
+        @vite('resources/js/tablero.js')
+    @endif
 
     @if ($puedeMover)
         {{-- Modal de edición rápida (clic en una tarjeta) --}}

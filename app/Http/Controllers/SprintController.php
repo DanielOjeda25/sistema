@@ -37,7 +37,7 @@ class SprintController extends Controller
 
     public function create()
     {
-        $proyectos = Proyecto::orderBy('nombre')->get();
+        $proyectos = Proyecto::visiblePara(request()->user())->orderBy('nombre')->get();
 
         return view('sprints.create', compact('proyectos'));
     }
@@ -46,10 +46,12 @@ class SprintController extends Controller
     {
         $data = $request->validate([
             'nombre' => 'required|string|max:255',
-            'proyecto_id' => 'required|exists:proyectos,id',
+            'proyecto_id' => ['required', 'exists:proyectos,id'],
             'fecha_inicio' => 'nullable|date',
             'fecha_fin' => 'nullable|date|after_or_equal:fecha_inicio',
         ]);
+
+        abort_unless(Proyecto::visiblePara($request->user())->whereKey($data['proyecto_id'])->exists(), 403);
 
         Sprint::create($data);
 
@@ -58,7 +60,7 @@ class SprintController extends Controller
 
     public function edit(Sprint $sprint)
     {
-        $proyectos = Proyecto::orderBy('nombre')->get();
+        $proyectos = Proyecto::visiblePara(request()->user())->orderBy('nombre')->get();
 
         return view('sprints.edit', compact('sprint', 'proyectos'));
     }
@@ -67,10 +69,12 @@ class SprintController extends Controller
     {
         $data = $request->validate([
             'nombre' => 'required|string|max:255',
-            'proyecto_id' => 'required|exists:proyectos,id',
+            'proyecto_id' => ['required', 'exists:proyectos,id'],
             'fecha_inicio' => 'nullable|date',
             'fecha_fin' => 'nullable|date|after_or_equal:fecha_inicio',
         ]);
+
+        abort_unless(Proyecto::visiblePara($request->user())->whereKey($data['proyecto_id'])->exists(), 403);
 
         $sprint->update($data);
 

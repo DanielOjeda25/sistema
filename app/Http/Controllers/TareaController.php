@@ -35,15 +35,26 @@ class TareaController extends Controller
 
     public function tablero(Request $request)
     {
-        $proyectos = Proyecto::orderBy('nombre')->get();
+        $usuario = $request->user();
+        $proyectos = Proyecto::visiblePara($usuario)->orderBy('nombre')->get();
         $usuarios = User::orderBy('name')->get();
         $proyectoId = $request->query('proyecto');
         $sprintId = $request->query('sprint');
 
+        if ($proyectoId) {
+            $proyectoId = (int) $proyectoId;
+
+            abort_unless($proyectos->contains('id', $proyectoId), 404);
+        }
+
         // Los sprints son por proyecto: el selector solo tiene sentido cuando
         // hay un proyecto elegido; con "todos los proyectos" no se filtra.
         $sprints = $proyectoId
-            ? Sprint::where('proyecto_id', $proyectoId)->orderBy('fecha_inicio')->orderBy('id')->get()
+            ? Sprint::visiblePara($usuario)
+                ->where('proyecto_id', $proyectoId)
+                ->orderBy('fecha_inicio')
+                ->orderBy('id')
+                ->get()
             : collect();
 
         // Si cambia el proyecto desde el filtro, el sprint viejo puede quedar
@@ -52,7 +63,7 @@ class TareaController extends Controller
             $sprintId = null;
         }
 
-        $tareas = Tarea::visiblePara($request->user())
+        $tareas = Tarea::visiblePara($usuario)
             ->with(['proyecto', 'asignado', 'sprint'])
             ->when($proyectoId, fn ($q) => $q->where('proyecto_id', $proyectoId))
             ->when($sprintId, fn ($q) => $q->where('sprint_id', $sprintId))
@@ -62,11 +73,13 @@ class TareaController extends Controller
 
         // Solo los roles que pueden editar tareas pueden arrastrar tarjetas;
         // para el resto (Programador, Cliente) el tablero es de solo lectura.
-        $puedeMover = $request->user()->hasAnyRole('Jefe', 'PM', 'PO');
+        $puedeMover = $usuario->hasAnyRole('Jefe', 'PM', 'PO');
 
         // El modal de edición puede abrir tarjetas de cualquier proyecto, así
         // que necesita todos los sprints agrupados por proyecto.
-        $sprintsPorProyecto = Sprint::with('proyecto')->get()
+        $sprintsPorProyecto = Sprint::visiblePara($usuario)
+            ->with('proyecto')
+            ->get()
             ->sortBy(fn ($s) => [$s->proyecto?->nombre, $s->fecha_inicio?->format('Y-m-d'), $s->id])
             ->groupBy('proyecto.nombre');
 
@@ -84,9 +97,23 @@ class TareaController extends Controller
 
         // El frontend manda las columnas que cambiaron con sus tareas en el
         // orden final. La posición es el índice dentro de la columna.
+        $ids = collect($data['columnas'])
+            ->flatMap(fn ($columna) => $columna['ids'])
+            ->unique()
+            ->values()
+            ->all();
+
+        $tareas = Tarea::visiblePara($request->user())->whereIn('id', $ids)->get()->keyBy('id');
+
         foreach ($data['columnas'] as $columna) {
             foreach ($columna['ids'] as $posicion => $id) {
-                Tarea::find($id)?->update([
+                $tarea = $tareas->get($id);
+
+                if (! $tarea) {
+                    continue;
+                }
+
+                $tarea->update([
                     'estado' => $columna['estado'],
                     'orden' => $posicion,
                 ]);

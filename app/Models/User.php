@@ -84,11 +84,19 @@ class User extends Authenticatable implements Auditable
             return true;
         }
 
-        $clienteId = $modelo instanceof Proyecto
-            ? $modelo->cliente_id
-            : $modelo->proyecto?->cliente_id;
+        $clienteId = null;
 
-        return $clienteId !== null && $clienteId === $this->cliente_id;
+        if ($modelo instanceof Proyecto) {
+            $clienteId = $modelo->cliente_id;
+        } elseif (isset($modelo->proyecto_id)) {
+            $clienteId = $modelo->proyecto_id
+                ? Proyecto::whereKey($modelo->proyecto_id)->value('cliente_id')
+                : null;
+        } elseif (isset($modelo->proyecto)) {
+            $clienteId = $modelo->proyecto?->cliente_id;
+        }
+
+        return $clienteId !== null && (int) $clienteId === (int) $this->cliente_id;
     }
 
     public function proyectosComoPm(): HasMany
