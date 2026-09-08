@@ -21,6 +21,10 @@ class SprintSummaryEndpointTest extends TestCase
         $this->seed();
         config()->set('services.openrouter.enabled', true);
         config()->set('services.openrouter.api_key', 'test-openrouter-key');
+        // Fijar los modelos para que el test no dependa del .env de cada
+        // máquina (el default de config/services.php es meta-llama).
+        config()->set('services.openrouter.model', 'meta-llama/llama-3.3-70b-instruct:free');
+        config()->set('services.openrouter.fallback_model', 'qwen/qwen-2.5-coder-32b-instruct:free');
     }
 
     public function test_internal_user_can_generate_a_summary_with_minimal_context(): void

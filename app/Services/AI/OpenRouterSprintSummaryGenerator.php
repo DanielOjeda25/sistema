@@ -80,7 +80,7 @@ PROMPT;
 
                 if (is_string($contenido) && trim($contenido) !== '') {
                     return [
-                        'contenido' => trim($contenido),
+                        'contenido' => $this->limpiarMarkdown(trim($contenido)),
                         'modelo' => $modelo,
                     ];
                 }
@@ -100,5 +100,22 @@ PROMPT;
         throw new RuntimeException(
             'OpenRouter no pudo generar el resumen: '.implode('; ', $errores)
         );
+    }
+
+    /**
+     * El prompt pide texto plano, pero los modelos igual devuelven markdown
+     * (**negritas**, # títulos, `código`); se limpia antes de guardar/mostrar.
+     */
+    private function limpiarMarkdown(string $texto): string
+    {
+        $patrones = [
+            '/^\s*#{1,6}\s+/m',      // títulos # ## ...
+            '/\*\*([^*]+)\*\*/',     // **negrita**
+            '/__([^_]+)__/',         // __negrita__
+            '/\*([^*\n]+)\*/',       // *itálica*
+            '/`([^`]+)`/',           // `código`
+        ];
+
+        return trim(preg_replace($patrones, '$1', $texto));
     }
 }
