@@ -24,10 +24,7 @@
 
                 <div>
                     <a href="/" class="flex items-center gap-3 group">
-                        <svg class="w-9 h-9 text-slate-300 group-hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                        </svg>
-                        <span class="font-extrabold text-2xl tracking-tight">CRUZNEGRA</span>
+                        <img src="{{ asset('images/cruznegra-logo-light.png') }}" alt="Cruz Negra" class="h-14 w-48 object-contain object-left">
                     </a>
 
                     <h1 class="mt-10 lg:mt-16 text-3xl lg:text-4xl font-extrabold tracking-tight leading-tight">
@@ -41,9 +38,7 @@
                     <ul class="mt-8 space-y-3 text-slate-300 hidden lg:block">
                         @foreach (['Clientes y proyectos', 'Tareas e hitos', 'Entregables y facturación'] as $item)
                             <li class="flex items-center gap-3">
-                                <svg class="w-5 h-5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                </svg>
+                                <x-heroicon-o-check-circle class="h-5 w-5 shrink-0 text-[#00e5a0]" />
                                 <span>{{ $item }}</span>
                             </li>
                         @endforeach

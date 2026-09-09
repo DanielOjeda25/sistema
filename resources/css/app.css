@@ -7,3 +7,68 @@
 [x-cloak] {
     display: none !important;
 }
+
+/* --- Barras de scroll acordes al diseño ---------------------------------
+   Estilizamos ambos cuerpos (sidebar oscuro y contenido claro) para que la
+   barra nativa de Windows no rompa la estética. Firefox usa scrollbar-color;
+   el resto, los pseudo-elementos ::-webkit-scrollbar. */
+
+.scroll-suave {
+    scrollbar-width: thin;
+    scrollbar-color: #b8d9cd transparent;
+}
+
+.scroll-suave::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+.scroll-suave::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.scroll-suave::-webkit-scrollbar-thumb {
+    background-color: #cfe6dc;
+    border: 3px solid transparent;
+    background-clip: content-box;
+    border-radius: 9999px;
+}
+
+.scroll-suave::-webkit-scrollbar-thumb:hover {
+    background-color: #00e5a0;
+}
+
+/* Variante para el panel lateral oscuro */
+.scroll-oscuro {
+    scrollbar-width: thin;
+    scrollbar-color: #3d4145 transparent;
+}
+
+.scroll-oscuro::-webkit-scrollbar {
+    width: 10px;
+}
+
+.scroll-oscuro::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.scroll-oscuro::-webkit-scrollbar-thumb {
+    background-color: #3d4145;
+    border: 3px solid transparent;
+    background-clip: content-box;
+    border-radius: 9999px;
+}
+
+.scroll-oscuro::-webkit-scrollbar-thumb:hover {
+    background-color: #00e5a0;
+}
+
+/* La barra horizontal del menú móvil no necesita barra visible */
+.scroll-oculto {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.scroll-oculto::-webkit-scrollbar {
+    display: none;
+}
