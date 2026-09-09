@@ -16,7 +16,7 @@
     </div>
     <div>
         <x-input-label for="estado" value="Estado" />
-        <select id="estado" name="estado" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+        <select id="estado" name="estado" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
             @foreach (['pendiente' => 'Pendiente', 'pagada' => 'Pagada', 'vencida' => 'Vencida'] as $valor => $etiqueta)
                 <option value="{{ $valor }}" @selected(old('estado', $factura->estado ?? 'pendiente') == $valor)>{{ $etiqueta }}</option>
             @endforeach
@@ -40,14 +40,14 @@
 
 <div>
     <x-input-label for="detalle" value="Detalle (opcional)" />
-    <textarea id="detalle" name="detalle" rows="3" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old('detalle', $factura->detalle ?? '') }}</textarea>
+    <textarea id="detalle" name="detalle" rows="3" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">{{ old('detalle', $factura->detalle ?? '') }}</textarea>
     <x-input-error class="mt-2" :messages="$errors->get('detalle')" />
 </div>
 
 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     <div>
         <x-input-label for="proyecto_id" value="Proyecto" />
-        <select id="proyecto_id" name="proyecto_id" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+        <select id="proyecto_id" name="proyecto_id" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
             <option value="">— Seleccioná un proyecto —</option>
             @foreach ($proyectos as $p)
                 <option value="{{ $p->id }}" @selected(old('proyecto_id', $factura->proyecto_id ?? '') == $p->id)>{{ $p->nombre }}</option>
@@ -57,7 +57,7 @@
     </div>
     <div>
         <x-input-label for="emitida_por" value="Emitida por" />
-        <select id="emitida_por" name="emitida_por" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+        <select id="emitida_por" name="emitida_por" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
             <option value="">— Seleccioná un usuario —</option>
             @foreach ($usuarios as $u)
                 <option value="{{ $u->id }}" @selected(old('emitida_por', $factura->emitida_por ?? '') == $u->id)>{{ $u->name }}</option>

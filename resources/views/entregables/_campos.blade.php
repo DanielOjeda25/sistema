@@ -10,7 +10,7 @@
 
 <div>
     <x-input-label for="contenido" value="Contenido" />
-    <textarea id="contenido" name="contenido" rows="6" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>{{ old('contenido', $entregable->contenido ?? '') }}</textarea>
+    <textarea id="contenido" name="contenido" rows="6" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>{{ old('contenido', $entregable->contenido ?? '') }}</textarea>
     <x-input-error class="mt-2" :messages="$errors->get('contenido')" />
 </div>
 
@@ -22,7 +22,7 @@
     </div>
     <div>
         <x-input-label for="estado" value="Estado" />
-        <select id="estado" name="estado" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+        <select id="estado" name="estado" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
             @foreach (['borrador' => 'Borrador', 'revisado' => 'Revisado', 'aprobado' => 'Aprobado'] as $valor => $etiqueta)
                 <option value="{{ $valor }}" @selected(old('estado', $entregable->estado ?? 'borrador') == $valor)>{{ $etiqueta }}</option>
             @endforeach
@@ -34,7 +34,7 @@
 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     <div>
         <x-input-label for="proyecto_id" value="Proyecto" />
-        <select id="proyecto_id" name="proyecto_id" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+        <select id="proyecto_id" name="proyecto_id" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
             <option value="">— Seleccioná un proyecto —</option>
             @foreach ($proyectos as $p)
                 <option value="{{ $p->id }}" @selected(old('proyecto_id', $entregable->proyecto_id ?? '') == $p->id)>{{ $p->nombre }}</option>
@@ -44,7 +44,7 @@
     </div>
     <div>
         <x-input-label for="generado_por" value="Generado por" />
-        <select id="generado_por" name="generado_por" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+        <select id="generado_por" name="generado_por" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
             <option value="">— Seleccioná un usuario —</option>
             @foreach ($usuarios as $u)
                 <option value="{{ $u->id }}" @selected(old('generado_por', $entregable->generado_por ?? '') == $u->id)>{{ $u->name }}</option>

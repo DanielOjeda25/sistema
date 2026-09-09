@@ -18,9 +18,9 @@
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-lg font-medium text-gray-900">Listado de Usuarios</h3>
                     @hasrole('Jefe')
-                        <a href="{{ route('users.create') }}" class="inline-flex items-center px-4 py-2 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63]">
+                        <button type="button" data-abrir-modal="modal-usuario-crear" class="inline-flex items-center px-4 py-2 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63]">
                             + Nuevo Usuario
-                        </a>
+                        </button>
                     @endhasrole
                 </div>
 
@@ -100,4 +100,18 @@
             </div>
         </div>
     </div>
+
+    @hasrole('Jefe')
+        <x-crud-modal id="modal-usuario-crear" abrir-con-errores titulo="Nuevo Usuario">
+            <form method="POST" action="{{ route('users.store') }}" class="space-y-4">
+                @csrf
+                <input type="hidden" name="desde_modal" value="1">
+                @include('users._campos')
+                <div class="flex items-center justify-end gap-4 border-t border-gray-200 pt-3">
+                    <button type="button" data-crud-cerrar class="text-sm text-gray-600 hover:underline">Cancelar</button>
+                    <x-primary-button>Crear Usuario</x-primary-button>
+                </div>
+            </form>
+        </x-crud-modal>
+    @endhasrole
 </x-app-layout>

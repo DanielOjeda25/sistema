@@ -30,7 +30,12 @@ class TareaController extends Controller
         ->paginate(15)
         ->withQueryString();
 
-    return view('tareas.index', compact('tareas'));
+    $proyectos = Proyecto::orderBy('nombre')->get();
+    $usuarios = User::orderBy('name')->get();
+    $solicitudes = SolicitudCambio::orderBy('titulo')->get();
+    $sprints = Sprint::with('proyecto')->orderBy('proyecto_id')->orderBy('fecha_inicio')->get();
+
+    return view('tareas.index', compact('tareas', 'proyectos', 'usuarios', 'solicitudes', 'sprints'));
 }
 
     public function tablero(Request $request)

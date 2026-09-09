@@ -46,13 +46,13 @@
             x-on:input="largo = $el.value.length"
             x-on:blur="tocado = true"
             @if ($minimo) minlength="{{ $minimo }}" @endif
-            {{ $attributes->merge(['class' => 'block w-full pe-10 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm']) }}
+            {{ $attributes->merge(['class' => 'block w-full pe-10 border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm']) }}
         >
 
         <button
             type="button"
             x-on:click="alternar()"
-            class="absolute inset-y-0 end-0 flex items-center px-3 text-gray-400 hover:text-gray-600 focus:outline-none focus:text-indigo-600"
+            class="absolute inset-y-0 end-0 flex items-center px-3 text-gray-400 hover:text-gray-600 focus:outline-none focus:text-[#008c63]"
             :aria-label="visible ? 'Ocultar contraseña' : 'Mostrar contraseña'"
             :title="visible ? 'Ocultar contraseña' : 'Mostrar contraseña'"
             tabindex="-1"

@@ -54,7 +54,10 @@ class UserController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        return view('users.index', compact('users'));
+        $roles = Role::orderBy('name')->get();
+        $clientes = Cliente::orderBy('nombre')->get();
+
+        return view('users.index', compact('users', 'roles', 'clientes'));
     }
 
     /**

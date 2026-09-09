@@ -12,7 +12,7 @@
 
 <div>
     <x-input-label for="proyecto_id" value="Proyecto" />
-    <select id="proyecto_id" name="proyecto_id" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+    <select id="proyecto_id" name="proyecto_id" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
         @foreach ($proyectos as $p)
             <option value="{{ $p->id }}" @selected(old('proyecto_id', $sprint->proyecto_id ?? '') == $p->id)>{{ $p->nombre }}</option>
         @endforeach

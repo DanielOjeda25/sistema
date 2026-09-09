@@ -34,7 +34,7 @@
 
 <div>
     <x-input-label for="{{ $prefijo ?? '' }}estado" value="Estado" />
-    <select id="{{ $prefijo ?? '' }}estado" name="estado" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+    <select id="{{ $prefijo ?? '' }}estado" name="estado" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
         <option value="activo" @selected(old('estado', $cliente->estado ?? 'activo') == 'activo')>Activo</option>
         <option value="inactivo" @selected(old('estado', $cliente->estado ?? 'activo') == 'inactivo')>Inactivo</option>
     </select>

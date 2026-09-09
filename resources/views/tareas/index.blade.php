@@ -5,9 +5,9 @@
                 Listado de Tareas
             </h2>
             @hasanyrole('Jefe|PM|PO')
-                <a href="{{ route('tareas.create') }}" class="inline-flex items-center px-4 py-2 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63]">
+                <button type="button" data-abrir-modal="modal-tarea-crear" class="inline-flex items-center px-4 py-2 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63]">
                 + Nueva Tarea
-            </a>
+            </button>
             @endhasanyrole
         </div>
     </x-slot>
@@ -63,6 +63,7 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200 text-gray-700">
                             @forelse ($tareas as $tarea)
+                                @php($valoresTarea = $tarea->only(['titulo', 'descripcion', 'estado', 'prioridad', 'proyecto_id', 'sprint_id', 'asignado_a', 'solicitud_cambio_id']) + ['fecha_limite' => $tarea->fecha_limite?->format('Y-m-d')])
                                 <tr>
                                     <td class="px-6 py-4">{{ $tarea->titulo }}</td>
                                     <td class="px-6 py-4">{{ $tarea->proyecto?->nombre ?? 'N/A' }}</td>
@@ -76,9 +77,9 @@
                                                 <x-heroicon-o-eye class="w-5 h-5" />
                                             </a>
                                             @hasanyrole('Jefe|PM|PO')
-                                                <a href="{{ route('tareas.edit', $tarea) }}" class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
+                                                <button type="button" data-abrir-modal="modal-tarea-editar" data-url="{{ route('tareas.update', $tarea) }}" data-valores='@json($valoresTarea)' class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
                                                     <x-heroicon-o-pencil-square class="w-5 h-5" />
-                                                </a>
+                                                </button>
                                             @endhasanyrole
                                         </div>
                                     </td>
@@ -101,4 +102,28 @@
             </div>
         </div>
     </div>
+    <x-crud-modal id="modal-tarea-crear" abrir-con-errores titulo="Nueva Tarea">
+        <form method="POST" action="{{ route('tareas.store') }}" class="space-y-4">
+            @csrf
+            <input type="hidden" name="desde_modal" value="1">
+            @include('tareas._campos', ['tarea' => null])
+            <div class="flex items-center justify-end gap-4 border-t border-gray-200 pt-3">
+                <button type="button" data-crud-cerrar class="text-sm text-gray-600 hover:underline">Cancelar</button>
+                <x-primary-button>Guardar Tarea</x-primary-button>
+            </div>
+        </form>
+    </x-crud-modal>
+
+    <x-crud-modal id="modal-tarea-editar" titulo="Editar Tarea">
+        <form method="POST" action="{{ route('tareas.store') }}" class="space-y-4" data-crud-form>
+            @csrf
+            @method('PUT')
+            <input type="hidden" name="desde_modal" value="1">
+            @include('tareas._campos', ['tarea' => null])
+            <div class="flex items-center justify-end gap-4 border-t border-gray-200 pt-3">
+                <button type="button" data-crud-cerrar class="text-sm text-gray-600 hover:underline">Cancelar</button>
+                <x-primary-button>Guardar Cambios</x-primary-button>
+            </div>
+        </form>
+    </x-crud-modal>
 </x-app-layout>

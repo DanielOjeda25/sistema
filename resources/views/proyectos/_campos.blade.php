@@ -11,7 +11,7 @@
 
 <div>
     <x-input-label for="descripcion" value="Descripción (opcional)" />
-    <textarea id="descripcion" name="descripcion" rows="3" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">{{ old('descripcion', $proyectoItem->descripcion ?? '') }}</textarea>
+    <textarea id="descripcion" name="descripcion" rows="3" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">{{ old('descripcion', $proyectoItem->descripcion ?? '') }}</textarea>
     <x-input-error class="mt-2" :messages="$errors->get('descripcion')" />
 </div>
 
@@ -30,7 +30,7 @@
 
 <div>
     <x-input-label for="estado" value="Estado" />
-    <select id="estado" name="estado" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+    <select id="estado" name="estado" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
         @foreach (['pendiente' => 'Pendiente', 'en_progreso' => 'En progreso', 'completado' => 'Completado', 'cancelado' => 'Cancelado'] as $valor => $etiqueta)
             <option value="{{ $valor }}" @selected(old('estado', $proyectoItem->estado ?? 'pendiente') == $valor)>{{ $etiqueta }}</option>
         @endforeach
@@ -41,7 +41,7 @@
 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     <div>
         <x-input-label for="cliente_id" value="Cliente" />
-        <select id="cliente_id" name="cliente_id" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+        <select id="cliente_id" name="cliente_id" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
             <option value="">— Seleccioná un cliente —</option>
             @foreach ($clientes as $c)
                 <option value="{{ $c->id }}" @selected(old('cliente_id', $proyectoItem->cliente_id ?? '') == $c->id)>{{ $c->nombre }} {{ $c->apellido }}</option>
@@ -51,7 +51,7 @@
     </div>
     <div>
         <x-input-label for="pm_id" value="Project Manager" />
-        <select id="pm_id" name="pm_id" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
+        <select id="pm_id" name="pm_id" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
             <option value="">— Seleccioná un PM —</option>
             @foreach ($usuarios as $u)
                 <option value="{{ $u->id }}" @selected(old('pm_id', $proyectoItem->pm_id ?? '') == $u->id)>{{ $u->name }}</option>
