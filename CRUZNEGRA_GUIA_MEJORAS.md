@@ -16,15 +16,15 @@ el código completo para copiar y pegar, y cómo comprobar que funciona.
 
 ## Índice — quién hace qué
 
-| Tarjeta en Trello | Responsable | Backend | Frontend |
-| ----------------- | ----------- | ------- | -------- |
-| Visor de auditoría | **Marcos** | Controller + ruta (1.1) | Vista + menú (1.2) |
-| Dashboard de Cliente con métricas | **Marcos** | Datos en dashboard (4.1) | Barras de avance (4.2) |
-| Notificaciones de solicitudes de cambio | **Jesús** | Notification + controller (2.1) | Campanita (2.2) |
-| Exportar facturas a PDF | **Jesús** | dompdf + plantilla (5.1) | Botón (5.2) |
-| Recordatorios de hitos por vencer | **Dante** | Query en dashboard (3.1) | Tarjeta de hitos (3.2) |
-| Informe IA semanal automático | **Lucas** | Todo (sección 6) | — |
-| Tests Feature de los 7 módulos | **Lucas** | Todo (sección 7) | — |
+| Tarjeta en Trello                       | Responsable      | Backend                         | Frontend               |
+| --------------------------------------- | ---------------- | ------------------------------- | ---------------------- |
+| Visor de auditoría                     | **Marcos** | Controller + ruta (1.1)         | Vista + menú (1.2)    |
+| Dashboard de Cliente con métricas      | **Marcos** | Datos en dashboard (4.1)        | Barras de avance (4.2) |
+| Notificaciones de solicitudes de cambio | **Jesús** | Notification + controller (2.1) | Campanita (2.2)        |
+| Exportar facturas a PDF                 | **Jesús** | dompdf + plantilla (5.1)        | Botón (5.2)           |
+| Recordatorios de hitos por vencer       | **Dante**  | Query en dashboard (3.1)        | Tarjeta de hitos (3.2) |
+| Informe IA semanal automático          | **Lucas**  | Todo (sección 6)               | —                     |
+| Tests Feature de los 7 módulos         | **Lucas**  | Todo (sección 7)               | —                     |
 
 ---
 
@@ -614,13 +614,13 @@ Solicitudes, Entregables y Facturas.
 
 ## Si algo sale mal
 
-| Problema | Solución |
-| -------- | -------- |
-| `Class "App\Http\Controllers\AuditoriaController" not found` | Falta el `use` arriba de `routes/web.php` o corre `php artisan optimize:clear` |
-| La campanita no aparece | Revisá que el bloque esté dentro del `<nav>` de `navigation.blade.php`, donde el usuario ya está logueado |
-| El PDF sale en blanco | Corre `php artisan vendor:publish --provider="Barryvdh\DomPDF\ServiceProvider"` y `php artisan optimize:clear` |
-| Las notificaciones no se guardan | Corre `php artisan migrate` (la tabla `notifications` tiene que existir) |
-| El comando del informe no envía nada | Tiene que existir al menos un `Sprint` con `estado = activo` y un usuario con rol `Jefe` |
+| Problema                                                       | Solución                                                                                                         |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `Class "App\Http\Controllers\AuditoriaController" not found` | Falta el`use` arriba de `routes/web.php` o corre `php artisan optimize:clear`                               |
+| La campanita no aparece                                        | Revisá que el bloque esté dentro del`<nav>` de `navigation.blade.php`, donde el usuario ya está logueado   |
+| El PDF sale en blanco                                          | Corre`php artisan vendor:publish --provider="Barryvdh\DomPDF\ServiceProvider"` y `php artisan optimize:clear` |
+| Las notificaciones no se guardan                               | Corre`php artisan migrate` (la tabla `notifications` tiene que existir)                                       |
+| El comando del informe no envía nada                          | Tiene que existir al menos un`Sprint` con `estado = activo` y un usuario con rol `Jefe`                     |
 
 ---
 
