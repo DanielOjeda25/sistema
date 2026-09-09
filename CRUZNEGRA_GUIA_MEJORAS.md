@@ -9,10 +9,36 @@ el código completo para copiar y pegar, y cómo comprobar que funciona.
 - **Marcos, Jesús y Dante** hacen sus tarjetas completas: **backend y frontend**.
   Cada tarjeta indica qué parte de backend (PHP) y qué parte de frontend (Blade) le toca.
 - **Lucas** hace únicamente dos tarjetas: el **Informe IA semanal automático** y
-  los **Tests Feature de los 7 módulos**. Son las secciones 6 y 7 de esta guía.
+  los **Tests Feature de los módulos**. Son las secciones 6 y 7 de esta guía.
 
 > **Regla de oro (igual que siempre):** copiá el bloque de código **entero**,
 > desde la primera línea hasta la última. Si copiás la mitad, la página se rompe.
+
+> **⚠️ ACTUALIZACIÓN 09/09 — leé esto antes de empezar**
+>
+> La estructura cambió desde que se escribió esta guía. Lo que hay que saber:
+>
+> - **Los formularios ya NO son páginas aparte**: todos los módulos crean y editan
+>   en **modales** dentro del listado (componente `<x-crud-modal>` + JS
+>   `resources/js/crud-modal.js`, campos en partials `_campos.blade.php`).
+>   Si tu tarjeta agrega un formulario nuevo, seguí ese patrón.
+> - **Ya existe el módulo de Sprints** (`/sprints`, tabla `sprints` con columnas
+>   `descripcion`, `estado`, `resumen_ia`) y el **resumen IA** de sprint
+>   (`POST /sprints/{id}/resumen-ia`, botón de chispas en el listado).
+>   El sistema tiene **8 módulos**, no 7.
+> - **El dashboard se rediseñó**: los reportes por estado están en un `@foreach`
+>   y los accesos rápidos en un loop `$accesos`. Anclá tus tarjetas nuevas
+>   después del grid de accesos rápidos.
+> - **El layout se rediseñó** (nav con logo, componente `mobile-nav` para móvil).
+>   La campanita de notificaciones va en `layouts/navigation.blade.php`, en el
+>   `<x-dropdown>` del usuario.
+> - **Facturas**: crear/editar/eliminar es para **Jefe y PM** (cambió; antes decía
+>   Jefe y PO).
+> - **Ya hay 48 tests** (`php artisan test`): TableroTareasTest,
+>   CorreccionesSeguridadTest, SprintSummaryEndpointTest, ProjectAIReportTest
+>   + auth de Breeze. La sección 7 es para **ampliar** esa cobertura, no empezar
+>   de cero.
+> - La paleta es **indigo** para acciones primarias (no azules sueltos).
 
 ## Índice — quién hace qué
 
@@ -24,7 +50,7 @@ el código completo para copiar y pegar, y cómo comprobar que funciona.
 | Exportar facturas a PDF | **Jesús** | dompdf + plantilla (5.1) | Botón (5.2) |
 | Recordatorios de hitos por vencer | **Dante** | Query en dashboard (3.1) | Tarjeta de hitos (3.2) |
 | Informe IA semanal automático | **Lucas** | Todo (sección 6) | — |
-| Tests Feature de los 7 módulos | **Lucas** | Todo (sección 7) | — |
+| Tests Feature de los módulos | **Lucas** | Todo (sección 7) | — |
 
 ---
 
@@ -229,7 +255,7 @@ nombre la campanita:
     $sinLeer = auth()->user()->unreadNotifications()->take(5)->get();
 @endphp
 <div class="relative" x-data="{ abierto: false }">
-    <button @click="abajo: abierto = !abierto" class="text-gray-500 hover:text-gray-700 relative">
+    <button @click="abierto = !abierto" class="text-gray-500 hover:text-gray-700 relative">
         🔔
         @if ($sinLeer->isNotEmpty())
             <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full px-1">
@@ -289,8 +315,9 @@ del array `$datos` (después de `'totalEntregables' => ...`):
 
 ### 3.2 FRONTEND — Dante
 
-**Archivo: `resources/views/dashboard.blade.php`** — agregar esta tarjeta **debajo**
-de las métricas que ya existen:
+**Archivo: `resources/views/dashboard.blade.php`** — agregar esta tarjeta **después
+del grid de accesos rápidos** (el `@foreach ($accesos as ...)`), antes del cierre
+del contenedor `max-w-7xl`.
 
 ```blade
 @if (isset($hitosProximos) && $hitosProximos->isNotEmpty())
@@ -346,7 +373,8 @@ amarillo. Uno con fecha de ayer aparece en rojo con "VENCIDO".
 
 ### 4.2 FRONTEND — Marcos
 
-**Archivo: `resources/views/dashboard.blade.php`** — sección solo para Cliente:
+**Archivo: `resources/views/dashboard.blade.php`** — sección solo para Cliente
+(mismo lugar: después del grid de accesos rápidos):
 
 ```blade
 @if ($misProyectos ?? null)
@@ -530,13 +558,23 @@ Schedule::command('informes:resumen-sprint-semanal')->mondays()->at('08:00');
 
 > Con `MAIL_MAILER=log` (como está el `.env`), el email se escribe en
 > `storage/logs/laravel.log` — suficiente para probar.
+>
+> **Ojo:** el comando busca sprints con `estado = 'activo'`, pero el seeder los
+> crea con el default `'planificado'`. Para probar, marcá uno así:
+> `php artisan tinker` → `\App\Models\Sprint::where('id', 1)->update(['estado' => 'activo']);`
 
 **Comprobar manualmente:** `php artisan informes:resumen-sprint-semanal` y revisar
 el log.
 
 ---
 
-## 7) TESTS FEATURE DE LOS 7 MÓDULOS — Solo Lucas
+## 7) TESTS FEATURE DE LOS MÓDULOS — Solo Lucas
+
+> **Actualizado:** ya existen 48 tests (ver banner de arriba). Esta tarjeta ahora
+> es para **completar la cobertura que falta**: no hay tests de los CRUD de
+> Clientes, Proyectos, Hitos, Solicitudes, Entregables, Facturas (listado/creación
+> por modal) ni de Sprints. Creá `tests/Feature/ModulosTest.php` y sumá casos con
+> el patrón de abajo; corré `php artisan test` para ver que no pises los existentes.
 
 **Archivo: `tests/Feature/ModulosTest.php`** (crear — ejemplo base para extender)
 
