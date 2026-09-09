@@ -43,7 +43,7 @@ class EntregableIASeeder extends Seeder
         ];
 
         foreach ($entregables as $datos) {
-            EntregableIA::firstOrCreate(
+            EntregableIA::updateOrCreate(
                 ['titulo' => $datos['titulo'], 'proyecto_id' => $datos['proyecto_id']],
                 $datos
             );

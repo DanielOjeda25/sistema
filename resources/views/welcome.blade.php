@@ -3,165 +3,88 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
         <title>{{ config('app.name', 'CRUZNEGRA') }} · Sistema de Gestión</title>
-
         <link rel="icon" href="/favicon.ico" sizes="32x32">
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
-
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
+    <body class="min-h-screen bg-[#101416] font-sans text-white antialiased">
+        <main class="min-h-screen bg-[radial-gradient(circle_at_75%_45%,#202a2d_0%,#101416_42%,#0b0d0e_100%)]">
+            <header class="border-b border-white/15 px-6 py-5 sm:px-10 lg:px-16">
+                <div class="mx-auto flex max-w-[1280px] items-center justify-between">
+                    <a href="/" class="flex items-center gap-3">
+                        <span class="relative flex h-8 w-8 items-center justify-center text-3xl font-light leading-none text-white">
+                            <span class="absolute h-8 w-2 bg-white"></span>
+                            <span class="absolute h-2 w-8 bg-white"></span>
+                        </span>
+                        <span class="text-xl font-bold tracking-tight">CRUZNEGRA</span>
+                    </a>
+                </div>
+            </header>
 
-    <body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col">
-
-        <header class="bg-white border-b border-gray-200 sticky top-0 z-10">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-
-                <a href="/" class="flex items-center gap-3">
-                    <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-                    </svg>
-                    <span class="font-extrabold text-xl text-gray-900 tracking-tight">CRUZNEGRA</span>
-                </a>
-
-                @if (Route::has('login'))
-                    <nav class="flex items-center gap-2 sm:gap-4">
-                        @auth
-                            <a href="{{ url('/dashboard') }}" class="text-sm font-semibold bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
-                                Ir al panel
-                            </a>
-                        @else
-                            <a href="{{ route('login') }}" class="text-sm font-semibold bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
-                                Ingresar
-                            </a>
-                        @endauth
-                    </nav>
-                @endif
-            </div>
-        </header>
-
-        <main class="flex-grow">
-
-            {{-- Portada --}}
-            <section class="bg-indigo-700 text-white">
-                <div class="max-w-5xl mx-auto px-6 py-20 sm:py-28 text-center">
-
-                    <span class="inline-block text-xs font-semibold tracking-widest uppercase text-indigo-200 mb-5">
-                        Sistema de Gestión Interna
-                    </span>
-
-                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
-                        Todos tus proyectos,<br class="hidden sm:block"> en un solo lugar
+            <section class="mx-auto grid min-h-[calc(100vh-81px)] max-w-[1280px] items-center gap-12 px-6 py-14 sm:px-10 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16 lg:px-16 lg:py-20">
+                <div>
+                    <p class="text-sm font-medium uppercase tracking-[0.08em] text-slate-300">Sistema de gestión interna</p>
+                    <h1 class="mt-6 max-w-xl text-5xl font-extrabold leading-[0.98] tracking-[-0.045em] sm:text-6xl lg:text-7xl">
+                        Gestioná mejor.<br>Trabajá más rápido.
                     </h1>
-
-                    <p class="mt-6 text-lg sm:text-xl text-indigo-100 max-w-2xl mx-auto leading-relaxed">
-                        CRUZNEGRA centraliza clientes, proyectos, tareas, hitos, entregables
-                        y facturación para que el equipo trabaje sobre la misma información.
+                    <p class="mt-8 max-w-lg text-base leading-7 text-slate-300">
+                        CRUZNEGRA reúne clientes, proyectos, tareas, hitos, entregables, control y facturación en un solo lugar.
                     </p>
+                    <p class="mt-7 text-sm text-slate-300">El acceso es administrado por tu organización.</p>
 
-                    @guest
-                        <div class="mt-10">
-                            <a href="{{ route('login') }}" class="inline-flex items-center justify-center px-6 py-3 bg-white text-indigo-700 font-semibold rounded-lg hover:bg-indigo-50 transition">
-                                Ingresar al sistema
-                            </a>
-                            <p class="mt-4 text-sm text-indigo-200">
-                                Las cuentas las crea el administrador del sistema.
-                            </p>
-                        </div>
-                    @else
-                        <div class="mt-10">
-                            <a href="{{ url('/dashboard') }}" class="inline-flex items-center justify-center px-6 py-3 bg-white text-indigo-700 font-semibold rounded-lg hover:bg-indigo-50 transition">
-                                Ir al panel de control
-                            </a>
-                        </div>
-                    @endguest
+                    <div class="mt-9 flex flex-wrap gap-3">
+                        <a href="{{ route('login') }}" class="inline-flex items-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#101416] transition hover:bg-slate-200">
+                            Ingresar <span class="ml-2 text-lg leading-none">→</span>
+                        </a>
+                        <a href="#vista-general" class="inline-flex items-center rounded-full border border-white/60 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white hover:text-[#101416]">
+                            Más información
+                        </a>
+                    </div>
                 </div>
-            </section>
 
-            {{-- Módulos --}}
-            <section class="max-w-6xl mx-auto px-6 py-16 sm:py-20">
-
-                <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight text-center">
-                    Qué podés gestionar
-                </h2>
-                <p class="mt-3 text-gray-500 text-center max-w-2xl mx-auto">
-                    Siete módulos conectados entre sí, con control de acceso por rol.
-                </p>
-
-                @php
-                    $modulos = [
-                        ['Clientes', 'Datos de contacto y empresa de cada cliente, con su historial de proyectos.', 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z'],
-                        ['Proyectos', 'Alcance, fechas y estado de cada proyecto, con su cliente y responsable asignado.', 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10'],
-                        ['Tareas e hitos', 'Trabajo repartido por persona, con prioridad, fecha límite y avance visible.', 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z'],
-                        ['Solicitudes de cambio', 'Pedidos de modificación registrados, aprobados y convertidos en tareas.', 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15'],
-                        ['Entregables', 'Documentos y productos del proyecto, con su estado de revisión y aprobación.', 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'],
-                        ['Facturación', 'Facturas por proyecto, con monto, vencimiento y estado de cobro.', 'M9 7h6m-6 4h6m-6 4h4M5 3h14a1 1 0 011 1v16l-3-2-2 2-2-2-2 2-2-2-3 2V4a1 1 0 011-1z'],
-                    ];
-                @endphp
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
-                    @foreach ($modulos as [$titulo, $texto, $icono])
-                        <div class="bg-white p-6 rounded-xl border border-gray-200 hover:border-indigo-300 hover:shadow-md transition">
-                            <div class="w-11 h-11 rounded-lg bg-indigo-50 flex items-center justify-center mb-4">
-                                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $icono }}"></path>
-                                </svg>
+                <div id="vista-general" class="relative mx-auto w-full max-w-[620px] lg:justify-self-end">
+                    <div class="absolute -inset-12 rounded-full bg-[#39545a]/30 blur-3xl"></div>
+                    <div class="relative rounded-[1.5rem] border-2 border-[#70797b] bg-[#171b1d] p-2 shadow-[0_30px_80px_rgba(0,0,0,0.65)]">
+                        <div class="overflow-hidden rounded-[1rem] bg-[#f5f7f8] text-slate-900">
+                            <div class="flex min-h-[300px] sm:min-h-[390px]">
+                                <aside class="hidden w-32 shrink-0 bg-[#1d2023] p-4 text-[9px] text-slate-500 sm:block">
+                                    <div class="text-[10px] font-bold text-white">CRUZNEGRA</div>
+                                    <div class="mt-8 space-y-4">
+                                        <p class="rounded bg-white/10 px-2 py-1 text-white">⌂ Inicio</p>
+                                        <p>Clientes</p>
+                                        <p>Proyectos</p>
+                                        <p>Tareas</p>
+                                        <p>Equipo</p>
+                                        <p>Archivos</p>
+                                    </div>
+                                </aside>
+                                <div class="flex-1 p-5 sm:p-8">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-[9px] text-slate-400">Panel de gestión</p>
+                                            <h2 class="mt-1 text-xl font-bold sm:text-2xl">Clientes. Proyectos</h2>
+                                        </div>
+                                        <span class="h-3 w-3 rounded-full bg-emerald-400"></span>
+                                    </div>
+                                    <p class="mt-3 max-w-xs text-[10px] leading-4 text-slate-500">Colaborá con el equipo y mantené toda la información organizada.</p>
+                                    <div class="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                                        @foreach ([['Proyecto', 'bg-emerald-100 text-emerald-700', '↗'], ['Conversaciones', 'bg-pink-100 text-pink-700', '•••'], ['Equipo', 'bg-amber-100 text-amber-700', '♟'], ['Búsquedas', 'bg-sky-100 text-sky-700', '⌕'], ['Trámites', 'bg-blue-100 text-blue-700', '▣'], ['Configuración', 'bg-orange-100 text-orange-700', '⚙'], ['Archivos', 'bg-yellow-100 text-yellow-700', '□'], ['Seguimientos', 'bg-teal-100 text-teal-700', '✓']] as [$titulo, $color, $icono])
+                                            <div class="rounded-lg border border-slate-200 bg-white p-2.5 shadow-sm sm:p-3">
+                                                <span class="flex h-7 w-7 items-center justify-center rounded-md {{ $color }} text-xs font-bold">{{ $icono }}</span>
+                                                <p class="mt-3 text-[8px] font-semibold sm:text-[9px]">{{ $titulo }}</p>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
                             </div>
-                            <h3 class="font-bold text-gray-900 text-lg">{{ $titulo }}</h3>
-                            <p class="text-sm text-gray-500 mt-2 leading-relaxed">{{ $texto }}</p>
-                        </div>
-                    @endforeach
-                </div>
-            </section>
-
-            {{-- Roles y trazabilidad --}}
-            <section class="bg-white border-t border-gray-200">
-                <div class="max-w-6xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-2 gap-10">
-
-                    <div class="flex gap-4">
-                        <div class="w-11 h-11 shrink-0 rounded-lg bg-indigo-50 flex items-center justify-center">
-                            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-gray-900 text-lg">Acceso por rol</h3>
-                            <p class="text-sm text-gray-500 mt-2 leading-relaxed">
-                                Cada persona ve y edita solo lo que le corresponde según su rol:
-                                Jefe, Project Manager, Product Owner, Programador o Cliente.
-                            </p>
                         </div>
                     </div>
-
-                    <div class="flex gap-4">
-                        <div class="w-11 h-11 shrink-0 rounded-lg bg-indigo-50 flex items-center justify-center">
-                            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-gray-900 text-lg">Trazabilidad</h3>
-                            <p class="text-sm text-gray-500 mt-2 leading-relaxed">
-                                Cada cambio queda registrado: quién lo hizo, cuándo y qué modificó.
-                                Auditoría completa de los movimientos del sistema.
-                            </p>
-                        </div>
-                    </div>
-
                 </div>
             </section>
-
         </main>
-
-        <footer class="bg-white border-t border-gray-200 py-6">
-            <div class="max-w-7xl mx-auto px-4 text-center text-sm text-gray-500">
-                &copy; {{ date('Y') }} CRUZNEGRA · Sistema de Gestión Interna de Proyectos.
-            </div>
-        </footer>
-
     </body>
 </html>

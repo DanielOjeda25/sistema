@@ -29,13 +29,13 @@
             </label>
 
             @if (Route::has('password.request'))
-                <a class="text-sm text-indigo-600 hover:text-indigo-800 hover:underline rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
+                <a class="text-sm font-medium text-[#101416] hover:text-[#39545a] hover:underline rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#101416]" href="{{ route('password.request') }}">
                     ¿Olvidaste tu contraseña?
                 </a>
             @endif
         </div>
 
-        <button type="submit" class="w-full inline-flex items-center justify-center px-4 py-3 bg-indigo-600 border border-transparent rounded-lg font-semibold text-sm text-white tracking-wide hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150">
+        <button type="submit" class="w-full inline-flex items-center justify-center px-4 py-3 bg-[#101416] border border-transparent rounded-lg font-semibold text-sm text-white tracking-wide hover:bg-[#202a2d] focus:outline-none focus:ring-2 focus:ring-[#101416] focus:ring-offset-2 transition ease-in-out duration-150">
             Ingresar
         </button>
 

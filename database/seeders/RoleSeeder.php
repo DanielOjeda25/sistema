@@ -18,6 +18,6 @@ class RoleSeeder extends Seeder
         $programador = Role::firstOrCreate(['name' => 'Programador']);
         $cliente     = Role::firstOrCreate(['name' => 'Cliente']);
 
-        $jefe->givePermissionTo($permisoEditarRoles);
+        $jefe->syncPermissions([$permisoEditarRoles]);
     }
 }

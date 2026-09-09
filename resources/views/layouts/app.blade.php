@@ -19,22 +19,86 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
-            @include('layouts.navigation')
+        @if (request()->routeIs('dashboard'))
+            {{ $slot }}
+        @else
+            <div class="min-h-screen bg-[#d9fff1] text-[#17191b]">
+                <div class="mx-auto flex min-h-screen max-w-[1240px] overflow-hidden border-x border-[#bcebd9] bg-white shadow-sm lg:my-5 lg:min-h-[calc(100vh-2.5rem)] lg:rounded-2xl">
+                    <aside class="hidden w-60 shrink-0 bg-[#202225] px-4 py-5 text-slate-300 lg:block">
+                        <a href="{{ route('dashboard') }}" class="block border-b border-white/10 px-3 pb-6">
+                            <span class="block overflow-hidden rounded-lg bg-white p-1">
+                                <img src="{{ asset('images/cruznegra-logo.png') }}" alt="Cruz Negra" class="h-16 w-full translate-x-1 object-contain object-left">
+                            </span>
+                        </a>
 
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endisset
+                        <nav class="mt-6 space-y-1">
+                            <a href="{{ route('dashboard') }}" class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('dashboard') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"><span>⌂</span> Dashboard</a>
+                            @hasanyrole('Jefe|PM')
+                                <a href="{{ route('users.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('users.*') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"><span>♙</span> Usuarios y roles</a>
+                            @endhasanyrole
+                            <a href="{{ route('proyectos.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('proyectos.*') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"><span>▦</span> Proyectos</a>
+                            <a href="{{ route('tareas.tablero') }}" class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('tareas.tablero') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"><span>✓</span> Mi trabajo</a>
+                            <a href="{{ route('tareas.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('tareas.*') && ! request()->routeIs('tareas.tablero') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"><span>☷</span> Tareas</a>
+                            <a href="{{ route('facturas.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('facturas.*') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"><span>$</span> Facturas</a>
+                        </nav>
 
-            <!-- Page Content -->
-            <main>
-                {{ $slot }}
-            </main>
-        </div>
+                        <p class="mt-8 px-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Módulos</p>
+                        <nav class="mt-2 space-y-1">
+                            <a href="{{ route('sprints.index') }}" class="block rounded-lg border-l-4 px-3 py-2 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('sprints.*') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}">Sprints</a>
+                            <a href="{{ route('hitos.index') }}" class="block rounded-lg border-l-4 px-3 py-2 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('hitos.*') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}">Hitos</a>
+                            <a href="{{ route('solicitudes-cambio.index') }}" class="block rounded-lg border-l-4 px-3 py-2 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('solicitudes-cambio.*') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}">Cambios</a>
+                            <a href="{{ route('entregables.index') }}" class="block rounded-lg border-l-4 px-3 py-2 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('entregables.*') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}">Entregables</a>
+                        </nav>
+
+                        <div class="mt-10 border-t border-white/10 pt-4">
+                            <p class="px-3 text-xs font-semibold text-white">{{ Auth::user()->name }}</p>
+                            <p class="px-3 pt-1 text-[11px] text-slate-500">{{ Auth::user()->getRoleNames()->first() ?? 'Usuario' }}</p>
+                            <a href="{{ route('profile.edit') }}" class="mt-4 flex items-center gap-3 rounded-lg border-l-4 px-3 py-2 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('profile.*') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}">Perfil</a>
+                            <form method="POST" action="{{ route('logout') }}" class="mt-1">
+                                @csrf
+                                <button type="submit" class="flex w-full items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2 text-left text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white">Cerrar sesión</button>
+                            </form>
+                        </div>
+                    </aside>
+
+                    <main class="min-w-0 flex-1 bg-[#f5fffb]">
+                        <header class="flex items-center justify-between border-b border-[#d7eee6] bg-white px-5 py-4 sm:px-8">
+                            <div class="flex items-center gap-3">
+                                <a href="{{ route('dashboard') }}" class="lg:hidden">
+                                    <img src="{{ asset('images/cruznegra-logo.png') }}" alt="Cruz Negra" class="h-8 w-24 translate-x-1 object-contain object-left">
+                                </a>
+                                <span class="hidden text-xs text-slate-400 sm:inline">{{ now()->translatedFormat('d \d\e F \d\e Y') }}</span>
+                            </div>
+                            <x-dropdown align="right" width="48">
+                                <x-slot name="trigger">
+                                    <button class="inline-flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-slate-600 transition hover:bg-[#f0fff9] focus:outline-none">
+                                        <span class="flex h-8 w-8 items-center justify-center rounded-full bg-[#c9fbe8] text-xs font-bold text-[#008c63]">{{ Str::upper(Str::substr(Auth::user()->name, 0, 1)) }}</span>
+                                        <span class="hidden sm:inline">{{ Auth::user()->name }}</span>
+                                        <span>⌄</span>
+                                    </button>
+                                </x-slot>
+                                <x-slot name="content">
+                                    <x-dropdown-link :href="route('profile.edit')">{{ __('Profile') }}</x-dropdown-link>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">{{ __('Log Out') }}</x-dropdown-link>
+                                    </form>
+                                </x-slot>
+                            </x-dropdown>
+                        </header>
+
+                        @isset($header)
+                            <div class="border-b border-[#d7eee6] bg-white px-5 py-5 sm:px-8">
+                                {{ $header }}
+                            </div>
+                        @endisset
+
+                        <div class="p-5 sm:p-8">
+                            {{ $slot }}
+                        </div>
+                    </main>
+                </div>
+            </div>
+        @endif
     </body>
 </html>

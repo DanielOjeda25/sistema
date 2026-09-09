@@ -26,7 +26,7 @@ class HitoSeeder extends Seeder
         ];
 
         foreach ($hitos as $datos) {
-            Hito::firstOrCreate(
+            Hito::updateOrCreate(
                 ['nombre' => $datos['nombre'], 'proyecto_id' => $datos['proyecto_id']],
                 $datos
             );

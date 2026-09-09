@@ -21,7 +21,10 @@ class SprintSeeder extends Seeder
         ];
 
         foreach ($sprints as $data) {
-            Sprint::firstOrCreate($data);
+            Sprint::updateOrCreate(
+                ['proyecto_id' => $data['proyecto_id'], 'nombre' => $data['nombre']],
+                $data
+            );
         }
 
         // Reparte las tareas existentes de cada proyecto entre sus sprints.

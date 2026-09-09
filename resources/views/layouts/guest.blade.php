@@ -20,11 +20,11 @@
         <div class="min-h-screen flex flex-col lg:flex-row">
 
             {{-- Panel de marca --}}
-            <div class="lg:w-5/12 bg-indigo-700 text-white px-8 py-10 lg:px-12 lg:py-16 flex flex-col justify-between">
+            <div class="lg:w-5/12 bg-[radial-gradient(circle_at_75%_45%,#202a2d_0%,#101416_42%,#0b0d0e_100%)] text-white px-8 py-10 lg:px-12 lg:py-16 flex flex-col justify-between">
 
                 <div>
                     <a href="/" class="flex items-center gap-3 group">
-                        <svg class="w-9 h-9 text-indigo-200 group-hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <svg class="w-9 h-9 text-slate-300 group-hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                         </svg>
                         <span class="font-extrabold text-2xl tracking-tight">CRUZNEGRA</span>
@@ -34,14 +34,14 @@
                         Sistema de Gestión Interna
                     </h1>
 
-                    <p class="mt-4 text-indigo-100 text-base lg:text-lg max-w-md">
+                    <p class="mt-4 text-slate-300 text-base lg:text-lg max-w-md">
                         Centralizá clientes, proyectos, tareas y facturación en un solo lugar.
                     </p>
 
-                    <ul class="mt-8 space-y-3 text-indigo-100 hidden lg:block">
+                    <ul class="mt-8 space-y-3 text-slate-300 hidden lg:block">
                         @foreach (['Clientes y proyectos', 'Tareas e hitos', 'Entregables y facturación'] as $item)
                             <li class="flex items-center gap-3">
-                                <svg class="w-5 h-5 text-indigo-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-5 h-5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                 </svg>
                                 <span>{{ $item }}</span>
@@ -50,7 +50,7 @@
                     </ul>
                 </div>
 
-                <p class="hidden lg:block text-sm text-indigo-300 mt-10">
+                <p class="hidden lg:block text-sm text-slate-400 mt-10">
                     &copy; {{ date('Y') }} CRUZNEGRA
                 </p>
             </div>

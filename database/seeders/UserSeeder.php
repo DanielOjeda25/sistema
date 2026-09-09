@@ -10,31 +10,31 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        $jefe = User::firstOrCreate(
+        $jefe = User::updateOrCreate(
             ['email' => 'jefe@example.com'],
             ['name' => 'Roberto', 'apellido' => 'Acosta', 'password' => bcrypt('1234')]
         );
         $jefe->syncRoles(['Jefe']);
 
-        $pm = User::firstOrCreate(
+        $pm = User::updateOrCreate(
             ['email' => 'pm@example.com'],
             ['name' => 'Laura', 'apellido' => 'Mendez', 'password' => bcrypt('1234')]
         );
         $pm->syncRoles(['PM']);
 
-        $po = User::firstOrCreate(
+        $po = User::updateOrCreate(
             ['email' => 'po@example.com'],
             ['name' => 'Diego', 'apellido' => 'Sosa', 'password' => bcrypt('1234')]
         );
         $po->syncRoles(['PO']);
 
-        $programador = User::firstOrCreate(
+        $programador = User::updateOrCreate(
             ['email' => 'dev@example.com'],
             ['name' => 'Sofia', 'apellido' => 'Ruiz', 'password' => bcrypt('1234')]
         );
         $programador->syncRoles(['Programador']);
 
-        $cliente = User::firstOrCreate(
+        $cliente = User::updateOrCreate(
             ['email' => 'cliente@example.com'],
             ['name' => 'Juan', 'apellido' => 'Perez', 'password' => bcrypt('1234')]
         );

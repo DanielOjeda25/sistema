@@ -53,7 +53,7 @@ class ClienteSeeder extends Seeder
         ];
 
         foreach ($clientes as $datos) {
-            Cliente::firstOrCreate(['email' => $datos['email']], $datos);
+            Cliente::updateOrCreate(['email' => $datos['email']], $datos);
         }
     }
 }

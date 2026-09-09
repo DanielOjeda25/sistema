@@ -59,7 +59,7 @@ class ProyectoSeeder extends Seeder
         ];
 
         foreach ($proyectos as $datos) {
-            Proyecto::firstOrCreate(['nombre' => $datos['nombre']], $datos);
+            Proyecto::updateOrCreate(['nombre' => $datos['nombre']], $datos);
         }
     }
 }

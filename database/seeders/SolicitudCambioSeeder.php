@@ -44,7 +44,7 @@ class SolicitudCambioSeeder extends Seeder
         ];
 
         foreach ($solicitudes as $datos) {
-            SolicitudCambio::firstOrCreate(
+            SolicitudCambio::updateOrCreate(
                 ['titulo' => $datos['titulo'], 'proyecto_id' => $datos['proyecto_id']],
                 $datos
             );

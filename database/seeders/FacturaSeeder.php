@@ -60,7 +60,7 @@ class FacturaSeeder extends Seeder
         ];
 
         foreach ($facturas as $datos) {
-            Factura::firstOrCreate(['numero' => $datos['numero']], $datos);
+            Factura::updateOrCreate(['numero' => $datos['numero']], $datos);
         }
     }
 }

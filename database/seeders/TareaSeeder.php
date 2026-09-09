@@ -84,7 +84,7 @@ class TareaSeeder extends Seeder
         ];
 
         foreach ($tareas as $datos) {
-            Tarea::firstOrCreate(
+            Tarea::updateOrCreate(
                 ['titulo' => $datos['titulo'], 'proyecto_id' => $datos['proyecto_id']],
                 $datos
             );
