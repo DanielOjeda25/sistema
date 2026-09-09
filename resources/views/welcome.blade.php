@@ -54,7 +54,7 @@
                                 <aside class="hidden w-32 shrink-0 bg-[#1d2023] p-4 text-[9px] text-slate-500 sm:block">
                                     <div class="text-[10px] font-bold text-white">CRUZNEGRA</div>
                                     <div class="mt-8 space-y-4">
-                                        <p class="rounded bg-white/10 px-2 py-1 text-white">⌂ Inicio</p>
+                                        <p class="flex items-center gap-1.5 rounded bg-white/10 px-2 py-1 text-white"><x-heroicon-o-home class="h-3 w-3 shrink-0" /> Inicio</p>
                                         <p>Clientes</p>
                                         <p>Proyectos</p>
                                         <p>Tareas</p>
@@ -72,9 +72,9 @@
                                     </div>
                                     <p class="mt-3 max-w-xs text-[10px] leading-4 text-slate-500">Colaborá con el equipo y mantené toda la información organizada.</p>
                                     <div class="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                                        @foreach ([['Proyecto', 'bg-emerald-100 text-emerald-700', '↗'], ['Conversaciones', 'bg-pink-100 text-pink-700', '•••'], ['Equipo', 'bg-amber-100 text-amber-700', '♟'], ['Búsquedas', 'bg-sky-100 text-sky-700', '⌕'], ['Trámites', 'bg-blue-100 text-blue-700', '▣'], ['Configuración', 'bg-orange-100 text-orange-700', '⚙'], ['Archivos', 'bg-yellow-100 text-yellow-700', '□'], ['Seguimientos', 'bg-teal-100 text-teal-700', '✓']] as [$titulo, $color, $icono])
+                                        @foreach ([['Proyecto', 'bg-emerald-100 text-emerald-700', 'arrow-trending-up'], ['Conversaciones', 'bg-pink-100 text-pink-700', 'chat-bubble-left-right'], ['Equipo', 'bg-amber-100 text-amber-700', 'users'], ['Búsquedas', 'bg-sky-100 text-sky-700', 'magnifying-glass'], ['Trámites', 'bg-blue-100 text-blue-700', 'clipboard-document-list'], ['Configuración', 'bg-orange-100 text-orange-700', 'cog-6-tooth'], ['Archivos', 'bg-yellow-100 text-yellow-700', 'folder'], ['Seguimientos', 'bg-teal-100 text-teal-700', 'check-circle']] as [$titulo, $color, $icono])
                                             <div class="rounded-lg border border-slate-200 bg-white p-2.5 shadow-sm sm:p-3">
-                                                <span class="flex h-7 w-7 items-center justify-center rounded-md {{ $color }} text-xs font-bold">{{ $icono }}</span>
+                                                <span class="flex h-7 w-7 items-center justify-center rounded-md {{ $color }}"><x-dynamic-component :component="'heroicon-o-'.$icono" class="h-4 w-4" /></span>
                                                 <p class="mt-3 text-[8px] font-semibold sm:text-[9px]">{{ $titulo }}</p>
                                             </div>
                                         @endforeach
