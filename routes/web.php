@@ -41,6 +41,15 @@ Route::get('/dashboard', function () {
         'totalHitos' => \App\Models\Hito::visiblePara($usuario)->count(),
         'totalEntregables' => \App\Models\EntregableIA::visiblePara($usuario)->count(),
     ];
+    
+    // Hitos que vencen pronto o ya vencieron (no completados).
+        $datos['hitosProximos'] = \App\Models\Hito::visiblePara($usuario)
+            ->where('completado', false)
+            ->whereDate('fecha_objetivo', '<=', today()->addDays(7))
+            ->with('proyecto')
+            ->orderBy('fecha_objetivo')
+            ->take(6)
+            ->get();
 
     // Los reportes son globales y nunca se calculan para el rol Cliente.
     if (! $esCliente) {
