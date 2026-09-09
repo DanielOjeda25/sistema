@@ -6,28 +6,28 @@
         $interno = ! $esCliente;
     @endphp
 
-    <div class="min-h-[calc(100vh-4rem)] bg-[#d9fff1] text-[#17191b]">
-        <div class="mx-auto flex min-h-[calc(100vh-4rem)] max-w-[1240px] overflow-hidden rounded-none border-x border-[#bcebd9] bg-white shadow-sm lg:my-5 lg:min-h-[calc(100vh-6.5rem)] lg:rounded-2xl">
-            <aside class="hidden w-60 shrink-0 bg-[#202225] px-4 py-5 text-slate-300 lg:block">
+    <div class="min-h-screen bg-[#d9fff1] text-[#17191b]">
+        <div class="flex h-screen w-full overflow-hidden bg-white shadow-sm">
+            <aside class="scroll-oscuro hidden w-60 shrink-0 overflow-y-auto bg-[#202225] px-4 py-5 text-slate-300 lg:block">
                 <a href="{{ route('dashboard') }}" class="block border-b border-white/10 px-3 pb-6">
-                    <span class="block overflow-hidden rounded-lg bg-white p-1"><img src="{{ asset('images/cruznegra-logo.png') }}" alt="Cruz Negra" class="h-16 w-full translate-x-1 object-contain object-left"></span>
+                    <img src="{{ asset('images/cruznegra-logo-light.png') }}" alt="Cruz Negra" class="h-14 w-full object-contain object-left">
                 </a>
 
                 <nav class="mt-6 space-y-1">
                     <a href="{{ route('dashboard') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-[#00e5a0] bg-white/10 px-3 py-2.5 text-sm font-semibold text-white">
-                        <span>⌂</span> Dashboard
+                        <x-heroicon-o-home class="h-5 w-5 shrink-0" /> Dashboard
                     </a>
                     <a href="{{ route('proyectos.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('proyectos.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">
-                        <span>▦</span> Proyectos
+                        <x-heroicon-o-squares-2x2 class="h-5 w-5 shrink-0" /> Proyectos
                     </a>
                     <a href="{{ route('tareas.tablero') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('tareas.tablero') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">
-                        <span>✓</span> Mi trabajo
+                        <x-heroicon-o-check-circle class="h-5 w-5 shrink-0" /> Mi trabajo
                     </a>
                     <a href="{{ route('tareas.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('tareas.*') && ! request()->routeIs('tareas.tablero') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">
-                        <span>☷</span> Tareas
+                        <x-heroicon-o-queue-list class="h-5 w-5 shrink-0" /> Tareas
                     </a>
                     <a href="{{ route('facturas.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('facturas.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">
-                        <span>$</span> Facturas
+                        <x-heroicon-o-banknotes class="h-5 w-5 shrink-0" /> Facturas
                     </a>
                 </nav>
 
@@ -49,10 +49,13 @@
                 </div>
             </aside>
 
-            <main class="min-w-0 flex-1 bg-[#f5fffb]">
-                <header class="flex items-center justify-between border-b border-[#d7eee6] bg-white px-5 py-4 sm:px-8">
+            <main class="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#f5fffb]">
+                <header class="flex shrink-0 items-center justify-between border-b border-[#d7eee6] bg-white px-5 py-4 sm:px-8">
                     <div class="flex items-center gap-3">
-                        <span class="text-xs text-slate-400">{{ now()->translatedFormat('d \d\e F \d\e Y') }}</span>
+                        <a href="{{ route('dashboard') }}" class="lg:hidden">
+                            <img src="{{ asset('images/cruznegra-logo.png') }}" alt="Cruz Negra" class="h-8 w-24 translate-x-1 object-contain object-left">
+                        </a>
+                        <span class="hidden text-xs text-slate-400 sm:inline">{{ now()->translatedFormat('d \d\e F \d\e Y') }}</span>
                     </div>
                     <div class="flex items-center gap-3">
                         <span class="hidden text-right sm:block"><span class="block text-xs font-semibold text-slate-700">{{ $usuario->name }}</span><span class="block text-[11px] text-slate-400">{{ $rol }}</span></span>
@@ -60,13 +63,15 @@
                     </div>
                 </header>
 
-                <div class="mx-auto max-w-4xl space-y-5 p-5 sm:p-8">
+                <x-mobile-nav class="shrink-0" />
+
+                <div class="scroll-suave w-full flex-1 space-y-5 overflow-y-auto p-5 sm:p-8">
                     <section class="rounded-xl border border-[#d7eee6] bg-white px-5 py-4 shadow-sm">
                         <p class="text-xs text-slate-400">Resumen de actividad</p>
                         <h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-900">Buen día, {{ $nombre }}.</h1>
                     </section>
 
-                    <div class="max-w-3xl">
+                    <div>
                         <section class="rounded-xl border border-[#d7eee6] bg-white p-5 shadow-sm">
                             <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
                                 <div>
@@ -101,7 +106,7 @@
                         </section>
 
                         @if ($interno)
-                            <section class="mt-5 space-y-5">
+                            <section class="mt-5 grid gap-5 xl:grid-cols-2">
                                 <div class="rounded-xl border border-[#d7eee6] bg-white p-5 shadow-sm">
                                     <div class="flex items-center justify-between"><div><h2 class="font-semibold text-slate-800">Estado de proyectos</h2><p class="mt-1 text-xs text-slate-400">Distribución actual</p></div><a href="{{ route('proyectos.index') }}" class="text-xs font-semibold text-[#009d70]">Ver todo</a></div>
                                     <div class="mt-4 divide-y divide-slate-100 rounded-lg border border-slate-100">
@@ -118,7 +123,7 @@
                                         @endforeach
                                     </div>
                                 </div>
-                                <div class="divide-y divide-[#edf7f3] rounded-xl border border-[#d7eee6] bg-white shadow-sm">
+                                <div class="divide-y divide-[#edf7f3] rounded-xl border border-[#d7eee6] bg-white shadow-sm xl:col-span-2">
                                     <a href="{{ route('facturas.index') }}" class="flex items-center justify-between px-5 py-4 transition hover:bg-[#f0fff9]"><span><span class="block text-sm font-medium text-slate-700">Total facturado</span><span class="block text-xs text-slate-400">Ver facturas</span></span><span class="text-lg font-bold text-[#009d70]">$ {{ number_format($totalFacturado, 2, ',', '.') }}</span></a>
                                     <a href="{{ route('facturas.index') }}" class="flex items-center justify-between px-5 py-4 transition hover:bg-[#f0fff9]"><span><span class="block text-sm font-medium text-slate-700">Pendiente de cobro</span><span class="block text-xs text-slate-400">Facturas pendientes y vencidas</span></span><span class="text-lg font-bold text-[#d97706]">$ {{ number_format($totalPendienteCobro, 2, ',', '.') }}</span></a>
                                     <a href="{{ route('tareas.index', ['estado' => 'pendiente']) }}" class="flex items-center justify-between px-5 py-4 transition hover:bg-[#f0fff9]"><span><span class="block text-sm font-medium text-slate-700">Tareas vencidas</span><span class="block text-xs text-slate-400">Requieren atención</span></span><span class="text-lg font-bold text-[#dc2626]">{{ $tareasVencidas }}</span></a>
