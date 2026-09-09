@@ -138,8 +138,9 @@ Route::middleware(['auth', 'role:Jefe|PM'])->group(function () {
     Route::resource('facturas', FacturaController::class)->except(['index', 'show', 'destroy']);
 });
 
-// Eliminar facturas es una operación excepcional: solo Jefe y PO.
-Route::middleware(['auth', 'role:Jefe|PO'])->group(function () {
+// Eliminar facturas sigue la regla del resto del módulo comercial: Jefe y PM
+// (los mismos roles que pueden crearlas y editarlas).
+Route::middleware(['auth', 'role:Jefe|PM'])->group(function () {
     Route::delete('facturas/{factura}', [FacturaController::class, 'destroy'])
         ->name('facturas.destroy');
 });

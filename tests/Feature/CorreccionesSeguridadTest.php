@@ -81,25 +81,27 @@ class CorreccionesSeguridadTest extends TestCase
     }
 
     /** @test */
-    public function jefe_y_po_pueden_eliminar_facturas(): void
+    public function jefe_y_pm_pueden_eliminar_facturas(): void
     {
+        // La eliminación sigue la misma regla que crear/editar: Jefe y PM
+        // manejan el módulo comercial completo.
         $jefe = User::where('email', 'jefe@example.com')->firstOrFail();
-        $po = User::where('email', 'po@example.com')->firstOrFail();
+        $pm = User::where('email', 'pm@example.com')->firstOrFail();
 
         $this->actingAs($jefe)->delete(route('facturas.destroy', 1))->assertRedirect();
         $this->assertDatabaseMissing('facturas', ['id' => 1]);
 
-        $this->actingAs($po)->delete(route('facturas.destroy', 2))->assertRedirect();
+        $this->actingAs($pm)->delete(route('facturas.destroy', 2))->assertRedirect();
         $this->assertDatabaseMissing('facturas', ['id' => 2]);
     }
 
     /** @test */
-    public function pm_y_programador_no_pueden_eliminar_facturas(): void
+    public function po_y_programador_no_pueden_eliminar_facturas(): void
     {
-        $pm = User::where('email', 'pm@example.com')->firstOrFail();
+        $po = User::where('email', 'po@example.com')->firstOrFail();
         $dev = User::where('email', 'dev@example.com')->firstOrFail();
 
-        $this->actingAs($pm)->delete(route('facturas.destroy', 1))->assertForbidden();
+        $this->actingAs($po)->delete(route('facturas.destroy', 1))->assertForbidden();
         $this->actingAs($dev)->delete(route('facturas.destroy', 1))->assertForbidden();
         $this->assertDatabaseHas('facturas', ['id' => 1]);
     }

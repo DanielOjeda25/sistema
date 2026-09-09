@@ -98,7 +98,7 @@ class FacturaController extends Controller
 
     public function destroy(Factura $factura)
     {
-        abort_unless(auth()->user()->hasAnyRole('Jefe', 'PO'), 403);
+        abort_unless(auth()->user()->hasAnyRole('Jefe', 'PM'), 403);
 
         $factura->delete();
 
