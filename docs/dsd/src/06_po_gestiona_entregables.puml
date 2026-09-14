@@ -1,4 +1,5 @@
 @startuml
+skinparam dpi 200
 skinparam style strictuml
 actor "PO" as PO
 boundary ":EntregableIAController" as EC
