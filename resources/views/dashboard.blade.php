@@ -130,6 +130,31 @@
                                 </div>
                             </section>
                         @endif
+
+@if (isset($hitosProximos) && $hitosProximos->isNotEmpty())
+    <div class="bg-white rounded-lg shadow p-6 mb-6">
+        <h3 class="font-semibold text-gray-800 mb-3">Hitos por vencer</h3>
+        <ul class="divide-y">
+            @foreach ($hitosProximos as $hito)
+                <li class="py-2 flex justify-between items-center">
+                    <div>
+                        <p class="font-medium">{{ $hito->nombre }}</p>
+                        <p class="text-xs text-gray-500">{{ $hito->proyecto->nombre }}</p>
+                    </div>
+                    <span class="text-xs px-2 py-1 rounded-full
+                        {{ $hito->fecha_objetivo->isPast() ? 'bg-red-100 text-red-700 font-bold' : 'bg-yellow-100 text-yellow-700' }}">
+                        @if ($hito->fecha_objetivo->isPast())
+                            VENCIDO
+                        @else
+                            {{ $hito->fecha_objetivo->diffForHumans() }}
+                        @endif
+                    </span>
+                </li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
                     </div>
                 </div>
             </main>
