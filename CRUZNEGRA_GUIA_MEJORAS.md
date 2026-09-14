@@ -650,6 +650,42 @@ Solicitudes, Entregables y Facturas.
 
 ---
 
+## 8) TESTEO IA ENTREGABLES — Solo Marcos (prueba manual)
+
+> **Agregada el 14/09.** Esta tarjeta no genera código: es recorrer el flujo de
+> informes IA de proyectos y anotar todo lo que falle. Hoy el generador activo es
+> el `FakeProjectReportGenerator` (`.env`: `AI_PROVIDER=fake`), así que el
+> contenido es de prueba — lo que se testea es el **flujo**, no el texto.
+
+### Preparación
+
+1. Laragon con MySQL (`Start All`), `php artisan serve` y `php migrate:fresh --seed`
+   si hace falta tener datos.
+2. Usuarios: `jefe@`, `pm@`, `dev@example.com` (password `1234` para todos) y
+   `cliente@example.com` para ver el lado Cliente.
+
+### Recorrido de prueba
+
+| # | Qué probar | Con quién | Esperado |
+| - | ---------- | --------- | -------- |
+| 1 | En un **proyecto con tareas y actualizaciones**, botón de generar informe IA | Jefe o PM | Se crea un entregable en estado **borrador**, sin publicar |
+| 2 | El informe aparece en **Entregables** con su tipo/origen IA | mismo | Visible para el equipo, NO para el Cliente |
+| 3 | Botón **Publicar** (publish) | Jefe/PM/PO | Pasa a publicado y **el Cliente ya lo ve** en entregables |
+| 4 | Botón **Retirar** (unpublish) | Jefe/PM/PO | Vuelve a borrador; el Cliente deja de verlo |
+| 5 | Intentar generar/publicar como **Programador** | `dev@example.com` | Generar sí (sube el material), publicar/retirar → **403** |
+| 6 | Intentar ver un informe **no publicado** como **Cliente** | `cliente@example.com` | No aparece en su listado; por URL directa → **403** |
+| 7 | Cliente de **otra empresa**: no ve informes de proyectos ajenos | `cliente@example.com` | Scoping por `visiblePara` respetado |
+| 8 | **Resumen IA de sprint** (botón de chispas en `/sprints`) | Jefe/PM/PO/Programador | Genera resumen con OpenRouter; Regenerar lo re-hace; el Cliente no ve el botón |
+| 9 | Sin configurar OpenRouter (clave vacía en `.env`) + Regenerar | Jefe | Modal con mensaje de error claro, **no** rompe la página |
+
+### Reporte
+
+Anotá número de paso, qué hiciste, qué esperabas y qué pasó (captura si es
+visual). Lo que falle va como comentario en la tarjeta de Trello; si está todo
+bien, la tarjeta pasa a DONE con el checklist marcado.
+
+---
+
 ## Si algo sale mal
 
 | Problema                                                       | Solución                                                                                                         |
