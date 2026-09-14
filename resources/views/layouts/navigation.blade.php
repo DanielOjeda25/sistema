@@ -87,11 +87,11 @@
                         </x-dropdown-link>
 
                         <!-- Authentication -->
-                        <form method="POST" action="{{ route('logout') }}">
+                        <form method="POST" action="{{ route('logout') }}" data-logout>
                             @csrf
 
                             <x-dropdown-link :href="route('logout')" onclick="event.preventDefault();
-                                                this.closest('form').submit();">
+                                                cerrarSesion(this.closest('form'));">
                                 {{ __('Log Out') }}
                             </x-dropdown-link>
                         </form>
@@ -173,11 +173,11 @@
                 </x-responsive-nav-link>
 
                 <!-- Authentication -->
-                <form method="POST" action="{{ route('logout') }}">
+                <form method="POST" action="{{ route('logout') }}" data-logout>
                     @csrf
 
                     <x-responsive-nav-link :href="route('logout')" onclick="event.preventDefault();
-                                        this.closest('form').submit();">
+                                        cerrarSesion(this.closest('form'));">
                         {{ __('Log Out') }}
                     </x-responsive-nav-link>
                 </form>
@@ -185,3 +185,24 @@
         </div>
     </div>
 </nav>
+
+<script>
+    // Logout por AJAX: si la sesion ya expiro (419), en lugar de la pagina
+    // "Pagina expirada" lleva limpio al login.
+    function cerrarSesion(form) {
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': form.querySelector('input[name="_token"]').value,
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+            },
+        }).then(r => {
+            if (r.status === 419 || r.status === 401) {
+                window.location.href = '{{ route("login") }}';
+                return;
+            }
+            window.location.href = '/';
+        }).catch(() => form.submit());
+    }
+</script>
