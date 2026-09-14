@@ -37,20 +37,20 @@ el código completo para copiar y pegar, y cómo comprobar que funciona.
 > - **Ya hay 48 tests** (`php artisan test`): TableroTareasTest,
 >   CorreccionesSeguridadTest, SprintSummaryEndpointTest, ProjectAIReportTest
 >   + auth de Breeze. La sección 7 es para **ampliar** esa cobertura, no empezar
->   de cero.
+>     de cero.
 > - La paleta es **indigo** para acciones primarias (no azules sueltos).
 
 ## Índice — quién hace qué
 
-| Tarjeta en Trello | Responsable | Backend | Frontend |
-| ----------------- | ----------- | ------- | -------- |
-| Visor de auditoría | **Marcos** | Controller + ruta (1.1) | Vista + menú (1.2) |
-| Dashboard de Cliente con métricas | **Marcos** | Datos en dashboard (4.1) | Barras de avance (4.2) |
-| Notificaciones de solicitudes de cambio | **Jesús** | Notification + controller (2.1) | Campanita (2.2) |
-| Exportar facturas a PDF | **Jesús** | dompdf + plantilla (5.1) | Botón (5.2) |
-| Recordatorios de hitos por vencer | **Dante** | Query en dashboard (3.1) | Tarjeta de hitos (3.2) |
-| Informe IA semanal automático | **Lucas** | Todo (sección 6) | — |
-| Tests Feature de los módulos | **Lucas** | Todo (sección 7) | — |
+| Tarjeta en Trello                       | Responsable      | Backend                         | Frontend               |
+| --------------------------------------- | ---------------- | ------------------------------- | ---------------------- |
+| Visor de auditoría                     | **Marcos** | Controller + ruta (1.1)         | Vista + menú (1.2)    |
+| Dashboard de Cliente con métricas      | **Marcos** | Datos en dashboard (4.1)        | Barras de avance (4.2) |
+| Notificaciones de solicitudes de cambio | **Jesús** | Notification + controller (2.1) | Campanita (2.2)        |
+| Exportar facturas a PDF                 | **Jesús** | dompdf + plantilla (5.1)        | Botón (5.2)           |
+| Recordatorios de hitos por vencer       | **Dante**  | Query en dashboard (3.1)        | Tarjeta de hitos (3.2) |
+| Informe IA semanal automático          | **Lucas**  | Todo (sección 6)               | —                     |
+| Tests Feature de los módulos           | **Lucas**  | Todo (sección 7)               | —                     |
 
 ---
 
