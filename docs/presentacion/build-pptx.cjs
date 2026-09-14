@@ -23,17 +23,23 @@ const W = 13.33, H = 7.5;
 
 const dsds = [
   ["01_pm_crea_proyecto", "DSD 1 · El PM crea un proyecto",
-   "create() carga clientes y usuarios · store(req) valida los datos · Proyecto::create(data) persiste y redirige con mensaje success"],
+   "El PM abre el formulario de creación y el sistema prepara los desplegables: la lista de clientes y la de usuarios que pueden actuar como Project Manager (mensajes create() y las consultas a Cliente y User). Al enviar el formulario, el controller valida los datos (nombre, fechas, estado, cliente y PM obligatorios). Si algo falla, vuelve al formulario mostrando los errores; si está todo correcto, crea el proyecto, lo guarda en la base de datos y vuelve al listado con el mensaje «Proyecto creado correctamente.»",
+   "create() · store(req) · validate · Proyecto::create(data) · redirect con success"],
   ["02_programador_ve_tareas", "DSD 2 · El Programador consulta tareas",
-   "index() con visiblePara, filtros y paginación (15) · show(t) por Route Model Binding · 403 si puedeVer falla"],
+   "El Programador entra al listado de tareas. Primero el sistema determina qué puede ver: si el usuario tuviera rol Cliente, solo vería las tareas de su empresa (scope visiblePara). Luego aplica la búsqueda y el filtro de estado elegidos y devuelve las tareas paginadas de a 15, cada una con su proyecto y su responsable ya cargados. Al abrir el detalle de una tarea, el sistema la busca por su id (Route Model Binding), verifica que el usuario tenga permiso para verla —si no, responde 403—, carga el proyecto, el asignado y la solicitud de cambio asociada, y muestra la ficha completa.",
+   "index() · visiblePara · when(q/estado) · paginate(15) · show(t) · puedeVer"],
   ["03_edita_tarea_tablero", "DSD 3 · Edición de tarea desde el tablero",
-   "PATCH AJAX con JSON · 422 con errores / 200 con la tarea · el JS mueve la tarjeta sin recargar"],
+   "El PM abre una tarjeta del tablero: el modal «Editar tarea» se completa con los datos que la tarjeta guarda en su atributo data-tarea. Al cambiar el estado a «En progreso» y guardar, el navegador envía una petición PATCH con JSON al servidor, que valida los campos. Si la validación falla responde 422 con los errores; si es correcta, actualiza la tarea en la base de datos (update = fill + save) y responde 200 con la tarea ya actualizada y sus relaciones. El JavaScript entonces reemplaza la tarjeta y la mueve a su nueva columna sin recargar la página.",
+   "update(req, t) · validate · update(data) · 422 con errores / 200 JSON"],
   ["04_pm_elimina_tarea", "DSD 4 · El PM elimina una tarea",
-   "DELETE AJAX · confirmación con modal propio · 200 {ok:true} y la tarjeta desaparece"],
+   "El PM pulsa «Eliminar» dentro del modal de la tarea y el sistema pide confirmación con un modal propio, no con el confirm() del navegador. Al confirmar, se envía DELETE /tareas/{id}: el sistema busca la tarea por su id y la borra de la base de datos con delete(). Responde 200 con {ok:true} y el JavaScript quita la tarjeta del tablero y actualiza los contadores de cada columna, sin recargar. Si la tarea no existiera, el Route Model Binding responde 404 antes de llegar al controller.",
+   "destroy(req, t) · delete() : bool · 200 {ok:true} · 404 si no existe"],
   ["05_jefe_aprueba_solicitud", "DSD 5 · El Jefe aprueba una solicitud de cambio",
-   "update(req, s) fija estado = aprobada · enum pendiente | aprobada | rechazada · redirect con success"],
+   "El Jefe abre el detalle de una solicitud de cambio, que muestra el proyecto afectado, quién la solicitó y su estado actual. Al editarla y fijar el estado en «aprobada», el controller valida los datos —el estado solo puede ser pendiente, aprobada o rechazada—, actualiza el registro en la base mediante fill(data) + save() y redirige al listado con el mensaje «Solicitud de cambio actualizada correctamente.»",
+   "show(s) · update(req, s) · validate · update(data) · redirect con success"],
   ["06_po_gestiona_entregables", "DSD 6 · El PO gestiona los entregables IA",
-   "update(req, e) acepta borrador | revisado | aprobado · redirect al listado con success"],
+   "El PO entra al listado de entregables IA, que muestra cada entregable con su proyecto, tipo, estado y quién lo generó (paginado de a 15). Al abrir uno, el sistema carga sus relaciones proyecto y generador. Al editarlo, el controller valida que el estado solo pueda tomar los valores borrador, revisado o aprobado —además del resto de los campos obligatorios—, actualiza el registro con update(data) y vuelve al listado con el mensaje de éxito.",
+   "index() · show(e) · update(req, e) · validate · update(data) · redirect"],
 ];
 
 // Cada CU: una lámina POR PASO, con "Figura N" y la acción que se ejecuta
@@ -101,17 +107,27 @@ pres.layout = "LAYOUT_WIDE";
 pres.author = "Equipo CRUZNEGRA";
 pres.title = "CRUZNEGRA — DSD y Casos de Uso Reales";
 
-function laminaImagen(titulo, subtitulo, imgPath, textoFigura, numFigura) {
+function laminaImagen(titulo, subtitulo, imgPath, textoFigura, numFigura, descLegible) {
   const s = pres.addSlide();
   s.background = { color: "FFFFFF" };
-  s.addText(titulo, { x: 0.5, y: 0.22, w: W - 1, h: 0.5, fontSize: 24, bold: true, color: TEXT, fontFace: "Segoe UI", margin: 0 });
-  s.addText(subtitulo, { x: 0.5, y: 0.72, w: W - 1, h: 0.35, fontSize: 13, color: MUTED, fontFace: "Segoe UI", margin: 0 });
+  s.addText(titulo, { x: 0.5, y: 0.2, w: W - 1, h: 0.5, fontSize: 24, bold: true, color: TEXT, fontFace: "Segoe UI", margin: 0 });
 
+  const conDesc = !!descLegible;
+  const maxH = conDesc ? 4.15 : 5.1;
+  const imgY = conDesc ? 0.85 : 1.15;
   const { w: pw, h: ph } = pngSize(imgPath);
-  const maxH = 5.1, maxW = 12.2;
   let h = maxH, w = maxH * (pw / ph);
-  if (w > maxW) { w = maxW; h = maxW * (ph / pw); }
-  s.addImage({ path: imgPath, x: (W - w) / 2, y: 1.15 + (5.1 - h) / 2, w, h });
+  if (w > 12.2) { w = 12.2; h = 12.2 * (ph / pw); }
+  s.addImage({ path: imgPath, x: (W - w) / 2, y: imgY + (maxH - h) / 2, w, h });
+
+  if (conDesc) {
+    s.addText([
+      { text: "Qué representa: ", options: { bold: true, color: "4F46E5" } },
+      { text: descLegible, options: { color: TEXT } },
+    ], { x: 0.6, y: 5.15, w: W - 1.2, h: 1.55, fontSize: 13.5, fontFace: "Segoe UI", align: "left", valign: "top", margin: 0, lineSpacingMultiple: 1.15 });
+    s.addText(textoFigura, { x: 0.6, y: 6.85, w: W - 1.2, h: 0.3, fontSize: 11, color: MUTED, fontFace: "Segoe UI", align: "right", margin: 0 });
+    return;
+  }
 
   const runs = numFigura
     ? [{ text: `Figura ${numFigura}. `, options: { bold: true, color: "4F46E5" } }, { text: textoFigura, options: { color: TEXT } }]
@@ -127,9 +143,8 @@ s.addText("DSD y Casos de Uso Reales", { x: 0, y: 3.2, w: W, h: 0.7, align: "cen
 s.addText("Sistema de Gestión Interna · Laravel 12 · Capturas de septiembre 2026", { x: 0, y: 4.0, w: W, h: 0.5, align: "center", fontSize: 15, color: "94A3B8", fontFace: "Segoe UI" });
 
 // ---- DSD (una lámina por diagrama, en alta resolución)
-for (const [file, titulo, desc] of dsds) {
-  laminaImagen(titulo, "Diseño detallado del caso de uso (PlantUML, generado desde el código real)",
-    path.join(HD, file + ".png"), desc, null);
+for (const [file, titulo, desc, mensajes] of dsds) {
+  laminaImagen(titulo, "Diseño detallado del caso de uso", path.join(HD, file + ".png"), "Mensajes: " + mensajes, null, desc);
 }
 
 // ---- separador
