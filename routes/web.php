@@ -14,6 +14,7 @@ use App\Http\Controllers\SprintSummaryController;
 use App\Http\Controllers\TareaController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuditoriaController;
 
 // -----------------------------------------------------------------------------
 // RUTAS PÚBLICAS
@@ -79,6 +80,17 @@ Route::get('/dashboard', function () {
         $datos['tareasVencidas'] = \App\Models\Tarea::whereDate('fecha_limite', '<', today())
             ->whereNotIn('estado', ['completada', 'cancelada'])
             ->count();
+                    // Detalle para el dashboard del Cliente: avance de sus proyectos.
+        $datos['misProyectos'] = $esCliente
+            ? \App\Models\Proyecto::visiblePara($usuario)
+                ->with('cliente')
+                ->withCount([
+                    'tareas',
+                    'tareas as tareas_completadas' => fn ($q) => $q->where('estado', 'completada'),
+                ])
+                ->take(6)
+                ->get()
+            : null;
     }
 
     return view('dashboard', $datos);
@@ -108,6 +120,10 @@ Route::middleware(['auth', 'role:Jefe|PM'])->group(function () {
  * sola persona para evitar escaladas de permisos.
  */
 Route::middleware(['auth', 'role:Jefe'])->group(function () {
+    // Bitácora de cambios del sistema (laravel-auditing): quién hizo qué y
+    // cuándo. Queda en Jefe porque es información sensible de administración.
+    Route::get('/auditoria', [AuditoriaController::class, 'index'])->name('auditoria.index');
+
     // Alta de usuarios. No hay registro público: las cuentas se crean acá y se
     // les asigna un rol. La contraseña que se pone es provisional; la persona
     // la cambia desde su perfil cuando entra.

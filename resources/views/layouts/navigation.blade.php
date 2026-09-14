@@ -16,6 +16,11 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    @role('Jefe')
+    <x-nav-link :href="route('auditoria.index')" :active="request()->routeIs('auditoria.*')">
+        Auditoría
+    </x-nav-link>
+@endrole
                     @hasanyrole('Jefe|PM')
                     <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')">
                         {{ __('Usuarios y Roles') }}
