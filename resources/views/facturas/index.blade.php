@@ -72,7 +72,7 @@
                                             <a href="{{ route('facturas.show', $factura) }}" class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
                                                 <x-heroicon-o-eye class="w-5 h-5" />
                                             </a>
-                                            <button type="button" data-abrir-modal="modal-factura-crear"
+                                            <button type="button" data-abrir-modal="modal-factura-editar"
                                                         data-url="{{ route('facturas.update', $factura) }}"
                                                         data-valores='@json($valoresFactura)'
                                                         class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">

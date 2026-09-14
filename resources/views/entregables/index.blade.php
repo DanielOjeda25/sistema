@@ -75,7 +75,7 @@
                                                 <x-heroicon-o-eye class="w-5 h-5" />
                                             </a>
                                             @hasanyrole('Jefe|PM|PO|Programador')
-                                                <button type="button" data-abrir-modal="modal-entregable-crear"
+                                                <button type="button" data-abrir-modal="modal-entregable-editar"
                                                         data-url="{{ route('entregables.update', $entregable) }}"
                                                         data-valores='@json($valoresEntregable)'
                                                         class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">

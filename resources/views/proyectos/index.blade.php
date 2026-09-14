@@ -78,7 +78,7 @@
                                                 <x-heroicon-o-squares-2x2 class="w-5 h-5" />
                                             </a>
                                             @hasanyrole('Jefe|PM')
-                                                <button type="button" data-abrir-modal="modal-proyecto-crear"
+                                                <button type="button" data-abrir-modal="modal-proyecto-editar"
                                                         data-url="{{ route('proyectos.update', $proyecto) }}"
                                                         data-valores='@json($valoresProyecto)'
                                                         class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
