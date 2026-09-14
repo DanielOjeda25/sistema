@@ -1,0 +1,19 @@
+@startuml
+skinparam style strictuml
+actor "PM" as PM
+boundary ":TareaController" as TC
+entity "t : Tarea" as T
+
+note over PM : El modal pide confirmacion\n(sin confirm() nativo)
+PM -> TC : destroy(req : Request, t : Tarea)\n[DELETE /tareas/{id} - Route Model Binding]
+activate TC
+TC -> T : delete() : bool
+
+alt eliminacion efectiva
+  TC --> PM : 200 JSON {ok : true}\nel JS quita la tarjeta y actualiza contadores
+else registro inexistente
+  note right of T : si no existe, el Route Model\nBinding responde 404 antes del controller
+  TC --> PM : 404
+end
+deactivate TC
+@enduml

@@ -1,0 +1,19 @@
+@startuml
+skinparam style strictuml
+actor "Jefe" as JEFE
+boundary ":SolicitudCambioController" as SCC
+entity "s : SolicitudCambio" as S
+
+JEFE -> SCC : show(s : SolicitudCambio)
+activate SCC
+SCC -> S : load(proyecto : Proyecto, solicitante : User)
+SCC --> JEFE : view('solicitudes_cambio.show', s)
+deactivate SCC
+
+JEFE -> SCC : update(req : Request, s : SolicitudCambio)
+activate SCC
+SCC -> SCC : validate(req) : array\n[titulo : string, descripcion : string,\nestado : string in pendiente|aprobada|rechazada,\nprioridad : string, proyecto_id : int,\nsolicitado_por : int]
+SCC -> S : update(data : array) : bool\n[fill(data) + save()]\ndata['estado'] : string = 'aprobada'
+SCC --> JEFE : redirect(solicitudes-cambio.index)\ncon success : string
+deactivate SCC
+@enduml

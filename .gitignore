@@ -25,3 +25,4 @@ Thumbs.db
 
 # Script local de arranque (contiene credenciales, no debe versionarse)
 sistema.bat
+plantuml.jar

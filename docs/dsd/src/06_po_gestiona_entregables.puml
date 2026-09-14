@@ -1,0 +1,25 @@
+@startuml
+skinparam style strictuml
+actor "PO" as PO
+boundary ":EntregableIAController" as EC
+entity "e : EntregableIA" as E
+
+PO -> EC : index(req : Request)
+activate EC
+EC -> EC : with('proyecto')->latest()->paginate(15)\n: LengthAwarePaginator<EntregableIA>
+EC --> PO : view('entregables.index', entregables)
+deactivate EC
+
+PO -> EC : show(e : EntregableIA)
+activate EC
+EC -> E : load(proyecto : Proyecto, generador : User)
+EC --> PO : view('entregables.show', e)
+deactivate EC
+
+PO -> EC : update(req : Request, e : EntregableIA)
+activate EC
+EC -> EC : validate(req) : array\n[titulo : string, contenido : string,\ntipo : string, proyecto_id : int,\ngenerado_por : int,\nestado : string in borrador|revisado|aprobado]
+EC -> E : update(data : array) : bool\n[fill(data) + save()]
+EC --> PO : redirect(entregables.index) con success : string
+deactivate EC
+@enduml
