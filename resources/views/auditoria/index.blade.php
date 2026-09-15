@@ -4,10 +4,37 @@
     </x-slot>
 
     <div class="py-12 max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <form method="GET" class="mb-4 flex gap-2">
-            <input type="text" name="q" value="{{ request('q') }}" placeholder="Buscar por evento o modelo..."
-                   class="border-gray-300 rounded-md w-64">
-            <button class="px-4 py-2 bg-indigo-600 text-white rounded-md">Buscar</button>
+        <form method="GET" class="mb-4 flex flex-wrap items-end gap-2">
+            <div>
+                <x-input-label for="q" value="Buscar" />
+                <input type="text" id="q" name="q" value="{{ request('q') }}" placeholder="Evento o modelo..."
+                       class="border-gray-300 rounded-md w-56">
+            </div>
+            <div>
+                <x-input-label for="usuario" value="Usuario" />
+                <select id="usuario" name="usuario" class="border-gray-300 rounded-md">
+                    <option value="">Todos</option>
+                    @foreach ($usuarios as $u)
+                        <option value="{{ $u->id }}" @selected(request('usuario') == $u->id)>{{ $u->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <x-input-label for="accion" value="Acción" />
+                <select id="accion" name="accion" class="border-gray-300 rounded-md">
+                    <option value="">Todas</option>
+                    @foreach (['created' => 'Creación', 'updated' => 'Modificación', 'deleted' => 'Eliminación'] as $valor => $etiqueta)
+                        <option value="{{ $valor }}" @selected(request('accion') == $valor)>{{ $etiqueta }}</option>
+                    @endforeach
+                </select>
+            </div>
+            @if (request('modelo'))
+                <input type="hidden" name="modelo" value="{{ request('modelo') }}">
+                <input type="hidden" name="registro" value="{{ request('registro') }}">
+                <span class="text-xs text-gray-500 pb-2">Historial de {{ class_basename(request('modelo')) }} #{{ request('registro') }}</span>
+            @endif
+            <button class="px-4 py-2.5 bg-indigo-600 text-white rounded-md">Filtrar</button>
+            <a href="{{ route('auditoria.index') }}" class="text-xs text-gray-500 hover:underline pb-2">Limpiar</a>
         </form>
 
         <div class="bg-white rounded-lg shadow overflow-x-auto">
@@ -33,7 +60,16 @@
                                     {{ $registro->event }}
                                 </span>
                             </td>
-                            <td class="px-4 py-3">{{ class_basename($registro->auditable_type) }} #{{ $registro->auditable_id }}</td>
+                            <td class="px-4 py-3">
+                                {{ class_basename($registro->auditable_type) }} #{{ $registro->auditable_id }}
+                                @if ($registro->event === 'updated' && is_array($registro->getModified()))
+                                    <div class="mt-1 text-xs text-gray-500">
+                                        @foreach ($registro->getModified() as $campo => $cambio)
+                                            <div><span class="font-medium">{{ $campo }}:</span> «{{ $cambio['old'] ?? '—' }}» → «{{ $cambio['new'] ?? '—' }}»</div>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </td>
                         </tr>
                     @empty
                         <tr><td colspan="4" class="px-4 py-6 text-center text-gray-500">Sin registros.</td></tr>
