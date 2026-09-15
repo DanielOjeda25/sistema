@@ -13,6 +13,7 @@ use App\Http\Controllers\SprintController;
 use App\Http\Controllers\SprintSummaryController;
 use App\Http\Controllers\TareaController;
 use App\Http\Controllers\UserController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuditoriaController;
 
@@ -97,6 +98,20 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    // Notificaciones in-app: marcar una como leida o todas.
+    Route::post('/notificaciones/{id}/leer', function (Request $request, $id) {
+        $notificacion = $request->user()->notifications()->findOrFail($id);
+        $notificacion->markAsRead();
+
+        return back();
+    })->name('notificaciones.leer');
+
+    Route::post('/notificaciones/leer-todas', function (Request $request) {
+        $request->user()->unreadNotifications->markAsRead();
+
+        return back();
+    })->name('notificaciones.leer-todas');
+
     // Rutas del perfil nativas de Laravel Breeze
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
