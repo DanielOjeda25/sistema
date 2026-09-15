@@ -41,7 +41,7 @@ Route::get('/dashboard', function () {
         'totalHitos' => \App\Models\Hito::visiblePara($usuario)->count(),
         'totalEntregables' => \App\Models\EntregableIA::visiblePara($usuario)->count(),
     ];
-    
+
     // Hitos que vencen pronto o ya vencieron (no completados).
         $datos['hitosProximos'] = \App\Models\Hito::visiblePara($usuario)
             ->where('completado', false)
@@ -100,6 +100,11 @@ Route::middleware('auth')->group(function () {
  * porque administra. PO/Programador/Cliente no entran.
  */
 Route::middleware(['auth', 'role:Jefe|PM'])->group(function () {
+            // Avisar al Jefe y a los PM de la nueva solicitud.
+        $solicitud = SolicitudCambio::latest('id')->first();
+        \App\Models\User::role(['Jefe', 'PM'])->get()->each(
+            fn (User $usuario) => $usuario->notify(new \App\Notifications\SolicitudCambioCreada($solicitud))
+        );
     Route::get('/usuarios', [UserController::class, 'index'])->name('users.index');
 });
 
