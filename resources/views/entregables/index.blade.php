@@ -71,11 +71,17 @@
                                     <td class="px-6 py-4">{{ $entregable->generador?->name ?? 'N/A' }}</td>
                                     <td class="px-6 py-4 text-sm font-medium">
                                         <div class="flex items-center gap-3">
+                                            @hasanyrole('Jefe')
+                                                <a href="{{ route('auditoria.index', ['modelo' => 'App\Models\EntregableIA', 'registro' => $entregable->id]) }}"
+                                                   class="text-gray-400 hover:text-gray-700" title="Historial de cambios" aria-label="Historial">
+                                                    <x-heroicon-o-clock class="w-5 h-5" />
+                                                </a>
+                                            @endhasanyrole
                                             <a href="{{ route('entregables.show', $entregable) }}" class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
                                                 <x-heroicon-o-eye class="w-5 h-5" />
                                             </a>
                                             @hasanyrole('Jefe|PM|PO|Programador')
-                                                <button type="button" data-abrir-modal="modal-entregable-crear"
+                                                <button type="button" data-abrir-modal="modal-entregable-editar"
                                                         data-url="{{ route('entregables.update', $entregable) }}"
                                                         data-valores='@json($valoresEntregable)'
                                                         class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">

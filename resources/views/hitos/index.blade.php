@@ -68,6 +68,12 @@
                                     <td class="px-6 py-4">{{ $hito->completado ? 'Completado' : 'Pendiente' }}</td>
                                     <td class="px-6 py-4 text-sm font-medium">
                                         <div class="flex items-center gap-3">
+                                            @hasanyrole('Jefe')
+                                                <a href="{{ route('auditoria.index', ['modelo' => 'App\Models\Hito', 'registro' => $hito->id]) }}"
+                                                   class="text-gray-400 hover:text-gray-700" title="Historial de cambios" aria-label="Historial">
+                                                    <x-heroicon-o-clock class="w-5 h-5" />
+                                                </a>
+                                            @endhasanyrole
                                             <a href="{{ route('hitos.show', $hito) }}" class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
                                                 <x-heroicon-o-eye class="w-5 h-5" />
                                             </a>

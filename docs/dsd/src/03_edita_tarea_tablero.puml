@@ -1,6 +1,7 @@
 @startuml
+skinparam dpi 200
 skinparam style strictuml
-actor "Programador" as PROG
+actor "PM" as PROG
 boundary ":TareaController" as TC
 entity "t : Tarea" as T
 

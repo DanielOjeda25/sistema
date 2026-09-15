@@ -16,11 +16,7 @@
             <header class="border-b border-white/15 px-6 py-5 sm:px-10 lg:px-16">
                 <div class="mx-auto flex max-w-[1280px] items-center justify-between">
                     <a href="/" class="flex items-center gap-3">
-                        <span class="relative flex h-8 w-8 items-center justify-center text-3xl font-light leading-none text-white">
-                            <span class="absolute h-8 w-2 bg-white"></span>
-                            <span class="absolute h-2 w-8 bg-white"></span>
-                        </span>
-                        <span class="text-xl font-bold tracking-tight">CRUZNEGRA</span>
+                        <img src="{{ asset('images/cruznegra-logo-light.png') }}" alt="Cruz Negra" class="h-10 w-auto">
                     </a>
                 </div>
             </header>
@@ -39,9 +35,6 @@
                     <div class="mt-9 flex flex-wrap gap-3">
                         <a href="{{ route('login') }}" class="inline-flex items-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#101416] transition hover:bg-slate-200">
                             Ingresar <span class="ml-2 text-lg leading-none">→</span>
-                        </a>
-                        <a href="#vista-general" class="inline-flex items-center rounded-full border border-white/60 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white hover:text-[#101416]">
-                            Más información
                         </a>
                     </div>
                 </div>

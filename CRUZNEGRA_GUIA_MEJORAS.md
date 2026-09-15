@@ -36,21 +36,21 @@ el código completo para copiar y pegar, y cómo comprobar que funciona.
 >   Jefe y PO).
 > - **Ya hay 48 tests** (`php artisan test`): TableroTareasTest,
 >   CorreccionesSeguridadTest, SprintSummaryEndpointTest, ProjectAIReportTest
->   + auth de Breeze. La sección 7 es para **ampliar** esa cobertura, no empezar
->     de cero.
+>     - auth de Breeze. La sección 7 es para **ampliar** esa cobertura, no empezar
+>       de cero.
 > - La paleta es **indigo** para acciones primarias (no azules sueltos).
 
 ## Índice — quién hace qué
 
-| Tarjeta en Trello                       | Responsable      | Backend                         | Frontend               |
-| --------------------------------------- | ---------------- | ------------------------------- | ---------------------- |
-| Visor de auditoría                     | **Marcos** | Controller + ruta (1.1)         | Vista + menú (1.2)    |
-| Dashboard de Cliente con métricas      | **Marcos** | Datos en dashboard (4.1)        | Barras de avance (4.2) |
-| Notificaciones de solicitudes de cambio | **Jesús** | Notification + controller (2.1) | Campanita (2.2)        |
-| Exportar facturas a PDF                 | **Jesús** | dompdf + plantilla (5.1)        | Botón (5.2)           |
-| Recordatorios de hitos por vencer       | **Dante**  | Query en dashboard (3.1)        | Tarjeta de hitos (3.2) |
-| Informe IA semanal automático          | **Lucas**  | Todo (sección 6)               | —                     |
-| Tests Feature de los módulos           | **Lucas**  | Todo (sección 7)               | —                     |
+| Tarjeta en Trello                       | Responsable | Backend                         | Frontend               |
+| --------------------------------------- | ----------- | ------------------------------- | ---------------------- |
+| Visor de auditoría                      | **Marcos**  | Controller + ruta (1.1)         | Vista + menú (1.2)     |
+| Dashboard de Cliente con métricas       | **Marcos**  | Datos en dashboard (4.1)        | Barras de avance (4.2) |
+| Notificaciones de solicitudes de cambio | **Jesús**   | Notification + controller (2.1) | Campanita (2.2)        |
+| Exportar facturas a PDF                 | **Jesús**   | dompdf + plantilla (5.1)        | Botón (5.2)            |
+| Recordatorios de hitos por vencer       | **Dante**   | Query en dashboard (3.1)        | Tarjeta de hitos (3.2) |
+| Informe IA semanal automático           | **Lucas**   | Todo (sección 6)                | —                      |
+| Tests Feature de los módulos            | **Lucas**   | Todo (sección 7)                | —                      |
 
 ---
 
@@ -229,7 +229,7 @@ justo **después** de la línea `SolicitudCambio::create($data);`, agregar:
         );
 ```
 
-*(Mejor aún: cambiar `SolicitudCambio::create($data)` por `$solicitud = SolicitudCambio::create($data);` y usar `$solicitud` en el aviso.)*
+_(Mejor aún: cambiar `SolicitudCambio::create($data)` por `$solicitud = SolicitudCambio::create($data);` y usar `$solicitud` en el aviso.)_
 
 **Ruta para marcar como leída** — en `routes/web.php`, dentro del grupo `auth` general:
 
@@ -666,17 +666,17 @@ Solicitudes, Entregables y Facturas.
 
 ### Recorrido de prueba
 
-| # | Qué probar | Con quién | Esperado |
-| - | ---------- | --------- | -------- |
-| 1 | En un **proyecto con tareas y actualizaciones**, botón de generar informe IA | Jefe o PM | Se crea un entregable en estado **borrador**, sin publicar |
-| 2 | El informe aparece en **Entregables** con su tipo/origen IA | mismo | Visible para el equipo, NO para el Cliente |
-| 3 | Botón **Publicar** (publish) | Jefe/PM/PO | Pasa a publicado y **el Cliente ya lo ve** en entregables |
-| 4 | Botón **Retirar** (unpublish) | Jefe/PM/PO | Vuelve a borrador; el Cliente deja de verlo |
-| 5 | Intentar generar/publicar como **Programador** | `dev@example.com` | Generar sí (sube el material), publicar/retirar → **403** |
-| 6 | Intentar ver un informe **no publicado** como **Cliente** | `cliente@example.com` | No aparece en su listado; por URL directa → **403** |
-| 7 | Cliente de **otra empresa**: no ve informes de proyectos ajenos | `cliente@example.com` | Scoping por `visiblePara` respetado |
-| 8 | **Resumen IA de sprint** (botón de chispas en `/sprints`) | Jefe/PM/PO/Programador | Genera resumen con OpenRouter; Regenerar lo re-hace; el Cliente no ve el botón |
-| 9 | Sin configurar OpenRouter (clave vacía en `.env`) + Regenerar | Jefe | Modal con mensaje de error claro, **no** rompe la página |
+| #   | Qué probar                                                                  | Con quién              | Esperado                                                                       |
+| --- | --------------------------------------------------------------------------- | ---------------------- | ------------------------------------------------------------------------------ |
+| 1   | En un**proyecto con tareas y actualizaciones**, botón de generar informe IA | Jefe o PM              | Se crea un entregable en estado**borrador**, sin publicar                      |
+| 2   | El informe aparece en**Entregables** con su tipo/origen IA                  | mismo                  | Visible para el equipo, NO para el Cliente                                     |
+| 3   | Botón**Publicar** (publish)                                                 | Jefe/PM/PO             | Pasa a publicado y**el Cliente ya lo ve** en entregables                       |
+| 4   | Botón**Retirar** (unpublish)                                                | Jefe/PM/PO             | Vuelve a borrador; el Cliente deja de verlo                                    |
+| 5   | Intentar generar/publicar como**Programador**                               | `dev@example.com`      | Generar sí (sube el material), publicar/retirar →**403**                       |
+| 6   | Intentar ver un informe**no publicado** como **Cliente**                    | `cliente@example.com`  | No aparece en su listado; por URL directa →**403**                             |
+| 7   | Cliente de**otra empresa**: no ve informes de proyectos ajenos              | `cliente@example.com`  | Scoping por`visiblePara` respetado                                             |
+| 8   | **Resumen IA de sprint** (botón de chispas en `/sprints`)                   | Jefe/PM/PO/Programador | Genera resumen con OpenRouter; Regenerar lo re-hace; el Cliente no ve el botón |
+| 9   | Sin configurar OpenRouter (clave vacía en`.env`) + Regenerar                | Jefe                   | Modal con mensaje de error claro,**no** rompe la página                        |
 
 ### Reporte
 
@@ -688,13 +688,13 @@ bien, la tarjeta pasa a DONE con el checklist marcado.
 
 ## Si algo sale mal
 
-| Problema                                                       | Solución                                                                                                         |
-| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `Class "App\Http\Controllers\AuditoriaController" not found` | Falta el`use` arriba de `routes/web.php` o corre `php artisan optimize:clear`                               |
-| La campanita no aparece                                        | Revisá que el bloque esté dentro del`<nav>` de `navigation.blade.php`, donde el usuario ya está logueado   |
-| El PDF sale en blanco                                          | Corre`php artisan vendor:publish --provider="Barryvdh\DomPDF\ServiceProvider"` y `php artisan optimize:clear` |
-| Las notificaciones no se guardan                               | Corre`php artisan migrate` (la tabla `notifications` tiene que existir)                                       |
-| El comando del informe no envía nada                          | Tiene que existir al menos un`Sprint` con `estado = activo` y un usuario con rol `Jefe`                     |
+| Problema                                                     | Solución                                                                                                      |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| `Class "App\Http\Controllers\AuditoriaController" not found` | Falta el`use` arriba de `routes/web.php` o corre `php artisan optimize:clear`                                 |
+| La campanita no aparece                                      | Revisá que el bloque esté dentro del`<nav>` de `navigation.blade.php`, donde el usuario ya está logueado      |
+| El PDF sale en blanco                                        | Corre`php artisan vendor:publish --provider="Barryvdh\DomPDF\ServiceProvider"` y `php artisan optimize:clear` |
+| Las notificaciones no se guardan                             | Corre`php artisan migrate` (la tabla `notifications` tiene que existir)                                       |
+| El comando del informe no envía nada                         | Tiene que existir al menos un`Sprint` con `estado = activo` y un usuario con rol `Jefe`                       |
 
 ---
 

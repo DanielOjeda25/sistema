@@ -69,10 +69,16 @@
                                     <td class="px-6 py-4">{{ ucfirst($factura->estado) }}</td>
                                     <td class="px-6 py-4 text-sm font-medium">
                                         <div class="flex items-center gap-3">
+                                            @hasanyrole('Jefe')
+                                                <a href="{{ route('auditoria.index', ['modelo' => 'App\Models\Factura', 'registro' => $factura->id]) }}"
+                                                   class="text-gray-400 hover:text-gray-700" title="Historial de cambios" aria-label="Historial">
+                                                    <x-heroicon-o-clock class="w-5 h-5" />
+                                                </a>
+                                            @endhasanyrole
                                             <a href="{{ route('facturas.show', $factura) }}" class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
                                                 <x-heroicon-o-eye class="w-5 h-5" />
                                             </a>
-                                            <button type="button" data-abrir-modal="modal-factura-crear"
+                                            <button type="button" data-abrir-modal="modal-factura-editar"
                                                         data-url="{{ route('facturas.update', $factura) }}"
                                                         data-valores='@json($valoresFactura)'
                                                         class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">

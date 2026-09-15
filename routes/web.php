@@ -13,7 +13,9 @@ use App\Http\Controllers\SprintController;
 use App\Http\Controllers\SprintSummaryController;
 use App\Http\Controllers\TareaController;
 use App\Http\Controllers\UserController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuditoriaController;
 
 // -----------------------------------------------------------------------------
 // RUTAS PÚBLICAS
@@ -79,12 +81,37 @@ Route::get('/dashboard', function () {
         $datos['tareasVencidas'] = \App\Models\Tarea::whereDate('fecha_limite', '<', today())
             ->whereNotIn('estado', ['completada', 'cancelada'])
             ->count();
+                    // Detalle para el dashboard del Cliente: avance de sus proyectos.
+        $datos['misProyectos'] = $esCliente
+            ? \App\Models\Proyecto::visiblePara($usuario)
+                ->with('cliente')
+                ->withCount([
+                    'tareas',
+                    'tareas as tareas_completadas' => fn ($q) => $q->where('estado', 'completada'),
+                ])
+                ->take(6)
+                ->get()
+            : null;
     }
 
     return view('dashboard', $datos);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    // Notificaciones in-app: marcar una como leida o todas.
+    Route::post('/notificaciones/{id}/leer', function (Request $request, $id) {
+        $notificacion = $request->user()->notifications()->findOrFail($id);
+        $notificacion->markAsRead();
+
+        return back();
+    })->name('notificaciones.leer');
+
+    Route::post('/notificaciones/leer-todas', function (Request $request) {
+        $request->user()->unreadNotifications->markAsRead();
+
+        return back();
+    })->name('notificaciones.leer-todas');
+
     // Rutas del perfil nativas de Laravel Breeze
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -113,6 +140,10 @@ Route::middleware(['auth', 'role:Jefe|PM'])->group(function () {
  * sola persona para evitar escaladas de permisos.
  */
 Route::middleware(['auth', 'role:Jefe'])->group(function () {
+    // Bitácora de cambios del sistema (laravel-auditing): quién hizo qué y
+    // cuándo. Queda en Jefe porque es información sensible de administración.
+    Route::get('/auditoria', [AuditoriaController::class, 'index'])->name('auditoria.index');
+
     // Alta de usuarios. No hay registro público: las cuentas se crean acá y se
     // les asigna un rol. La contraseña que se pone es provisional; la persona
     // la cambia desde su perfil cuando entra.

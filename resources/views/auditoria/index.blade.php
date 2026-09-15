@@ -1,0 +1,83 @@
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Auditoría del sistema</h2>
+    </x-slot>
+
+    <div class="py-12 max-w-7xl mx-auto sm:px-6 lg:px-8">
+        <form method="GET" class="mb-4 flex flex-wrap items-end gap-2">
+            <div>
+                <x-input-label for="q" value="Buscar" />
+                <input type="text" id="q" name="q" value="{{ request('q') }}" placeholder="Evento o modelo..."
+                       class="border-gray-300 rounded-md w-56">
+            </div>
+            <div>
+                <x-input-label for="usuario" value="Usuario" />
+                <select id="usuario" name="usuario" class="border-gray-300 rounded-md">
+                    <option value="">Todos</option>
+                    @foreach ($usuarios as $u)
+                        <option value="{{ $u->id }}" @selected(request('usuario') == $u->id)>{{ $u->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <x-input-label for="accion" value="Acción" />
+                <select id="accion" name="accion" class="border-gray-300 rounded-md">
+                    <option value="">Todas</option>
+                    @foreach (['created' => 'Creación', 'updated' => 'Modificación', 'deleted' => 'Eliminación'] as $valor => $etiqueta)
+                        <option value="{{ $valor }}" @selected(request('accion') == $valor)>{{ $etiqueta }}</option>
+                    @endforeach
+                </select>
+            </div>
+            @if (request('modelo'))
+                <input type="hidden" name="modelo" value="{{ request('modelo') }}">
+                <input type="hidden" name="registro" value="{{ request('registro') }}">
+                <span class="text-xs text-gray-500 pb-2">Historial de {{ class_basename(request('modelo')) }} #{{ request('registro') }}</span>
+            @endif
+            <button class="px-4 py-2.5 bg-indigo-600 text-white rounded-md">Filtrar</button>
+            <a href="{{ route('auditoria.index') }}" class="text-xs text-gray-500 hover:underline pb-2">Limpiar</a>
+        </form>
+
+        <div class="bg-white rounded-lg shadow overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50 text-left">
+                    <tr>
+                        <th class="px-4 py-3">Fecha</th>
+                        <th class="px-4 py-3">Usuario</th>
+                        <th class="px-4 py-3">Evento</th>
+                        <th class="px-4 py-3">Registro</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($auditoria as $registro)
+                        <tr class="border-t">
+                            <td class="px-4 py-3">{{ $registro->created_at->format('d/m/Y H:i') }}</td>
+                            <td class="px-4 py-3">{{ $registro->user->name ?? 'Sistema' }}</td>
+                            <td class="px-4 py-3">
+                                <span class="px-2 py-1 rounded-full text-xs
+                                    {{ $registro->event === 'created' ? 'bg-green-100 text-green-800' : '' }}
+                                    {{ $registro->event === 'updated' ? 'bg-blue-100 text-blue-800' : '' }}
+                                    {{ $registro->event === 'deleted' ? 'bg-red-100 text-red-800' : '' }}">
+                                    {{ $registro->event }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3">
+                                {{ class_basename($registro->auditable_type) }} #{{ $registro->auditable_id }}
+                                @if ($registro->event === 'updated' && is_array($registro->getModified()))
+                                    <div class="mt-1 text-xs text-gray-500">
+                                        @foreach ($registro->getModified() as $campo => $cambio)
+                                            <div><span class="font-medium">{{ $campo }}:</span> «{{ $cambio['old'] ?? '—' }}» → «{{ $cambio['new'] ?? '—' }}»</div>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="4" class="px-4 py-6 text-center text-gray-500">Sin registros.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        {{ $auditoria->links() }}
+    </div>
+</x-app-layout>

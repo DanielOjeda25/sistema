@@ -96,7 +96,10 @@ class TareaController extends Controller
         $data = $request->validate([
             'columnas' => ['required', 'array'],
             'columnas.*.estado' => ['required', 'in:pendiente,en_progreso,completada,cancelada'],
-            'columnas.*.ids' => ['required', 'array'],
+            // 'present' y no 'required': al mover la única tarjeta de una
+            // columna, la columna origen viaja con ids [] y required lo
+            // rechazaría con 422 aunque sea un movimiento válido.
+            'columnas.*.ids' => ['present', 'array'],
             'columnas.*.ids.*' => ['integer', 'exists:tareas,id'],
         ]);
 
