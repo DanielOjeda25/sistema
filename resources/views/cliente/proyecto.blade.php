@@ -32,7 +32,7 @@
             </div>
 
             {{-- Linea de tiempo: hitos y sprints en orden cronologico --}}
-            <div class="bg-white rounded-2xl shadow-sm p-6">
+            <div class="bg-white rounded-2xl shadow-sm p-6" x-data="{ abierta: null, linea: @js($linea), abrir(i) { this.abierta = this.linea[i] } }">
                 <div class="flex items-center justify-between mb-1">
                     <h3 class="text-lg font-bold text-gray-800">Cómo viene el proyecto</h3>
                     <div class="hidden sm:flex items-center gap-4 text-xs text-gray-500">
@@ -67,9 +67,11 @@
                                     $claseNodo = $item['hecho'] ? 'bg-[#00b87d] text-white' : ($item['vencido'] ? 'bg-red-500 text-white' : ($esCurso ? 'bg-indigo-500 text-white animar-curso' : 'bg-gray-300 text-gray-500'));
                                     $icono = $item['hecho'] ? '✓' : ($item['vencido'] ? '!' : ($esCurso ? '▶' : $i + 1));
                                 @endphp
-                                <div class="relative w-44 shrink-0 px-2 text-center animar-item" style="animation-delay: {{ $i * 0.18 }}s">
+                                <div class="relative w-44 shrink-0 px-2 text-center animar-item cursor-pointer"
+                                     style="animation-delay: {{ $i * 0.18 }}s"
+                                     @click="abrir({{ $i }})" title="Ver detalle">
                                     <p class="text-xs text-gray-400 h-4">{{ $item['fecha']?->format('d/m/Y') }}</p>
-                                    <div class="relative mx-auto my-3 w-10 h-10">
+                                    <div class="relative mx-auto mt-8 mb-5 w-10 h-10 transition-transform duration-200 hover:scale-110 cursor-pointer">
                                         <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-md {{ $claseNodo }}">{{ $icono }}</div>
                                     </div>
                                     <span class="inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full mb-1
@@ -108,6 +110,46 @@
                     .scroll-oculto::-webkit-scrollbar { height: 6px; }
                     .scroll-oculto::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 9999px; }
                 </style>
+
+                {{-- Pop-up con el detalle del hito o etapa --}}
+                <div x-show="abierta" x-cloak class="fixed inset-0 overflow-y-auto" style="z-index: 9999" role="dialog" aria-modal="true" @keydown.escape.window="abierta = null">
+                    <div class="fixed inset-0 bg-gray-900/60" @click="abierta = null"></div>
+                    <div class="min-h-full flex items-center justify-center p-4">
+                        <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-md p-6" x-show="abierta">
+                            <button @click="abierta = null" class="absolute top-3 right-4 text-gray-400 hover:text-gray-600 text-xl leading-none" aria-label="Cerrar">×</button>
+                            <template x-if="abierta">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
+                                            :class="abierta.tipo === 'hito' ? 'bg-amber-100 text-amber-700' : 'bg-indigo-50 text-indigo-700'"
+                                            x-text="abierta.tipo === 'hito' ? 'Hito' : 'Etapa'"></span>
+                                        <span class="text-xs text-gray-400" x-text="abierta.fecha_texto"></span>
+                                    </div>
+                                    <h4 class="text-lg font-bold text-gray-800" x-text="abierta.titulo"></h4>
+                                    <p class="mt-1 text-sm font-semibold"
+                                       :class="abierta.hecho ? 'text-[#008c63]' : (abierta.vencido ? 'text-red-600' : 'text-indigo-600')"
+                                       x-text="abierta.hecho ? '✓ Completado' : (abierta.vencido ? 'Atrasado' : 'En curso')"></p>
+
+                                    <p class="mt-4 text-sm text-gray-600 leading-relaxed" x-show="abierta.descripcion" x-text="abierta.descripcion"></p>
+
+                                    <div class="mt-4 space-y-1 text-sm text-gray-600">
+                                        <p x-show="abierta.fecha_fin_texto" x-text="'Etapa con inicio el ' + abierta.fecha_texto + ' y fin el ' + abierta.fecha_fin_texto"></p>
+                                    </div>
+
+                                    <div x-show="abierta.avance !== undefined && abierta.avance !== null" class="mt-4">
+                                        <div class="flex justify-between text-xs text-gray-500 mb-1">
+                                            <span>Avance de la etapa</span>
+                                            <span x-text="abierta.avance + '%'"></span>
+                                        </div>
+                                        <div class="w-full bg-gray-100 rounded-full h-2">
+                                            <div class="bg-indigo-400 h-2 rounded-full transition-all" :style="'width: ' + abierta.avance + '%'"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
 
             </div>
 

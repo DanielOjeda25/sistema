@@ -90,9 +90,11 @@ class ProyectoController extends Controller
             $hitos = $proyecto->hitos
                 ->map(fn ($h) => [
                     'fecha' => $h->fecha_objetivo,
+                    'fecha_texto' => $h->fecha_objetivo?->format('d/m/Y'),
                     'tipo' => 'hito',
                     'titulo' => $h->nombre,
                     'detalle' => $h->descripcion,
+                    'descripcion' => $h->descripcion,
                     'hecho' => (bool) $h->completado,
                     'vencido' => ! $h->completado && $h->fecha_objetivo->isPast(),
                 ]);
@@ -106,11 +108,12 @@ class ProyectoController extends Controller
 
                     return [
                         'fecha' => $sp->fecha_inicio,
+                        'fecha_texto' => $sp->fecha_inicio?->format('d/m/Y'),
+                        'fecha_fin_texto' => $fin,
                         'tipo' => 'sprint',
                         'titulo' => $sp->nombre,
-                        'detalle' => trim(($sp->descripcion ? $sp->descripcion.' · ' : '')
-                            ."{$hechas} de {$total} tareas completadas"
-                            .($fin ? " · hasta el {$fin}" : '')),
+                        'detalle' => trim("{$hechas} de {$total} tareas completadas".($fin ? " · hasta el {$fin}" : '')),
+                        'descripcion' => $sp->descripcion,
                         'hecho' => $total > 0 && $hechas === $total,
                         'vencido' => false,
                         'avance' => $avance,
