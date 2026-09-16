@@ -83,14 +83,14 @@ class ClienteExperienciaTest extends TestCase
     {
         $html = $this->actingAs($this->cliente())->get('/proyectos')->getContent();
 
-        // Visibles: seguir el estado de su inversion.
-        foreach (['Dashboard', 'Proyectos', 'Hitos', 'Cambios', 'Entregables', 'Facturas'] as $link) {
+        // Visibles: solo lo que le importa (pantallas minimas).
+        foreach (['Dashboard', 'Mis proyectos', 'Entregables', 'Facturas'] as $link) {
             $this->assertStringContainsString($link, $html, "Falta el link $link en el menu del Cliente");
         }
 
-        // Ocultos: herramientas internas del equipo (tablero, tareas, sprints,
-        // usuarios, auditoria).
-        foreach (['Mi trabajo', 'Usuarios y roles', 'Auditoría', '>Sprints</a>', '>Tareas</a>'] as $link) {
+        // Ocultos: herramientas internas del equipo y pantallas que quedan
+        // absorbidas (hitos y cambios se ven dentro del detalle del proyecto).
+        foreach (['Mi trabajo', 'Usuarios y roles', 'Auditoría', '>Sprints</a>', '>Tareas</a>', '>Hitos</a>', '>Cambios</a>'] as $link) {
             $this->assertStringNotContainsString($link, $html);
         }
     }
@@ -116,5 +116,36 @@ class ClienteExperienciaTest extends TestCase
             'columnas' => [['estado' => 'completada', 'ids' => [1]]],
         ])->assertForbidden();
         $this->actingAs($cliente)->delete('/facturas/1')->assertForbidden();
+    }
+
+    /** @test */
+    public function el_detalle_del_proyecto_del_cliente_es_una_linea_de_tiempo(): void
+    {
+        $cliente = $this->cliente();
+        $proyecto = \App\Models\Proyecto::where('cliente_id', $cliente->cliente_id)->firstOrFail();
+
+        // hitos y sprints del proyecto para tener contenido en la linea
+        $hito = \App\Models\Hito::create([
+            'nombre' => 'Hito timeline',
+            'fecha_objetivo' => today()->addDays(10),
+            'completado' => false,
+            'proyecto_id' => $proyecto->id,
+        ]);
+        $sprint = \App\Models\Sprint::create([
+            'nombre' => 'Sprint timeline',
+            'proyecto_id' => $proyecto->id,
+            'fecha_inicio' => today()->subDays(5),
+        ]);
+
+        $respuesta = $this->actingAs($cliente)->get(route('proyectos.show', $proyecto));
+
+        $respuesta->assertOk()
+            ->assertSee('Cómo viene el proyecto')
+            ->assertSee('Hito timeline')
+            ->assertSee('Sprint timeline')
+            ->assertSee('Avance del proyecto')
+            // nada de herramientas internas
+            ->assertDontSee('Nueva Tarea', false)
+            ->assertDontSee('Asignar a', false);
     }
 }
