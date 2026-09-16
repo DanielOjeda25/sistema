@@ -52,7 +52,7 @@
                     $marcadoCurso = false;
                 @endphp
 
-                <div class="overflow-x-auto scroll-oculto mt-6 pb-2">
+                <div class="hidden md:block overflow-x-auto scroll-oculto mt-6 pb-2">
                     <div class="relative min-w-max px-6">
                         {{-- riel de fondo y riel de avance --}}
                         <div class="absolute top-6 left-8 right-8 h-1.5 bg-gray-200 rounded-full"></div>
@@ -98,6 +98,39 @@
                             @endforeach
                         </div>
                     </div>
+                </div>
+
+                {{-- Movil: linea de tiempo vertical --}}
+                <div class="md:hidden">
+                    @php
+                        $marcadoMovil = false;
+                    @endphp
+                    @forelse ($linea as $item)
+                        @php
+                            $esCursoMovil = ! $item['hecho'] && ! $item['vencido'] && ! $marcadoMovil;
+                            if ($esCursoMovil) { $marcadoMovil = true; }
+                            $borde = $item['hecho'] ? 'border-[#00b87d]' : ($item['vencido'] ? 'border-red-400' : ($esCursoMovil ? 'border-indigo-400' : 'border-gray-300'));
+                        @endphp
+                        <div class="mb-3 rounded-xl bg-white border-l-4 {{ $borde }} shadow-sm p-4 animar-item">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full
+                                    {{ $item['tipo'] === 'hito' ? 'bg-amber-100 text-amber-700' : 'bg-indigo-50 text-indigo-700' }}">
+                                    {{ $item['tipo'] === 'hito' ? 'Hito' : 'Etapa' }}
+                                </span>
+                                <span class="text-xs text-gray-400">{{ $item['fecha']?->format('d/m/Y') }}</span>
+                            </div>
+                            <p class="mt-1 font-semibold text-gray-800">{{ $item['titulo'] }}</p>
+                            <p class="text-xs font-semibold mt-0.5
+                                {{ $item['hecho'] ? 'text-[#008c63]' : ($item['vencido'] ? 'text-red-600' : ($esCursoMovil ? 'text-indigo-600' : 'text-gray-400')) }}">
+                                {{ $item['hecho'] ? 'Completado' : ($item['vencido'] ? 'Atrasado' : ($esCursoMovil ? 'En curso' : 'Pendiente')) }}
+                            </p>
+                            @if ($item['detalle'])
+                                <p class="text-xs text-gray-500 mt-1">{{ $item['detalle'] }}</p>
+                            @endif
+                        </div>
+                    @empty
+                        <p class="text-sm text-gray-400">Sin hitos ni etapas cargados.</p>
+                    @endforelse
                 </div>
 
                 <style>

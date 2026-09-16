@@ -90,6 +90,19 @@ Route::get('/dashboard', function () {
         $datos['tareasVencidas'] = Tarea::whereDate('fecha_limite', '<', today())
             ->whereNotIn('estado', ['completada', 'cancelada'])
             ->count();
+
+        // Facturacion por mes (ultimos 6 meses con movimiento) para el
+        // grafico del dashboard interno.
+        $porMes = Factura::selectRaw("DATE_FORMAT(fecha_emision, '%Y-%m') as mes, SUM(monto) as total")
+            ->groupBy('mes')
+            ->orderBy('mes')
+            ->get()
+            ->pluck('total', 'mes');
+        $meses = collect(range(5, 0))->map(fn ($i) => now()->subMonths($i)->format('Y-m'));
+        $datos['facturacionPorMes'] = $meses->map(fn ($mes) => [
+            'mes' => now()->createFromFormat('Y-m', $mes)->translatedFormat('M'),
+            'total' => (float) ($porMes[$mes] ?? 0),
+        ]);
         // Detalle para el dashboard del Cliente: avance de sus proyectos.
         $datos['misProyectos'] = $esCliente
             ? Proyecto::visiblePara($usuario)
