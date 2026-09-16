@@ -12,7 +12,7 @@
         </div>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-12" x-data="{ ver: null }">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
 
@@ -63,6 +63,15 @@
                         <tbody class="bg-white divide-y divide-gray-200 text-gray-700">
                             @forelse ($entregables as $entregable)
                                 @php($valoresEntregable = $entregable->only(['titulo', 'contenido', 'tipo', 'estado', 'proyecto_id', 'generado_por']))
+                                @php($verEntregable = [
+                                    'titulo' => $entregable->titulo,
+                                    'contenido' => $entregable->contenido,
+                                    'tipo' => $entregable->tipo,
+                                    'estado' => $entregable->estado,
+                                    'proyecto' => $entregable->proyecto?->nombre,
+                                    'generador' => $entregable->generador?->name,
+                                    'fecha' => $entregable->generado_en?->format('d/m/Y'),
+                                ])
                                 <tr>
                                     <td class="px-6 py-4">{{ $entregable->titulo }}</td>
                                     <td class="px-6 py-4">{{ $entregable->proyecto?->nombre ?? 'N/A' }}</td>
@@ -77,9 +86,9 @@
                                                     <x-heroicon-o-clock class="w-5 h-5" />
                                                 </a>
                                             @endhasanyrole
-                                            <a href="{{ route('entregables.show', $entregable) }}" class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
+                                            <button type="button" @click="ver = @js($verEntregable)" class="text-blue-600 hover:text-blue-800" title="Ver detalle" aria-label="Ver detalle">
                                                 <x-heroicon-o-eye class="w-5 h-5" />
-                                            </a>
+                                            </button>
                                             @hasanyrole('Jefe|PM|PO|Programador')
                                                 <button type="button" data-abrir-modal="modal-entregable-editar"
                                                         data-url="{{ route('entregables.update', $entregable) }}"
@@ -111,6 +120,8 @@
     </div>
 
     @hasanyrole('Jefe|PM|PO|Programador')
+    <x-entregable-view-modal />
+
     <x-crud-modal id="modal-entregable-crear" abrir-con-errores titulo="Nuevo Entregable">
         <form method="POST" action="{{ route('entregables.store') }}" class="space-y-4">
             @csrf

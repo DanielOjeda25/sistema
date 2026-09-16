@@ -177,7 +177,16 @@
                             <p class="text-sm font-medium text-gray-800">{{ $entregable->titulo }}</p>
                             <p class="text-xs text-gray-400 mt-0.5">{{ ucfirst($entregable->tipo) }} · {{ $entregable->generado_en?->format('d/m/Y') }}</p>
                         </div>
-                        <a href="{{ route('entregables.show', $entregable) }}" class="text-sm text-indigo-600 hover:underline shrink-0">Ver</a>
+                        <button type="button" class="text-sm text-indigo-600 hover:underline shrink-0"
+                                @click="ver = @js([
+                                    'titulo' => $entregable->titulo,
+                                    'contenido' => $entregable->contenido,
+                                    'tipo' => $entregable->tipo,
+                                    'estado' => $entregable->estado,
+                                    'proyecto' => $entregable->proyecto?->nombre,
+                                    'generador' => $entregable->generador?->name,
+                                    'fecha' => $entregable->generado_en?->format('d/m/Y'),
+                                ])">Ver</button>
                     </div>
                 @empty
                     <p class="text-sm text-gray-400">Todavía no hay material aprobado para este proyecto.</p>
@@ -186,4 +195,5 @@
 
         </div>
     </div>
+    <x-entregable-view-modal />
 </x-app-layout>
