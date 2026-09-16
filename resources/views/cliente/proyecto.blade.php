@@ -174,6 +174,27 @@
                 @endforelse
             </div>
 
+            {{-- Cambios solicitados sobre este proyecto --}}
+            <div class="bg-white rounded-2xl shadow-sm p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-3">Cambios que pedimos</h3>
+                @forelse ($cambios as $cambio)
+                    <div class="border-b last:border-0 border-gray-100 py-3 flex items-start justify-between gap-4">
+                        <div>
+                            <p class="text-sm font-medium text-gray-800">{{ $cambio->titulo }}</p>
+                            <p class="text-xs text-gray-400 mt-0.5">Pedida por {{ $cambio->solicitante?->name ?? '—' }}</p>
+                        </div>
+                        <span class="px-2 py-0.5 rounded-full text-xs font-semibold shrink-0
+                            {{ $cambio->estado === 'aprobada' ? 'bg-green-100 text-green-700' : '' }}
+                            {{ $cambio->estado === 'pendiente' ? 'bg-yellow-100 text-yellow-700' : '' }}
+                            {{ $cambio->estado === 'rechazada' ? 'bg-red-100 text-red-700' : '' }}">
+                            {{ ucfirst($cambio->estado) }}
+                        </span>
+                    </div>
+                @empty
+                    <p class="text-sm text-gray-400">Sin solicitudes de cambio para este proyecto.</p>
+                @endforelse
+            </div>
+
             {{-- Entregables aprobados --}}
             <div class="bg-white rounded-2xl shadow-sm p-6">
                 <h3 class="text-lg font-bold text-gray-800 mb-3">Material aprobado para vos</h3>

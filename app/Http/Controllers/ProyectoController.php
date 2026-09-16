@@ -139,12 +139,18 @@ class ProyectoController extends Controller
                 ->take(5)
                 ->get();
 
+            $cambios = $proyecto->solicitudesCambio()
+                ->with('solicitante')
+                ->latest()
+                ->take(5)
+                ->get();
+
             $totalTareas = $proyecto->tareas()->count();
             $tareasHechas = $proyecto->tareas()->where('estado', 'completada')->count();
             $avanceProyecto = $totalTareas > 0 ? (int) round($tareasHechas * 100 / $totalTareas) : 0;
 
             return view('cliente.proyecto', compact(
-                'proyecto', 'linea', 'novedades', 'entregables',
+                'proyecto', 'linea', 'novedades', 'entregables', 'cambios',
                 'totalTareas', 'tareasHechas', 'avanceProyecto'
             ));
         }
