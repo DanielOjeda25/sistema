@@ -23,9 +23,11 @@
                     <a href="{{ route('tareas.tablero') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('tareas.tablero') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">
                         <x-heroicon-o-check-circle class="h-5 w-5 shrink-0" /> Mi trabajo
                     </a>
+                    @unless ($usuario->esCliente())
                     <a href="{{ route('tareas.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('tareas.*') && ! request()->routeIs('tareas.tablero') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">
                         <x-heroicon-o-queue-list class="h-5 w-5 shrink-0" /> Tareas
                     </a>
+                    @endunless
                     <a href="{{ route('facturas.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('facturas.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">
                         <x-heroicon-o-banknotes class="h-5 w-5 shrink-0" /> Facturas
                     </a>
@@ -33,8 +35,11 @@
 
                 <p class="mt-8 px-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Módulos</p>
                 <nav class="mt-2 space-y-1">
+                    @unless ($usuario->esCliente())
                     <a href="{{ route('sprints.index') }}" class="block rounded-lg border-l-4 border-transparent px-3 py-2 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('sprints.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">Sprints</a>
+                    @endunless
                     <a href="{{ route('hitos.index') }}" class="block rounded-lg border-l-4 border-transparent px-3 py-2 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('hitos.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">Hitos</a>
+                    <a href="{{ route('solicitudes-cambio.index') }}" class="block rounded-lg border-l-4 border-transparent px-3 py-2 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('solicitudes-cambio.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">Cambios</a>
                     <a href="{{ route('entregables.index') }}" class="block rounded-lg border-l-4 border-transparent px-3 py-2 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('entregables.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">Entregables</a>
                 </nav>
 

@@ -41,7 +41,10 @@ Route::get('/dashboard', function () {
         'facturasPendientes' => \App\Models\Factura::visiblePara($usuario)
             ->where('estado', 'pendiente')->count(),
         'totalHitos' => \App\Models\Hito::visiblePara($usuario)->count(),
-        'totalEntregables' => \App\Models\EntregableIA::visiblePara($usuario)->count(),
+        // El Cliente solo recibe entregables aprobados; el equipo cuenta todos.
+        'totalEntregables' => \App\Models\EntregableIA::visiblePara($usuario)
+            ->when($esCliente, fn ($q) => $q->where('estado', 'aprobado'))
+            ->count(),
     ];
 
     // Hitos que vencen pronto o ya vencieron (no completados).
