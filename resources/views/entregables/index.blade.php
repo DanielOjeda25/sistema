@@ -12,7 +12,7 @@
         </div>
     </x-slot>
 
-    <div class="py-12" x-data="{ ver: null }">
+    <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
 
@@ -119,9 +119,9 @@
         </div>
     </div>
 
-    @hasanyrole('Jefe|PM|PO|Programador')
     <x-entregable-view-modal />
 
+    @hasanyrole('Jefe|PM|PO|Programador')
     <x-crud-modal id="modal-entregable-crear" abrir-con-errores titulo="Nuevo Entregable">
         <form method="POST" action="{{ route('entregables.store') }}" class="space-y-4">
             @csrf
