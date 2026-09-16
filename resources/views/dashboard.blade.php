@@ -20,9 +20,11 @@
                     <a href="{{ route('proyectos.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('proyectos.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">
                         <x-heroicon-o-squares-2x2 class="h-5 w-5 shrink-0" /> {{ $usuario->esCliente() ? 'Mis proyectos' : 'Proyectos' }}
                     </a>
+                    @unless ($usuario->esCliente())
                     <a href="{{ route('tareas.tablero') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('tareas.tablero') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">
                         <x-heroicon-o-check-circle class="h-5 w-5 shrink-0" /> Mi trabajo
                     </a>
+                    @endunless
                     @unless ($usuario->esCliente())
                     <a href="{{ route('tareas.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('tareas.*') && ! request()->routeIs('tareas.tablero') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">
                         <x-heroicon-o-queue-list class="h-5 w-5 shrink-0" /> Tareas
@@ -83,8 +85,20 @@
                             <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
                                 <div>
                                     <p class="text-xs font-medium text-slate-400">Resumen general</p>
-                                    <p class="mt-1 text-3xl font-bold text-slate-900">{{ $totalProyectos + $tareasPendientes + $totalHitos }}</p>
-                                    <p class="text-xs text-slate-500">elementos registrados para seguimiento</p>
+                                    <p class="mt-1 text-3xl font-bold text-slate-900">
+                                        @if ($usuario->esCliente())
+                                            {{ $totalProyectos + $totalHitos + $totalEntregables }}
+                                        @else
+                                            {{ $totalProyectos + $tareasPendientes + $totalHitos }}
+                                        @endif
+                                    </p>
+                                    <p class="text-xs text-slate-500">
+                                        @if ($usuario->esCliente())
+                                            proyectos, hitos y material para vos
+                                        @else
+                                            elementos registrados para seguimiento
+                                        @endif
+                                    </p>
                                 </div>
                                 <div class="flex gap-2">
                                     @if ($usuario->esCliente())
@@ -101,16 +115,24 @@
                                 <div class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-[#00d99a]"></span><span><span class="block text-sm font-medium text-slate-700">Proyectos</span><span class="block text-xs text-slate-400">{{ $totalProyectos }} registrados</span></span></div>
                                 <span class="text-sm font-semibold text-slate-700">{{ $totalProyectos }}</span>
                             </a>
+                            @unless ($usuario->esCliente())
                             <a href="{{ route('tareas.index', ['estado' => 'pendiente']) }}" class="flex items-center justify-between px-4 py-3 hover:bg-[#f0fff9]">
                                 <div class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span><span><span class="block text-sm font-medium text-slate-700">Tareas pendientes</span><span class="block text-xs text-slate-400">Requieren seguimiento</span></span></div>
                                 <span class="text-sm font-semibold text-slate-700">{{ $tareasPendientes }}</span>
                             </a>
+                            @endunless
+                            @if ($usuario->esCliente())
+                            <a href="{{ route('facturas.index') }}" class="flex items-center justify-between px-4 py-3 hover:bg-[#f0fff9]">
+                                <div class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span><span><span class="block text-sm font-medium text-slate-700">Facturas pendientes de pago</span><span class="block text-xs text-slate-400">Tenés {{ $facturasPendientes }} en curso</span></span></div>
+                                <span class="text-sm font-semibold text-slate-700">{{ $facturasPendientes }}</span>
+                            </a>
+                            @endif
                             <a href="{{ route('hitos.index') }}" class="flex items-center justify-between px-4 py-3 hover:bg-[#f0fff9]">
                                 <div class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span><span><span class="block text-sm font-medium text-slate-700">Hitos</span><span class="block text-xs text-slate-400">Puntos de control</span></span></div>
                                 <span class="text-sm font-semibold text-slate-700">{{ $totalHitos }}</span>
                             </a>
                             <a href="{{ route('entregables.index') }}" class="flex items-center justify-between px-4 py-3 hover:bg-[#f0fff9]">
-                                <div class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-sky-500"></span><span><span class="block text-sm font-medium text-slate-700">Entregables</span><span class="block text-xs text-slate-400">Material del proyecto</span></span></div>
+                                <div class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-sky-500"></span><span><span class="block text-sm font-medium text-slate-700">Entregables</span><span class="block text-xs text-slate-400">{{ $usuario->esCliente() ? 'Material aprobado para vos' : 'Material del proyecto' }}</span></span></div>
                                 <span class="text-sm font-semibold text-slate-700">{{ $totalEntregables }}</span>
                             </a>
                             </div>
