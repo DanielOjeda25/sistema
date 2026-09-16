@@ -136,6 +136,12 @@
                                         <p x-show="abierta.fecha_fin_texto" x-text="'Etapa con inicio el ' + abierta.fecha_texto + ' y fin el ' + abierta.fecha_fin_texto"></p>
                                     </div>
 
+                                    {{-- Resumen del sprint redactado por el equipo con IA --}}
+                                    <div x-show="abierta.resumen_ia" class="mt-4 rounded-xl border border-[#d7eee6] bg-[#f5fffb] p-4">
+                                        <p class="text-[10px] font-bold uppercase tracking-widest text-[#008c63] mb-1">Resumen del sprint para vos</p>
+                                        <p class="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed" x-text="abierta.resumen_ia"></p>
+                                    </div>
+
                                     <div x-show="abierta.avance !== undefined && abierta.avance !== null" class="mt-4">
                                         <div class="flex justify-between text-xs text-gray-500 mb-1">
                                             <span>Avance de la etapa</span>

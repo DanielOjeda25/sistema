@@ -114,6 +114,7 @@ class ProyectoController extends Controller
                         'titulo' => $sp->nombre,
                         'detalle' => trim("{$hechas} de {$total} tareas completadas".($fin ? " · hasta el {$fin}" : '')),
                         'descripcion' => $sp->descripcion,
+                        'resumen_ia' => $sp->resumen_ia,
                         'hecho' => $total > 0 && $hechas === $total,
                         'vencido' => false,
                         'avance' => $avance,
