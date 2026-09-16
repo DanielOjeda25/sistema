@@ -1,6 +1,24 @@
 <?php
 
+/*
+ |---------------------------------------------------------------
+ | MODELO CLIENTE (tabla "clientes")
+ |---------------------------------------------------------------
+ | Representa a la empresa para la que trabajamos. Es la entidad
+ | raiz: no depende de nadie (no tiene claves foraneas), pero de
+ | ella dependen los proyectos, las cuentas de usuario cliente
+ | y las facturas.
+ |
+ | Relaciones POO que ofrece:
+ |   $cliente->proyectos   -> todos sus proyectos   (hasMany)
+ |   $cliente->usuarios    -> cuentas de su empresa (hasMany User)
+ |   $cliente->facturas    -> sus facturas          (hasMany)
+ |
+ | Ademas audita automaticamente cada cambio (laravel-auditing).
+*/
+
 namespace App\Models;
+
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

@@ -1,6 +1,28 @@
 <?php
 
+/*
+ |---------------------------------------------------------------
+ | CONTROLLER DE TAREAS
+ |---------------------------------------------------------------
+ | Atiende las dos caras del modulo:
+ |
+ | 1) VISTA LISTA (/tareas): index, show, create, edit, update y
+ |    destroy. El CRUD clasico con buscador, filtro por estado y
+ |    paginacion de 15.
+ |
+ | 2) TABLERO ESTILO TRELLO (/tareas/tablero): tablero() dibuja las
+ |    columnas (pendiente, en progreso, completada, cancelada) y
+ *    mover() guarda por AJAX el movimiento de las tarjetas: recibe
+ *    el estado y el orden final de cada columna y actualiza la base
+ *    sin recargar la pagina.
+ |
+ | Seguridad que aplica:
+ |   - visiblePara(): un Cliente solo ve las tareas de su empresa
+ |   - mover / crear / editar / eliminar: solo Jefe, PM y PO
+*/
+
 namespace App\Http\Controllers;
+
 
 use App\Models\Proyecto;
 use App\Models\SolicitudCambio;
