@@ -104,4 +104,14 @@ class FacturaController extends Controller
 
         return redirect()->route('facturas.index')->with('success', 'Factura eliminada correctamente.');
     }
+    public function descargarPdf(Request $request, Factura $factura)
+    {
+        abort_unless($request->user()->puedeVer($factura), 403);
+
+        $factura->load(['proyecto.cliente', 'emisor']);
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('facturas.pdf', compact('factura'));
+
+        return $pdf->download("factura-{$factura->numero}.pdf");
+    }
 }

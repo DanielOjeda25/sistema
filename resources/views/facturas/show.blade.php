@@ -18,9 +18,13 @@
                 <p><strong>Estado:</strong> {{ ucfirst($factura->estado) }}</p>
                 <p><strong>Detalle:</strong> {{ $factura->detalle ?? 'Sin detalle' }}</p>
 
-                <div class="pt-4 flex gap-4 border-t">
+                <div class="pt-4 flex items-center gap-4 border-t">
                     <a href="{{ route('facturas.edit', $factura) }}" class="text-yellow-600 hover:text-yellow-800 inline-flex" title="Editar" aria-label="Editar">
                         <x-heroicon-o-pencil-square class="w-5 h-5" />
+                    </a>
+                    <a href="{{ route('facturas.pdf', $factura) }}" class="inline-flex items-center gap-1.5 text-indigo-600 hover:text-indigo-800" title="Descargar PDF">
+                        <x-heroicon-o-arrow-down-tray class="w-5 h-5" />
+                        Descargar PDF
                     </a>
                     <a href="{{ route('facturas.index') }}" class="text-gray-600 hover:underline">Volver al listado</a>
                 </div>

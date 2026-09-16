@@ -251,6 +251,10 @@ Route::middleware('auth')->group(function () {
     Route::resource('sprints', SprintController::class)->only(['index']);
     Route::resource('entregables', EntregableIAController::class)->only(['index', 'show']);
     Route::resource('facturas', FacturaController::class)->only(['index', 'show']);
+    // Descargar factura en PDF: es lectura, cualquier usuario autorizado
+    // puede bajar las facturas de los proyectos que puede ver.
+    Route::get('/facturas/{factura}/pdf', [FacturaController::class, 'descargarPdf'])
+        ->name('facturas.pdf');
 });
 
 // -----------------------------------------------------------------------------
