@@ -82,8 +82,9 @@
                                 $sinLeer = auth()->user()->unreadNotifications()->take(8)->get();
                                 $totalSinLeer = auth()->user()->unreadNotifications()->count();
                             @endphp
+                            <div class="flex items-center gap-1">
                             <div class="relative" x-data="{ abierto: false }">
-                                <button @click="abierto = !abierto" class="relative mr-2 rounded-lg p-2 text-slate-500 transition hover:bg-[#f0fff9] hover:text-slate-700" aria-label="Notificaciones">
+                                <button @click="abierto = !abierto" class="relative rounded-lg p-2 text-slate-500 transition hover:bg-[#f0fff9] hover:text-slate-700" aria-label="Notificaciones">
                                     <x-heroicon-o-bell class="h-5 w-5" />
                                     @if ($totalSinLeer > 0)
                                         <span class="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">{{ $totalSinLeer > 9 ? '9+' : $totalSinLeer }}</span>
@@ -140,6 +141,7 @@
                                     </form>
                                 </x-slot>
                             </x-dropdown>
+                            </div>
                         </header>
 
                         <x-mobile-nav class="shrink-0" />
