@@ -83,13 +83,14 @@ class ClienteExperienciaTest extends TestCase
     {
         $html = $this->actingAs($this->cliente())->get('/proyectos')->getContent();
 
-        // Visibles: su alcance de lectura.
-        foreach (['Dashboard', 'Proyectos', 'Mi trabajo', 'Hitos', 'Cambios', 'Entregables', 'Facturas'] as $link) {
+        // Visibles: seguir el estado de su inversion.
+        foreach (['Dashboard', 'Proyectos', 'Hitos', 'Cambios', 'Entregables', 'Facturas'] as $link) {
             $this->assertStringContainsString($link, $html, "Falta el link $link en el menu del Cliente");
         }
 
-        // Ocultos: gestion interna.
-        foreach (['Usuarios y roles', 'Auditoría', '>Sprints</a>', '>Tareas</a>'] as $link) {
+        // Ocultos: herramientas internas del equipo (tablero, tareas, sprints,
+        // usuarios, auditoria).
+        foreach (['Mi trabajo', 'Usuarios y roles', 'Auditoría', '>Sprints</a>', '>Tareas</a>'] as $link) {
             $this->assertStringNotContainsString($link, $html);
         }
     }

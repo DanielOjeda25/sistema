@@ -85,7 +85,11 @@
                                     <p class="text-xs text-slate-500">elementos registrados para seguimiento</p>
                                 </div>
                                 <div class="flex gap-2">
+                                    @if ($usuario->esCliente())
+                                    <a href="{{ route('entregables.index') }}" class="rounded-lg bg-[#00b87d] px-3 py-2 text-xs font-semibold text-white hover:bg-[#008c63]">Ver entregables</a>
+                                    @else
                                     <a href="{{ route('tareas.tablero') }}" class="rounded-lg bg-[#00b87d] px-3 py-2 text-xs font-semibold text-white hover:bg-[#008c63]">Abrir tablero</a>
+                                    @endif
                                     <a href="{{ route('proyectos.index') }}" class="rounded-lg border border-[#d7eee6] px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-[#f0fff9]">Ver proyectos</a>
                                 </div>
                             </div>

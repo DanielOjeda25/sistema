@@ -3,7 +3,7 @@
     $enlaces = [
         ['route' => 'dashboard', 'label' => 'Dashboard', 'pattern' => 'dashboard'],
         ['route' => 'proyectos.index', 'label' => 'Proyectos', 'pattern' => 'proyectos.*'],
-        ['route' => 'tareas.tablero', 'label' => 'Mi trabajo', 'pattern' => 'tareas.tablero'],
+        ['route' => 'tareas.tablero', 'label' => 'Mi trabajo', 'pattern' => 'tareas.tablero', 'interno' => true],
         ['route' => 'tareas.index', 'label' => 'Tareas', 'pattern' => 'tareas.*', 'interno' => true],
         ['route' => 'facturas.index', 'label' => 'Facturas', 'pattern' => 'facturas.*'],
         ['route' => 'sprints.index', 'label' => 'Sprints', 'pattern' => 'sprints.*', 'interno' => true],

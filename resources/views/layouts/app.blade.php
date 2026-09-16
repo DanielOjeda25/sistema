@@ -38,7 +38,9 @@
                                 <a href="{{ route('auditoria.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('auditoria.*') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"><x-heroicon-o-clock class="h-5 w-5 shrink-0" /> Auditoría</a>
                             @endhasanyrole
                             <a href="{{ route('proyectos.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('proyectos.*') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"><x-heroicon-o-squares-2x2 class="h-5 w-5 shrink-0" /> Proyectos</a>
+                            @unless (auth()->user()->esCliente())
                             <a href="{{ route('tareas.tablero') }}" class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('tareas.tablero') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"><x-heroicon-o-check-circle class="h-5 w-5 shrink-0" /> Mi trabajo</a>
+                            @endunless
                             @unless (auth()->user()->esCliente())
                             <a href="{{ route('tareas.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('tareas.*') && ! request()->routeIs('tareas.tablero') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"><x-heroicon-o-queue-list class="h-5 w-5 shrink-0" /> Tareas</a>
                             @endunless
