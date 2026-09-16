@@ -4,9 +4,11 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Listado de Facturas
             </h2>
+            @hasanyrole('Jefe|PM')
             <button type="button" data-abrir-modal="modal-factura-crear" class="inline-flex items-center px-4 py-2 bg-[#00b87d] border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63]">
                 + Nueva Factura
             </button>
+            @endhasanyrole
         </div>
     </x-slot>
 
@@ -115,6 +117,7 @@
         </div>
     </div>
 
+    @hasanyrole('Jefe|PM')
     <x-crud-modal id="modal-factura-crear" abrir-con-errores titulo="Nueva Factura">
         <form method="POST" action="{{ route('facturas.store') }}" class="space-y-4">
             @csrf
@@ -126,7 +129,9 @@
             </div>
         </form>
     </x-crud-modal>
+    @endhasanyrole
 
+    @hasanyrole('Jefe|PM')
     <x-crud-modal id="modal-factura-editar" titulo="Editar Factura">
         <form method="POST" action="{{ route('facturas.store') }}" class="space-y-4">
             @csrf
@@ -139,4 +144,5 @@
             </div>
         </form>
     </x-crud-modal>
+    @endhasanyrole
 </x-app-layout>

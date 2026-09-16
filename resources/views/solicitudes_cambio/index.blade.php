@@ -111,6 +111,7 @@
         </div>
     </div>
 
+    @hasanyrole('Jefe|PM|PO')
     <x-crud-modal id="modal-solicitud-crear" abrir-con-errores titulo="Nueva Solicitud de Cambio">
         <form method="POST" action="{{ route('solicitudes-cambio.store') }}" class="space-y-4">
             @csrf
@@ -122,7 +123,9 @@
             </div>
         </form>
     </x-crud-modal>
+    @endhasanyrole
 
+    @hasanyrole('Jefe|PM|PO')
     <x-crud-modal id="modal-solicitud-editar" titulo="Editar Solicitud de Cambio">
         <form method="POST" action="{{ route('solicitudes-cambio.store') }}" class="space-y-4">
             @csrf
@@ -135,4 +138,5 @@
             </div>
         </form>
     </x-crud-modal>
+    @endhasanyrole
 </x-app-layout>

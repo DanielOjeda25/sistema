@@ -109,6 +109,7 @@
         </div>
     </div>
 
+    @hasanyrole('Jefe|PM|PO')
     <x-crud-modal id="modal-sprint-crear" abrir-con-errores titulo="Nuevo Sprint">
         <form method="POST" action="{{ route('sprints.store') }}" class="space-y-4">
             @csrf
@@ -120,7 +121,9 @@
             </div>
         </form>
     </x-crud-modal>
+    @endhasanyrole
 
+    @hasanyrole('Jefe|PM|PO')
     <x-crud-modal id="modal-sprint-editar" titulo="Editar Sprint">
         <form method="POST" action="{{ route('sprints.store') }}" class="space-y-4">
             @csrf
@@ -133,6 +136,7 @@
             </div>
         </form>
     </x-crud-modal>
+    @endhasanyrole
 
     {{-- Confirmación de eliminación: modal propio en vez del confirm() nativo --}}
     {{-- Resumen de sprint generado con IA (OpenRouter) --}}

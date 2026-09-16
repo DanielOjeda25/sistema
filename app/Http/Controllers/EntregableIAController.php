@@ -12,6 +12,9 @@ class EntregableIAController extends Controller
     public function index(Request $request)
     {
         $entregables = EntregableIA::visiblePara($request->user())
+            // El Cliente solo ve los entregables aprobados y publicados; los
+            // borradores y revisiones son internos del equipo.
+            ->when($request->user()->esCliente(), fn ($q) => $q->where('estado', 'aprobado'))
             ->with(['proyecto', 'generador'])
             ->when($request->filled('q'), function ($query) use ($request) {
                 $texto = $request->string('q')->trim()->toString();

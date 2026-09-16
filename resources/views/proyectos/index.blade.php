@@ -113,6 +113,7 @@
         </div>
     </div>
 
+    @hasanyrole('Jefe|PM')
     <x-crud-modal id="modal-proyecto-crear" abrir-con-errores titulo="Nuevo Proyecto">
         <form method="POST" action="{{ route('proyectos.store') }}" class="space-y-4">
             @csrf
@@ -124,7 +125,9 @@
             </div>
         </form>
     </x-crud-modal>
+    @endhasanyrole
 
+    @hasanyrole('Jefe|PM')
     <x-crud-modal id="modal-proyecto-editar" titulo="Editar Proyecto">
         <form method="POST" action="{{ route('proyectos.store') }}" class="space-y-4">
             @csrf
@@ -137,4 +140,5 @@
             </div>
         </form>
     </x-crud-modal>
+    @endhasanyrole
 </x-app-layout>

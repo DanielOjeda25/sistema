@@ -108,6 +108,7 @@
             </div>
         </div>
     </div>
+    @hasanyrole('Jefe|PM|PO')
     <x-crud-modal id="modal-tarea-crear" abrir-con-errores titulo="Nueva Tarea">
         <form method="POST" action="{{ route('tareas.store') }}" class="space-y-4">
             @csrf
@@ -119,7 +120,9 @@
             </div>
         </form>
     </x-crud-modal>
+    @endhasanyrole
 
+    @hasanyrole('Jefe|PM|PO')
     <x-crud-modal id="modal-tarea-editar" titulo="Editar Tarea">
         <form method="POST" action="{{ route('tareas.store') }}" class="space-y-4" data-crud-form>
             @csrf
@@ -132,4 +135,5 @@
             </div>
         </form>
     </x-crud-modal>
+    @endhasanyrole
 </x-app-layout>

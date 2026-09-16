@@ -110,6 +110,7 @@
         </div>
     </div>
 
+    @hasanyrole('Jefe|PM|PO|Programador')
     <x-crud-modal id="modal-entregable-crear" abrir-con-errores titulo="Nuevo Entregable">
         <form method="POST" action="{{ route('entregables.store') }}" class="space-y-4">
             @csrf
@@ -121,7 +122,9 @@
             </div>
         </form>
     </x-crud-modal>
+    @endhasanyrole
 
+    @hasanyrole('Jefe|PM|PO|Programador')
     <x-crud-modal id="modal-entregable-editar" titulo="Editar Entregable">
         <form method="POST" action="{{ route('entregables.store') }}" class="space-y-4">
             @csrf
@@ -134,4 +137,5 @@
             </div>
         </form>
     </x-crud-modal>
+    @endhasanyrole
 </x-app-layout>

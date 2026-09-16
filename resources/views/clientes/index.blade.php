@@ -112,6 +112,7 @@
     </div>
 
     @hasanyrole('Jefe|PM')
+        @hasanyrole('Jefe|PM')
         <x-crud-modal id="modal-cliente-crear" abrir-con-errores titulo="Nuevo Cliente">
             <form method="POST" action="{{ route('clientes.store') }}" class="space-y-4">
                 @csrf
@@ -123,7 +124,9 @@
                 </div>
             </form>
         </x-crud-modal>
+        @endhasanyrole
 
+        @hasanyrole('Jefe|PM')
         <x-crud-modal id="modal-cliente-editar" titulo="Editar Cliente">
             <form method="POST" action="{{ route('clientes.store') }}" class="space-y-4" data-crud-form>
                 @csrf
@@ -136,5 +139,6 @@
                 </div>
             </form>
         </x-crud-modal>
+        @endhasanyrole
     @endhasanyrole
 </x-app-layout>
