@@ -12,44 +12,43 @@ use Illuminate\Http\Request;
 class ProyectoController extends Controller
 {
     public function index(Request $request)
-{
-    // Portal del Cliente: tarjetas simples con el avance de cada proyecto.
-    if ($request->user()->esCliente()) {
+    {
+        // Portal del Cliente: tarjetas simples con el avance de cada proyecto.
+        if ($request->user()->esCliente()) {
+            $proyectos = Proyecto::visiblePara($request->user())
+                ->with(['cliente', 'pm'])
+                ->withCount([
+                    'tareas',
+                    'tareas as tareas_completadas' => fn ($q) => $q->where('estado', 'completada'),
+                    'hitos as hitos_completados' => fn ($q) => $q->where('completado', true),
+                ])
+                ->orderBy('fecha_inicio')
+                ->get();
+
+            return view('cliente.proyectos', compact('proyectos'));
+        }
+
         $proyectos = Proyecto::visiblePara($request->user())
             ->with(['cliente', 'pm'])
-            ->withCount([
-                'tareas',
-                'tareas as tareas_completadas' => fn ($q) => $q->where('estado', 'completada'),
-                'hitos as hitos_completados' => fn ($q) => $q->where('completado', true),
-            ])
-            ->orderBy('fecha_inicio')
-            ->get();
+            ->when($request->filled('q'), function ($query) use ($request) {
+                $texto = $request->string('q')->trim()->toString();
 
-        return view('cliente.proyectos', compact('proyectos'));
-    }
+                $query->where(function ($subquery) use ($texto) {
+                    $subquery->where('nombre', 'like', "%{$texto}%")
+                        ->orWhere('descripcion', 'like', "%{$texto}%");
+                });
+            })
+            ->when($request->filled('estado'), fn ($query) => $query->where('estado', $request->string('estado')->toString())
+            )
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
 
-    $proyectos = Proyecto::visiblePara($request->user())
-        ->with(['cliente', 'pm'])
-        ->when($request->filled('q'), function ($query) use ($request) {
-            $texto = $request->string('q')->trim()->toString();
+        // Listas para los modales de crear/editar del listado.
+        $clientes = Cliente::orderBy('nombre')->get();
+        $usuarios = User::orderBy('name')->get();
 
-            $query->where(function ($subquery) use ($texto) {
-                $subquery->where('nombre', 'like', "%{$texto}%")
-                    ->orWhere('descripcion', 'like', "%{$texto}%");
-            });
-        })
-        ->when($request->filled('estado'), fn ($query) =>
-            $query->where('estado', $request->string('estado')->toString())
-        )
-        ->latest()
-        ->paginate(15)
-        ->withQueryString();
-
-    // Listas para los modales de crear/editar del listado.
-    $clientes = Cliente::orderBy('nombre')->get();
-    $usuarios = User::orderBy('name')->get();
-
-    return view('proyectos.index', compact('proyectos', 'clientes', 'usuarios'));
+        return view('proyectos.index', compact('proyectos', 'clientes', 'usuarios'));
 
     }
 

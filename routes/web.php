@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ActualizacionProyectoController;
+use App\Http\Controllers\AuditoriaController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\EntregableIAController;
 use App\Http\Controllers\FacturaController;
@@ -13,9 +14,14 @@ use App\Http\Controllers\SprintController;
 use App\Http\Controllers\SprintSummaryController;
 use App\Http\Controllers\TareaController;
 use App\Http\Controllers\UserController;
+use App\Models\Cliente;
+use App\Models\EntregableIA;
+use App\Models\Factura;
+use App\Models\Hito;
+use App\Models\Proyecto;
+use App\Models\Tarea;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuditoriaController;
 
 // -----------------------------------------------------------------------------
 // RUTAS PÚBLICAS
@@ -34,59 +40,59 @@ Route::get('/dashboard', function () {
     // Números del dashboard actual. Para Cliente se limitan a su empresa.
     $datos = [
         'esCliente' => $esCliente,
-        'totalClientes' => $esCliente ? null : \App\Models\Cliente::count(),
-        'totalProyectos' => \App\Models\Proyecto::visiblePara($usuario)->count(),
-        'tareasPendientes' => \App\Models\Tarea::visiblePara($usuario)
+        'totalClientes' => $esCliente ? null : Cliente::count(),
+        'totalProyectos' => Proyecto::visiblePara($usuario)->count(),
+        'tareasPendientes' => Tarea::visiblePara($usuario)
             ->where('estado', 'pendiente')->count(),
-        'facturasPendientes' => \App\Models\Factura::visiblePara($usuario)
+        'facturasPendientes' => Factura::visiblePara($usuario)
             ->where('estado', 'pendiente')->count(),
-        'totalHitos' => \App\Models\Hito::visiblePara($usuario)->count(),
+        'totalHitos' => Hito::visiblePara($usuario)->count(),
         // El Cliente solo recibe entregables aprobados; el equipo cuenta todos.
-        'totalEntregables' => \App\Models\EntregableIA::visiblePara($usuario)
+        'totalEntregables' => EntregableIA::visiblePara($usuario)
             ->when($esCliente, fn ($q) => $q->where('estado', 'aprobado'))
             ->count(),
     ];
 
     // Hitos que vencen pronto o ya vencieron (no completados).
-        $datos['hitosProximos'] = \App\Models\Hito::visiblePara($usuario)
-            ->where('completado', false)
-            ->whereDate('fecha_objetivo', '<=', today()->addDays(7))
-            ->with('proyecto')
-            ->orderBy('fecha_objetivo')
-            ->take(6)
-            ->get();
+    $datos['hitosProximos'] = Hito::visiblePara($usuario)
+        ->where('completado', false)
+        ->whereDate('fecha_objetivo', '<=', today()->addDays(7))
+        ->with('proyecto')
+        ->orderBy('fecha_objetivo')
+        ->take(6)
+        ->get();
 
     // Los reportes son globales y nunca se calculan para el rol Cliente.
     if (! $esCliente) {
         $datos['proyectosPorEstado'] = [
-            'pendiente' => \App\Models\Proyecto::where('estado', 'pendiente')->count(),
-            'en_progreso' => \App\Models\Proyecto::where('estado', 'en_progreso')->count(),
-            'completado' => \App\Models\Proyecto::where('estado', 'completado')->count(),
-            'cancelado' => \App\Models\Proyecto::where('estado', 'cancelado')->count(),
+            'pendiente' => Proyecto::where('estado', 'pendiente')->count(),
+            'en_progreso' => Proyecto::where('estado', 'en_progreso')->count(),
+            'completado' => Proyecto::where('estado', 'completado')->count(),
+            'cancelado' => Proyecto::where('estado', 'cancelado')->count(),
         ];
 
         $datos['tareasPorEstado'] = [
-            'pendiente' => \App\Models\Tarea::where('estado', 'pendiente')->count(),
-            'en_progreso' => \App\Models\Tarea::where('estado', 'en_progreso')->count(),
-            'completada' => \App\Models\Tarea::where('estado', 'completada')->count(),
-            'cancelada' => \App\Models\Tarea::where('estado', 'cancelada')->count(),
+            'pendiente' => Tarea::where('estado', 'pendiente')->count(),
+            'en_progreso' => Tarea::where('estado', 'en_progreso')->count(),
+            'completada' => Tarea::where('estado', 'completada')->count(),
+            'cancelada' => Tarea::where('estado', 'cancelada')->count(),
         ];
 
-        $datos['totalFacturado'] = \App\Models\Factura::sum('monto');
+        $datos['totalFacturado'] = Factura::sum('monto');
 
         // Pendiente de cobro incluye facturas pendientes y vencidas: ninguna
         // de las dos fue pagada todavía.
-        $datos['totalPendienteCobro'] = \App\Models\Factura::whereIn(
+        $datos['totalPendienteCobro'] = Factura::whereIn(
             'estado',
             ['pendiente', 'vencida']
         )->sum('monto');
 
-        $datos['tareasVencidas'] = \App\Models\Tarea::whereDate('fecha_limite', '<', today())
+        $datos['tareasVencidas'] = Tarea::whereDate('fecha_limite', '<', today())
             ->whereNotIn('estado', ['completada', 'cancelada'])
             ->count();
-                    // Detalle para el dashboard del Cliente: avance de sus proyectos.
+        // Detalle para el dashboard del Cliente: avance de sus proyectos.
         $datos['misProyectos'] = $esCliente
-            ? \App\Models\Proyecto::visiblePara($usuario)
+            ? Proyecto::visiblePara($usuario)
                 ->with('cliente')
                 ->withCount([
                     'tareas',

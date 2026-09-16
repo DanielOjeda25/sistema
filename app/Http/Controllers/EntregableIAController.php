@@ -24,8 +24,7 @@ class EntregableIAController extends Controller
                         ->orWhere('tipo', 'like', "%{$texto}%");
                 });
             })
-            ->when($request->filled('estado'), fn ($query) =>
-                $query->where('estado', $request->string('estado')->toString())
+            ->when($request->filled('estado'), fn ($query) => $query->where('estado', $request->string('estado')->toString())
             )
             ->latest()
             ->paginate(15)

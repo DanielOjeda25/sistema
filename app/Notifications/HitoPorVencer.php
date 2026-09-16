@@ -10,9 +10,7 @@ class HitoPorVencer extends Notification
 {
     use Queueable;
 
-    public function __construct(public Hito $hito, public int $diasRestantes)
-    {
-    }
+    public function __construct(public Hito $hito, public int $diasRestantes) {}
 
     // Canal database: la campanita del layout la lee de unreadNotifications.
     public function via(object $notifiable): array

@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Models\Hito;
-use App\Models\User;
 use App\Notifications\HitoPorVencer;
 use Illuminate\Console\Command;
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Factura;
 use App\Models\Proyecto;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
 class FacturaController extends Controller
@@ -21,8 +22,7 @@ class FacturaController extends Controller
                         ->orWhere('detalle', 'like', "%{$texto}%");
                 });
             })
-            ->when($request->filled('estado'), fn ($query) =>
-                $query->where('estado', $request->string('estado')->toString())
+            ->when($request->filled('estado'), fn ($query) => $query->where('estado', $request->string('estado')->toString())
             )
             ->latest()
             ->paginate(15)
@@ -81,7 +81,7 @@ class FacturaController extends Controller
     public function update(Request $request, Factura $factura)
     {
         $data = $request->validate([
-            'numero' => 'required|string|max:255|unique:facturas,numero,' . $factura->id,
+            'numero' => 'required|string|max:255|unique:facturas,numero,'.$factura->id,
             'monto' => 'required|numeric|min:0|max:10000000',
             'fecha_emision' => 'required|date_format:Y-m-d',
             'fecha_vencimiento' => 'nullable|date_format:Y-m-d|after_or_equal:fecha_emision',
@@ -104,13 +104,14 @@ class FacturaController extends Controller
 
         return redirect()->route('facturas.index')->with('success', 'Factura eliminada correctamente.');
     }
+
     public function descargarPdf(Request $request, Factura $factura)
     {
         abort_unless($request->user()->puedeVer($factura), 403);
 
         $factura->load(['proyecto.cliente', 'emisor']);
 
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('facturas.pdf', compact('factura'));
+        $pdf = Pdf::loadView('facturas.pdf', compact('factura'));
 
         return $pdf->download("factura-{$factura->numero}.pdf");
     }

@@ -31,8 +31,7 @@ class AuditoriaController extends Controller
             // Historial de un registro concreto (desde el boton Historial de los listados).
             ->when($request->filled('modelo'), function ($query) use ($request) {
                 $query->where('auditable_type', $request->string('modelo')->toString())
-                    ->when($request->filled('registro'), fn ($q) =>
-                        $q->where('auditable_id', $request->string('registro')->toString()));
+                    ->when($request->filled('registro'), fn ($q) => $q->where('auditable_id', $request->string('registro')->toString()));
             })
             ->paginate(20)
             ->withQueryString();

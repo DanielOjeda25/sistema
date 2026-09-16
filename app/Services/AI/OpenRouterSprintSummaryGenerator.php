@@ -72,6 +72,7 @@ PROMPT;
                     ]);
             } catch (ConnectionException $exception) {
                 $errores[] = "{$modelo}: error de conexión";
+
                 continue;
             }
 
@@ -86,6 +87,7 @@ PROMPT;
                 }
 
                 $errores[] = "{$modelo}: respuesta vacía";
+
                 continue;
             }
 

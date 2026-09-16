@@ -2,6 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\EntregableIA;
+use App\Models\Hito;
+use App\Models\Proyecto;
+use App\Models\Sprint;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -68,7 +72,7 @@ class ClienteExperienciaTest extends TestCase
         // - "Borrador de manual" (su empresa, borrador) se aprueba -> visible.
         // - "Resumen de reunion" (su empresa, revisado) -> oculto.
         // - "Esquema legal" (otra empresa, aprobado) -> oculto.
-        \App\Models\EntregableIA::where('titulo', 'Borrador de manual de usuario')
+        EntregableIA::where('titulo', 'Borrador de manual de usuario')
             ->update(['estado' => 'aprobado']);
 
         $html = $this->actingAs($cliente)->get('/entregables')->getContent();
@@ -122,16 +126,16 @@ class ClienteExperienciaTest extends TestCase
     public function el_detalle_del_proyecto_del_cliente_es_una_linea_de_tiempo(): void
     {
         $cliente = $this->cliente();
-        $proyecto = \App\Models\Proyecto::where('cliente_id', $cliente->cliente_id)->firstOrFail();
+        $proyecto = Proyecto::where('cliente_id', $cliente->cliente_id)->firstOrFail();
 
         // hitos y sprints del proyecto para tener contenido en la linea
-        $hito = \App\Models\Hito::create([
+        $hito = Hito::create([
             'nombre' => 'Hito timeline',
             'fecha_objetivo' => today()->addDays(10),
             'completado' => false,
             'proyecto_id' => $proyecto->id,
         ]);
-        $sprint = \App\Models\Sprint::create([
+        $sprint = Sprint::create([
             'nombre' => 'Sprint timeline',
             'proyecto_id' => $proyecto->id,
             'fecha_inicio' => today()->subDays(5),

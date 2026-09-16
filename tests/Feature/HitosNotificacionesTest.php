@@ -28,7 +28,7 @@ class HitosNotificacionesTest extends TestCase
         $pm = User::where('email', 'pm@example.com')->firstOrFail();
 
         return Hito::create(array_merge([
-            'nombre' => 'Hito de prueba ' . uniqid(),
+            'nombre' => 'Hito de prueba '.uniqid(),
             'descripcion' => 'prueba',
             'fecha_objetivo' => today()->addDays(3),
             'completado' => false,

@@ -2,22 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cliente;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
-use App\Models\Cliente;
-use App\Models\User;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
-
-// Mostrar el formulario con los roles
+    // Mostrar el formulario con los roles
     public function editRoles(User $user)
     {
         // Traemos todos los roles de la base de datos
-        $roles = Role::all(); 
-        
+        $roles = Role::all();
+
         return view('users.roles', compact('user', 'roles'));
     }
 
@@ -25,15 +24,13 @@ class UserController extends Controller
     public function updateRoles(Request $request, User $user)
     {
         // Spatie tiene un método mágico llamado "syncRoles".
-        // Lo que hace es: mira los roles que llegaron del formulario, 
+        // Lo que hace es: mira los roles que llegaron del formulario,
         // se los asigna al usuario, y le quita los que no estén marcados.
         $user->syncRoles($request->roles);
 
         // Volvemos a la página anterior con un mensaje de éxito
         return redirect()->back()->with('success', 'Roles actualizados correctamente.');
     }
-
-
 
     /**
      * Display a listing of the resource.

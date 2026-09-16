@@ -15,8 +15,8 @@ class TareaSeeder extends Seeder
         $obraLR = Proyecto::where('nombre', 'Sistema de obra L&R')->first();
         $gestor = Proyecto::where('nombre', 'Gestor de expedientes Gimenez')->first();
         $portal = Proyecto::where('nombre', 'Portal del socio — Cooperativa Union')->first();
-        $dev    = User::where('email', 'dev@example.com')->first();
-        $pm     = User::where('email', 'pm@example.com')->first();
+        $dev = User::where('email', 'dev@example.com')->first();
+        $pm = User::where('email', 'pm@example.com')->first();
 
         $solicitudReporte = SolicitudCambio::where('titulo', 'Agregar reporte de horas por obra')->first();
 

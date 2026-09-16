@@ -12,31 +12,30 @@ use Illuminate\Http\Request;
 class TareaController extends Controller
 {
     public function index(Request $request)
-{
-    $tareas = Tarea::visiblePara($request->user())
-        ->with(['proyecto', 'asignado'])
-        ->when($request->filled('q'), function ($query) use ($request) {
-            $texto = $request->string('q')->trim()->toString();
+    {
+        $tareas = Tarea::visiblePara($request->user())
+            ->with(['proyecto', 'asignado'])
+            ->when($request->filled('q'), function ($query) use ($request) {
+                $texto = $request->string('q')->trim()->toString();
 
-            $query->where(function ($subquery) use ($texto) {
-                $subquery->where('titulo', 'like', "%{$texto}%")
-                    ->orWhere('descripcion', 'like', "%{$texto}%");
-            });
-        })
-        ->when($request->filled('estado'), fn ($query) =>
-            $query->where('estado', $request->string('estado')->toString())
-        )
-        ->latest()
-        ->paginate(15)
-        ->withQueryString();
+                $query->where(function ($subquery) use ($texto) {
+                    $subquery->where('titulo', 'like', "%{$texto}%")
+                        ->orWhere('descripcion', 'like', "%{$texto}%");
+                });
+            })
+            ->when($request->filled('estado'), fn ($query) => $query->where('estado', $request->string('estado')->toString())
+            )
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
 
-    $proyectos = Proyecto::orderBy('nombre')->get();
-    $usuarios = User::orderBy('name')->get();
-    $solicitudes = SolicitudCambio::orderBy('titulo')->get();
-    $sprints = Sprint::with('proyecto')->orderBy('proyecto_id')->orderBy('fecha_inicio')->get();
+        $proyectos = Proyecto::orderBy('nombre')->get();
+        $usuarios = User::orderBy('name')->get();
+        $solicitudes = SolicitudCambio::orderBy('titulo')->get();
+        $sprints = Sprint::with('proyecto')->orderBy('proyecto_id')->orderBy('fecha_inicio')->get();
 
-    return view('tareas.index', compact('tareas', 'proyectos', 'usuarios', 'solicitudes', 'sprints'));
-}
+        return view('tareas.index', compact('tareas', 'proyectos', 'usuarios', 'solicitudes', 'sprints'));
+    }
 
     public function tablero(Request $request)
     {

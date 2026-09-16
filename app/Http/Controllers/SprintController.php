@@ -21,8 +21,7 @@ class SprintController extends Controller
                         ->orWhereHas('proyecto', fn ($q) => $q->where('nombre', 'like', "%{$texto}%"));
                 });
             })
-            ->when($request->filled('proyecto'), fn ($query) =>
-                $query->where('proyecto_id', $request->string('proyecto')->toString())
+            ->when($request->filled('proyecto'), fn ($query) => $query->where('proyecto_id', $request->string('proyecto')->toString())
             )
             ->orderBy('proyecto_id')
             ->orderBy('fecha_inicio')

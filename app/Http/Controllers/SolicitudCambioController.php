@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Proyecto;
 use App\Models\SolicitudCambio;
 use App\Models\User;
+use App\Notifications\SolicitudCambioCreada;
 use Illuminate\Http\Request;
 
 class SolicitudCambioController extends Controller
@@ -21,8 +22,7 @@ class SolicitudCambioController extends Controller
                         ->orWhere('descripcion', 'like', "%{$texto}%");
                 });
             })
-            ->when($request->filled('estado'), fn ($query) =>
-                $query->where('estado', $request->string('estado')->toString())
+            ->when($request->filled('estado'), fn ($query) => $query->where('estado', $request->string('estado')->toString())
             )
             ->latest()
             ->paginate(15)
@@ -59,7 +59,7 @@ class SolicitudCambioController extends Controller
 
         // Avisar al Jefe y a los PM de la nueva solicitud utilizando la variable $solicitud recién creada
         User::role(['Jefe', 'PM'])->get()->each(
-            fn (User $usuario) => $usuario->notify(new \App\Notifications\SolicitudCambioCreada($solicitud))
+            fn (User $usuario) => $usuario->notify(new SolicitudCambioCreada($solicitud))
         );
 
         return ($request->input('desde_modal') ? redirect()->back() : redirect()->route('solicitudes-cambio.index'))->with('success', 'Solicitud de cambio creada correctamente.');

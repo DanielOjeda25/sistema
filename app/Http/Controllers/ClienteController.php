@@ -20,8 +20,7 @@ class ClienteController extends Controller
                         ->orWhere('empresa', 'like', "%{$texto}%");
                 });
             })
-            ->when($request->filled('estado'), fn ($query) =>
-                $query->where('estado', $request->string('estado')->toString())
+            ->when($request->filled('estado'), fn ($query) => $query->where('estado', $request->string('estado')->toString())
             )
             ->latest()
             ->paginate(15)
@@ -66,7 +65,7 @@ class ClienteController extends Controller
         $data = $request->validate([
             'nombre' => 'required|string|max:255',
             'apellido' => 'required|string|max:255',
-            'email' => 'required|email|unique:clientes,email,' . $cliente->id,
+            'email' => 'required|email|unique:clientes,email,'.$cliente->id,
             'telefono' => 'nullable|string|max:50',
             'empresa' => 'nullable|string|max:255',
             'estado' => 'required|in:activo,inactivo',
