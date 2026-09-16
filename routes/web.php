@@ -148,7 +148,7 @@ Route::middleware('auth')->group(function () {
  * El PM necesita ver la lista para saber a quién asignar tareas. El Jefe la ve
  * porque administra. PO/Programador/Cliente no entran.
  */
-Route::middleware(['auth', 'role:Jefe|PM'])->group(function () {
+Route::middleware(['auth', 'role:Jefe'])->group(function () {
     Route::get('/usuarios', [UserController::class, 'index'])->name('users.index');
 });
 

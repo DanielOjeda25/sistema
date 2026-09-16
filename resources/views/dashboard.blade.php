@@ -17,6 +17,14 @@
                     <a href="{{ route('dashboard') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-[#00e5a0] bg-white/10 px-3 py-2.5 text-sm font-semibold text-white">
                         <x-heroicon-o-home class="h-5 w-5 shrink-0" /> Dashboard
                     </a>
+                    @role('Jefe')
+                    <a href="{{ route('users.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('users.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">
+                        <x-heroicon-o-users class="h-5 w-5 shrink-0" /> Usuarios y roles
+                    </a>
+                    <a href="{{ route('auditoria.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('auditoria.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">
+                        <x-heroicon-o-clock class="h-5 w-5 shrink-0" /> Auditoría
+                    </a>
+                    @endrole
                     <a href="{{ route('proyectos.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('proyectos.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">
                         <x-heroicon-o-squares-2x2 class="h-5 w-5 shrink-0" /> {{ $usuario->esCliente() ? 'Mis proyectos' : 'Proyectos' }}
                     </a>
@@ -42,7 +50,9 @@
                     @endunless
                     @unless ($usuario->esCliente())
                     <a href="{{ route('hitos.index') }}" class="block rounded-lg border-l-4 border-transparent px-3 py-2 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('hitos.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">Hitos</a>
+                    @unless ($usuario->esCliente())
                     <a href="{{ route('solicitudes-cambio.index') }}" class="block rounded-lg border-l-4 border-transparent px-3 py-2 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('solicitudes-cambio.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">Cambios</a>
+                    @endunless
                     @endunless
                     <a href="{{ route('entregables.index') }}" class="block rounded-lg border-l-4 border-transparent px-3 py-2 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('entregables.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">Entregables</a>
                 </nav>

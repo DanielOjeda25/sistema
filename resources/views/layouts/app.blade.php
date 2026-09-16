@@ -31,7 +31,7 @@
 
                         <nav class="mt-6 space-y-1">
                             <a href="{{ route('dashboard') }}" class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('dashboard') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"><x-heroicon-o-home class="h-5 w-5 shrink-0" /> Dashboard</a>
-                            @hasanyrole('Jefe|PM')
+                            @role('Jefe')
                                 <a href="{{ route('users.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('users.*') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"><x-heroicon-o-users class="h-5 w-5 shrink-0" /> Usuarios y roles</a>
                             @endhasanyrole
                             @hasanyrole('Jefe')
