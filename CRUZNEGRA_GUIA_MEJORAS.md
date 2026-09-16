@@ -411,7 +411,14 @@ la barra de avance.
 
 ### 5.1 BACKEND — Jesús
 
-Instalar la librería (una sola vez, en la raíz del proyecto):
+> **ACTUALIZACIÓN 15/09:** la librería **ya está instalada en main**
+> (commit con `composer require barryvdh/laravel-dompdf` v3.1). Tras hacer
+> `git pull` solo tenés que correr `composer install` para que aparezca en
+> tu `vendor/`. Si el error que ves es
+> `Class "Barryvdh\DomPDF\Facade\Pdf" not found`, es exactamente eso:
+> falta el `composer install`, no hay que cambiar código.
+
+Instalar la librería (ya hecho; solo si trabajás desde cero):
 
 ```bash
 composer require barryvdh/laravel-dompdf
@@ -431,12 +438,21 @@ adentro de la clase:
     }
 ```
 
-**Archivo: `routes/web.php`** — dentro del grupo que ya tiene el resource de
-facturas, agregar:
+**Archivo: `routes/web.php`** — **no** va dentro del grupo de escritura de
+facturas: descargar el PDF es una acción de lectura (el Cliente también tiene
+que poder bajar su factura). Agregala en el grupo de **lectura** (el mismo que
+tiene `facturas index/show`):
 
 ```php
     Route::get('/facturas/{factura}/pdf', [FacturaController::class, 'descargarPdf'])
         ->name('facturas.pdf');
+```
+
+Y en el método `descargarPdf` del controller, validá visibilidad igual que en
+`show` (el modelo Factura tiene `proyecto_id`, así que `puedeVer` funciona):
+
+```php
+        abort_unless($request->user()->puedeVer($factura), 403);
 ```
 
 **Archivo: `resources/views/facturas/pdf.blade.php`** (crear — es la plantilla del PDF)
@@ -469,6 +485,10 @@ facturas, agregar:
 </body>
 </html>
 ```
+
+> **Verificado contra el código (15/09):** la relación `emisor()` existe en el
+> modelo Factura y `fecha_emision`/`fecha_vencimiento` están casteadas como
+> date, así que el método y la plantilla de arriba funcionan tal cual.
 
 ### 5.2 FRONTEND — Jesús
 
