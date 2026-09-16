@@ -33,48 +33,82 @@
 
             {{-- Linea de tiempo: hitos y sprints en orden cronologico --}}
             <div class="bg-white rounded-2xl shadow-sm p-6">
-                <h3 class="text-lg font-bold text-gray-800 mb-1">Cómo viene el proyecto</h3>
-                <p class="text-sm text-gray-500 mb-6">Los hitos acordados y las etapas de trabajo, en orden de tiempo.</p>
+                <div class="flex items-center justify-between mb-1">
+                    <h3 class="text-lg font-bold text-gray-800">Cómo viene el proyecto</h3>
+                    <div class="hidden sm:flex items-center gap-4 text-xs text-gray-500">
+                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#00b87d]"></span> Completado</span>
+                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-ping-slow"></span> En curso</span>
+                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span> Atrasado</span>
+                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-gray-300"></span> Pendiente</span>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-500">Seguí el camino de izquierda a derecha.</p>
 
-                @forelse ($linea as $item)
-                    <div class="flex gap-4">
-                        {{-- columna fecha + linea vertical --}}
-                        <div class="flex flex-col items-center">
-                            <div class="w-4 h-4 rounded-full mt-1.5
-                                {{ $item['hecho'] ? 'bg-[#00b87d]' : ($item['vencido'] ? 'bg-red-500' : 'bg-gray-300') }}"></div>
-                            @if (! $loop->last)
-                                <div class="w-0.5 flex-1 bg-gray-200 my-1"></div>
-                            @endif
-                        </div>
-                        <div class="flex-1 pb-6">
-                            <div class="flex flex-wrap items-center gap-2">
-                                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full
-                                    {{ $item['tipo'] === 'hito' ? 'bg-amber-100 text-amber-700' : 'bg-indigo-100 text-indigo-700' }}">
-                                    {{ $item['tipo'] === 'hito' ? 'Hito' : 'Etapa' }}
-                                </span>
-                                <span class="font-semibold text-gray-800">{{ $item['titulo'] }}</span>
-                                @if ($item['hecho'])
-                                    <span class="text-xs text-[#008c63] font-semibold">✓ Completado</span>
-                                @elseif ($item['vencido'])
-                                    <span class="text-xs text-red-600 font-semibold">Atrasado</span>
-                                @endif
-                            </div>
-                            @if ($item['fecha'])
-                                <p class="text-xs text-gray-400 mt-0.5">{{ $item['fecha']->format('d/m/Y') }}</p>
-                            @endif
-                            @if ($item['detalle'])
-                                <p class="text-sm text-gray-600 mt-1">{{ $item['detalle'] }}</p>
-                            @endif
-                            @if (isset($item['avance']))
-                                <div class="mt-2 w-full max-w-xs bg-gray-100 rounded-full h-2">
-                                    <div class="bg-indigo-400 h-2 rounded-full" style="width: {{ $item['avance'] }}%"></div>
+                @php
+                    // progreso de la linea: hasta el ultimo hito/etapa completado
+                    $ultimoHecho = 0;
+                    foreach ($linea as $i => $item) { if ($item['hecho']) { $ultimoHecho = $i; } }
+                    $llenado = $linea->count() > 1 ? round($ultimoHecho / ($linea->count() - 1) * 100) : 100;
+                    $marcadoCurso = false;
+                @endphp
+
+                <div class="overflow-x-auto scroll-oculto mt-6 pb-2">
+                    <div class="relative min-w-max px-6">
+                        {{-- riel de fondo y riel de avance --}}
+                        <div class="absolute top-6 left-8 right-8 h-1.5 bg-gray-200 rounded-full"></div>
+                        <div class="absolute top-6 left-8 h-1.5 bg-gradient-to-r from-[#00b87d] to-[#00d99a] rounded-full animar-riel"
+                             style="width: {{ $llenado }}%"></div>
+
+                        <div class="flex items-start">
+                            @foreach ($linea as $i => $item)
+                                @php
+                                    $esCurso = ! $item['hecho'] && ! $item['vencido'] && ! $marcadoCurso;
+                                    if ($esCurso) { $marcadoCurso = true; }
+                                    $claseNodo = $item['hecho'] ? 'bg-[#00b87d] text-white' : ($item['vencido'] ? 'bg-red-500 text-white' : ($esCurso ? 'bg-indigo-500 text-white animar-curso' : 'bg-gray-300 text-gray-500'));
+                                    $icono = $item['hecho'] ? '✓' : ($item['vencido'] ? '!' : ($esCurso ? '▶' : $i + 1));
+                                @endphp
+                                <div class="relative w-44 shrink-0 px-2 text-center animar-item" style="animation-delay: {{ $i * 0.18 }}s">
+                                    <p class="text-xs text-gray-400 h-4">{{ $item['fecha']?->format('d/m/Y') }}</p>
+                                    <div class="relative mx-auto my-3 w-10 h-10">
+                                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-md {{ $claseNodo }}">{{ $icono }}</div>
+                                    </div>
+                                    <span class="inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full mb-1
+                                        {{ $item['tipo'] === 'hito' ? 'bg-amber-100 text-amber-700' : 'bg-indigo-50 text-indigo-700' }}">
+                                        {{ $item['tipo'] === 'hito' ? 'Hito' : 'Etapa' }}
+                                    </span>
+                                    <p class="text-sm font-semibold text-gray-800 leading-snug">{{ $item['titulo'] }}</p>
+                                    @if ($item['hecho'])
+                                        <p class="text-xs text-[#008c63] font-semibold mt-0.5">✓ Completado</p>
+                                    @elseif ($item['vencido'])
+                                        <p class="text-xs text-red-600 font-semibold mt-0.5">Atrasado</p>
+                                    @elseif ($esCurso)
+                                        <p class="text-xs text-indigo-600 font-semibold mt-0.5">En curso</p>
+                                    @endif
+                                    @if ($item['detalle'])
+                                        <p class="text-xs text-gray-500 mt-1 leading-relaxed">{{ $item['detalle'] }}</p>
+                                    @endif
+                                    @if (isset($item['avance']))
+                                        <div class="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                            <div class="h-full bg-indigo-400 rounded-full animar-riel" style="width: {{ $item['avance'] }}%"></div>
+                                        </div>
+                                    @endif
                                 </div>
-                            @endif
+                            @endforeach
                         </div>
                     </div>
-                @empty
-                    <p class="text-sm text-gray-400">Todavía no hay hitos ni etapas cargados para este proyecto.</p>
-                @endforelse
+                </div>
+
+                <style>
+                    @keyframes crecerRiel { from { width: 0; } }
+                    .animar-riel { animation: crecerRiel 1.2s ease-out; }
+                    @keyframes aparecerItem { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+                    .animar-item { animation: aparecerItem .5s ease-out both; }
+                    @keyframes latido { 0%,100% { box-shadow: 0 0 0 0 rgba(99,102,241,.45); } 50% { box-shadow: 0 0 0 8px rgba(99,102,241,0); } }
+                    .animar-curso { animation: latido 2s infinite; }
+                    .scroll-oculto::-webkit-scrollbar { height: 6px; }
+                    .scroll-oculto::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 9999px; }
+                </style>
+
             </div>
 
             {{-- Novedades visibles para el cliente --}}
