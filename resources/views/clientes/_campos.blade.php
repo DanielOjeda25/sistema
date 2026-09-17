@@ -4,13 +4,13 @@
 --}}
 <div>
     <x-input-label for="{{ $prefijo ?? '' }}nombre" value="Nombre" />
-    <x-text-input id="{{ $prefijo ?? '' }}nombre" name="nombre" type="text" class="mt-1 block w-full" :value="old('nombre', $cliente->nombre ?? '')" required />
+    <x-text-input maxlength="255" id="{{ $prefijo ?? '' }}nombre" name="nombre" type="text" class="mt-1 block w-full" :value="old('nombre', $cliente->nombre ?? '')" required />
     <x-input-error class="mt-2" :messages="$errors->get('nombre')" />
 </div>
 
 <div>
     <x-input-label for="{{ $prefijo ?? '' }}apellido" value="Apellido" />
-    <x-text-input id="{{ $prefijo ?? '' }}apellido" name="apellido" type="text" class="mt-1 block w-full" :value="old('apellido', $cliente->apellido ?? '')" required />
+    <x-text-input maxlength="255" id="{{ $prefijo ?? '' }}apellido" name="apellido" type="text" class="mt-1 block w-full" :value="old('apellido', $cliente->apellido ?? '')" required />
     <x-input-error class="mt-2" :messages="$errors->get('apellido')" />
 </div>
 
@@ -22,13 +22,13 @@
 
 <div>
     <x-input-label for="{{ $prefijo ?? '' }}telefono" value="Teléfono (opcional)" />
-    <x-text-input id="{{ $prefijo ?? '' }}telefono" name="telefono" type="text" class="mt-1 block w-full" :value="old('telefono', $cliente->telefono ?? '')" />
+    <x-text-input maxlength="50" id="{{ $prefijo ?? '' }}telefono" name="telefono" type="text" class="mt-1 block w-full" :value="old('telefono', $cliente->telefono ?? '')" />
     <x-input-error class="mt-2" :messages="$errors->get('telefono')" />
 </div>
 
 <div>
     <x-input-label for="{{ $prefijo ?? '' }}empresa" value="Empresa (opcional)" />
-    <x-text-input id="{{ $prefijo ?? '' }}empresa" name="empresa" type="text" class="mt-1 block w-full" :value="old('empresa', $cliente->empresa ?? '')" />
+    <x-text-input maxlength="255" id="{{ $prefijo ?? '' }}empresa" name="empresa" type="text" class="mt-1 block w-full" :value="old('empresa', $cliente->empresa ?? '')" />
     <x-input-error class="mt-2" :messages="$errors->get('empresa')" />
 </div>
 

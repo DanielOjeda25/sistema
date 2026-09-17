@@ -7,13 +7,13 @@
 <div class="grid gap-4 sm:grid-cols-2" x-data="{ rol: '{{ old('rol', '') }}' }">
     <div>
         <x-input-label for="name" value="Nombre" />
-        <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name')" required autofocus />
+        <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name')" required autofocus  maxlength="255" />
         <x-input-error class="mt-2" :messages="$errors->get('name')" />
     </div>
 
     <div>
         <x-input-label for="apellido" value="Apellido" />
-        <x-text-input id="apellido" name="apellido" type="text" class="mt-1 block w-full" :value="old('apellido')" required />
+        <x-text-input id="apellido" name="apellido" type="text" class="mt-1 block w-full" :value="old('apellido')" required  maxlength="255" />
         <x-input-error class="mt-2" :messages="$errors->get('apellido')" />
     </div>
 

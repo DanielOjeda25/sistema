@@ -162,12 +162,12 @@
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div>
                         <x-input-label for="edit_name" value="Nombre" />
-                        <x-text-input id="edit_name" name="name" type="text" class="mt-1 block w-full" :value="old('name')" required />
+                        <x-text-input maxlength="255" id="edit_name" name="name" type="text" class="mt-1 block w-full" :value="old('name')" required />
                         <x-input-error class="mt-2" :messages="$errors->get('name')" />
                     </div>
                     <div>
                         <x-input-label for="edit_apellido" value="Apellido" />
-                        <x-text-input id="edit_apellido" name="apellido" type="text" class="mt-1 block w-full" :value="old('apellido')" required />
+                        <x-text-input maxlength="255" id="edit_apellido" name="apellido" type="text" class="mt-1 block w-full" :value="old('apellido')" required />
                         <x-input-error class="mt-2" :messages="$errors->get('apellido')" />
                     </div>
                     <div class="sm:col-span-2">
