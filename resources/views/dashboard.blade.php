@@ -207,7 +207,7 @@
                             </style>
                         @endif
 
-@if (isset($hitosProximos) && $hitosProximos->isNotEmpty())
+@if ($interno && isset($hitosProximos) && $hitosProximos->isNotEmpty())
     <section class="mt-5 rounded-xl border border-[#d7eee6] bg-white shadow-sm overflow-hidden">
         <div class="flex items-center justify-between px-5 py-4 border-b border-[#d7eee6]">
             <div>
