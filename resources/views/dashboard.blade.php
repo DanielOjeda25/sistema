@@ -42,6 +42,11 @@
                     <a href="{{ route('facturas.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('facturas.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">
                         <x-heroicon-o-banknotes class="h-5 w-5 shrink-0" /> Facturas
                     </a>
+                    @unless ($usuario->esCliente())
+                    <a href="{{ route('clientes.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('clientes.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">
+                        <x-heroicon-o-building-office-2 class="h-5 w-5 shrink-0" /> Clientes y empresas
+                    </a>
+                    @endunless
                 </nav>
 
                 <p class="mt-8 px-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Módulos</p>

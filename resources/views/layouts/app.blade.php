@@ -45,6 +45,9 @@
                             <a href="{{ route('tareas.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('tareas.*') && ! request()->routeIs('tareas.tablero') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"><x-heroicon-o-queue-list class="h-5 w-5 shrink-0" /> Tareas</a>
                             @endunless
                             <a href="{{ route('facturas.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('facturas.*') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"><x-heroicon-o-banknotes class="h-5 w-5 shrink-0" /> Facturas</a>
+                            @unless (auth()->user()->esCliente())
+                            <a href="{{ route('clientes.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('clientes.*') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"><x-heroicon-o-building-office-2 class="h-5 w-5 shrink-0" /> Clientes y empresas</a>
+                            @endunless
                         </nav>
 
                         <p class="mt-8 px-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Módulos</p>

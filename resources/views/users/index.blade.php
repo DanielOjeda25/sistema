@@ -194,9 +194,9 @@
                         <x-input-error class="mt-2" :messages="$errors->get('estado')" />
                     </div>
                     <div class="sm:col-span-2 rounded-lg border border-emerald-100 bg-emerald-50 p-4">
-                        <x-input-label for="edit_cliente_id" value="Empresa del cliente (solo rol Cliente)" />
+                        <x-input-label for="edit_cliente_id" value="Ficha de cliente (solo rol Cliente)" />
                         <select id="edit_cliente_id" name="cliente_id" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
-                            <option value="">— Sin empresa —</option>
+                            <option value="">— Sin ficha asignada —</option>
                             @foreach ($clientes as $c)
                                 <option value="{{ $c->id }}" @selected(old('cliente_id') == $c->id)>{{ $c->nombre }} {{ $c->apellido }}@if($c->empresa) · {{ $c->empresa }}@endif</option>
                             @endforeach

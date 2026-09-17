@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Listado de Clientes
+                Clientes y empresas
             </h2>
             @hasanyrole('Jefe|PM')
                 <button type="button" data-abrir-modal="modal-cliente-crear"

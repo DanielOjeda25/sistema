@@ -6,6 +6,7 @@
         ['route' => 'tareas.tablero', 'label' => 'Mi trabajo', 'pattern' => 'tareas.tablero', 'interno' => true],
         ['route' => 'tareas.index', 'label' => 'Tareas', 'pattern' => 'tareas.*', 'interno' => true],
         ['route' => 'facturas.index', 'label' => 'Facturas', 'pattern' => 'facturas.*'],
+        ['route' => 'clientes.index', 'label' => 'Clientes', 'pattern' => 'clientes.*', 'interno' => true],
         ['route' => 'sprints.index', 'label' => 'Sprints', 'pattern' => 'sprints.*', 'interno' => true],
         ['route' => 'hitos.index', 'label' => 'Hitos', 'pattern' => 'hitos.*'],
         ['route' => 'entregables.index', 'label' => 'Entregables', 'pattern' => 'entregables.*'],
