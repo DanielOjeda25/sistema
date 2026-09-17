@@ -72,7 +72,9 @@
         'vencimiento' => $factura->fecha_vencimiento?->format('d/m/Y') ?? 'Sin vencimiento',
         'detalle' => $factura->detalle,
         'pdf' => route('facturas.pdf', $factura),
-    ]) = $factura->only(['numero', 'monto', 'estado', 'detalle', 'proyecto_id', 'emitida_por']) + ['fecha_emision' => $factura->fecha_emision?->format('Y-m-d'), 'fecha_vencimiento' => $factura->fecha_vencimiento?->format('Y-m-d')])
+    ])
+
+                                @php($valoresFactura = $factura->only(['numero', 'monto', 'estado', 'detalle', 'proyecto_id', 'emitida_por']) + ['fecha_emision' => $factura->fecha_emision?->format('Y-m-d'), 'fecha_vencimiento' => $factura->fecha_vencimiento?->format('Y-m-d')])
                                 <tr>
                                     <td class="px-6 py-4">{{ $factura->numero }}</td>
                                     <td class="px-6 py-4">{{ $factura->proyecto?->nombre ?? 'N/A' }}</td>
