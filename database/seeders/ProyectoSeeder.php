@@ -12,11 +12,11 @@ class ProyectoSeeder extends Seeder
     public function run(): void
     {
         $pmLaura = User::where('email', 'pm@example.com')->first();
-        $pmJefe  = User::where('email', 'jefe@example.com')->first();
+        $pmJefe = User::where('email', 'jefe@example.com')->first();
 
-        $clienteLR    = Cliente::where('email', 'mariana@constructoraLR.com')->first();
-        $clienteAbog  = Cliente::where('email', 'fede@gimenezabog.com.py')->first();
-        $clienteCoop  = Cliente::where('email', 'patri@cooperativaUnion.com')->first();
+        $clienteLR = Cliente::where('email', 'mariana@constructoraLR.com')->first();
+        $clienteAbog = Cliente::where('email', 'fede@gimenezabog.com.py')->first();
+        $clienteCoop = Cliente::where('email', 'patri@cooperativaUnion.com')->first();
         $clienteLucia = Cliente::where('email', 'lucia.f@gmail.com')->first();
 
         $proyectos = [

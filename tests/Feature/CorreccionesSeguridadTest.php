@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\Factura;
 use App\Models\Sprint;
 use App\Models\Tarea;
 use App\Models\User;

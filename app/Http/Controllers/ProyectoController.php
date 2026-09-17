@@ -12,29 +12,43 @@ use Illuminate\Http\Request;
 class ProyectoController extends Controller
 {
     public function index(Request $request)
-{
-    $proyectos = Proyecto::visiblePara($request->user())
-        ->with(['cliente', 'pm'])
-        ->when($request->filled('q'), function ($query) use ($request) {
-            $texto = $request->string('q')->trim()->toString();
+    {
+        // Portal del Cliente: tarjetas simples con el avance de cada proyecto.
+        if ($request->user()->esCliente()) {
+            $proyectos = Proyecto::visiblePara($request->user())
+                ->with(['cliente', 'pm'])
+                ->withCount([
+                    'tareas',
+                    'tareas as tareas_completadas' => fn ($q) => $q->where('estado', 'completada'),
+                    'hitos as hitos_completados' => fn ($q) => $q->where('completado', true),
+                ])
+                ->orderBy('fecha_inicio')
+                ->get();
 
-            $query->where(function ($subquery) use ($texto) {
-                $subquery->where('nombre', 'like', "%{$texto}%")
-                    ->orWhere('descripcion', 'like', "%{$texto}%");
-            });
-        })
-        ->when($request->filled('estado'), fn ($query) =>
-            $query->where('estado', $request->string('estado')->toString())
-        )
-        ->latest()
-        ->paginate(15)
-        ->withQueryString();
+            return view('cliente.proyectos', compact('proyectos'));
+        }
 
-    // Listas para los modales de crear/editar del listado.
-    $clientes = Cliente::orderBy('nombre')->get();
-    $usuarios = User::orderBy('name')->get();
+        $proyectos = Proyecto::visiblePara($request->user())
+            ->with(['cliente', 'pm'])
+            ->when($request->filled('q'), function ($query) use ($request) {
+                $texto = $request->string('q')->trim()->toString();
 
-    return view('proyectos.index', compact('proyectos', 'clientes', 'usuarios'));
+                $query->where(function ($subquery) use ($texto) {
+                    $subquery->where('nombre', 'like', "%{$texto}%")
+                        ->orWhere('descripcion', 'like', "%{$texto}%");
+                });
+            })
+            ->when($request->filled('estado'), fn ($query) => $query->where('estado', $request->string('estado')->toString())
+            )
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
+
+        // Listas para los modales de crear/editar del listado.
+        $clientes = Cliente::orderBy('nombre')->get();
+        $usuarios = User::orderBy('name')->get();
+
+        return view('proyectos.index', compact('proyectos', 'clientes', 'usuarios'));
 
     }
 
@@ -66,6 +80,79 @@ class ProyectoController extends Controller
     public function show(Request $request, Proyecto $proyecto, ProjectContextBuilder $contextBuilder)
     {
         abort_unless($request->user()->puedeVer($proyecto), 403);
+
+        // Portal del Cliente: una linea de tiempo simple con hitos, sprints,
+        // novedades y entregables aprobados del proyecto.
+        if ($request->user()->esCliente()) {
+            $proyecto->load(['cliente', 'pm', 'hitos', 'sprints.tareas']);
+
+            $hitos = $proyecto->hitos
+                ->map(fn ($h) => [
+                    'fecha' => $h->fecha_objetivo,
+                    'fecha_texto' => $h->fecha_objetivo?->format('d/m/Y'),
+                    'tipo' => 'hito',
+                    'titulo' => $h->nombre,
+                    'detalle' => $h->descripcion,
+                    'descripcion' => $h->descripcion,
+                    'hecho' => (bool) $h->completado,
+                    'vencido' => ! $h->completado && $h->fecha_objetivo->isPast(),
+                ]);
+
+            $sprints = $proyecto->sprints
+                ->map(function ($sp) {
+                    $total = $sp->tareas->count();
+                    $hechas = $sp->tareas->where('estado', 'completada')->count();
+                    $fin = $sp->fecha_fin?->format('d/m/Y');
+                    $avance = $total > 0 ? (int) round($hechas * 100 / $total) : 0;
+
+                    return [
+                        'fecha' => $sp->fecha_inicio,
+                        'fecha_texto' => $sp->fecha_inicio?->format('d/m/Y'),
+                        'fecha_fin_texto' => $fin,
+                        'tipo' => 'sprint',
+                        'titulo' => $sp->nombre,
+                        'detalle' => trim("{$hechas} de {$total} tareas completadas".($fin ? " · hasta el {$fin}" : '')),
+                        'descripcion' => $sp->descripcion,
+                        'resumen_ia' => $sp->resumen_ia,
+                        'hecho' => $total > 0 && $hechas === $total,
+                        'vencido' => false,
+                        'avance' => $avance,
+                    ];
+                });
+
+            $linea = $hitos->concat($sprints)
+                ->sortBy(fn ($item) => $item['fecha'])
+                ->values();
+
+            $novedades = $proyecto->actualizaciones()
+                ->with('autor')
+                ->where('visible_cliente', true)
+                ->latest('fecha')
+                ->latest('id')
+                ->take(5)
+                ->get();
+
+            $entregables = EntregableIA::where('proyecto_id', $proyecto->id)
+                ->where('estado', 'aprobado')
+                ->latest('generado_en')
+                ->take(5)
+                ->get();
+
+            $cambios = $proyecto->solicitudesCambio()
+                ->with('solicitante')
+                ->latest()
+                ->take(5)
+                ->get();
+
+            $totalTareas = $proyecto->tareas()->count();
+            $tareasHechas = $proyecto->tareas()->where('estado', 'completada')->count();
+            $avanceProyecto = $totalTareas > 0 ? (int) round($tareasHechas * 100 / $totalTareas) : 0;
+
+            return view('cliente.proyecto', compact(
+                'proyecto', 'linea', 'novedades', 'entregables', 'cambios',
+                'totalTareas', 'tareasHechas', 'avanceProyecto'
+            ));
+        }
 
         $proyecto->load(['cliente', 'pm', 'tareas', 'hitos', 'facturas']);
 

@@ -132,4 +132,25 @@ class TableroTareasTest extends TestCase
         $this->assertSame(0, $segunda->fresh()->orden);
         $this->assertSame(1, $primera->fresh()->orden);
     }
+
+    public function test_mover_la_unica_tarjeta_de_una_columna_acepta_columna_origen_vacia(): void
+    {
+        // Al mover la única tarjeta de una columna, el frontend envía la
+        // columna origen con ids []; 'required' rechazaba ese array vacío
+        // con 422 aunque el movimiento sea válido.
+        $jefe = User::where('email', 'jefe@example.com')->firstOrFail();
+        $tarea = Tarea::where('estado', 'pendiente')->orderBy('id')->firstOrFail();
+
+        $this->actingAs($jefe)
+            ->patchJson(route('tareas.mover'), [
+                'columnas' => [
+                    ['estado' => 'pendiente', 'ids' => []],
+                    ['estado' => 'en_progreso', 'ids' => [$tarea->id]],
+                ],
+            ])
+            ->assertOk();
+
+        $this->assertSame('en_progreso', $tarea->fresh()->estado);
+        $this->assertSame(0, $tarea->fresh()->orden);
+    }
 }

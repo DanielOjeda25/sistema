@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ActualizacionProyectoController;
+use App\Http\Controllers\AuditoriaController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\EntregableIAController;
 use App\Http\Controllers\FacturaController;
@@ -13,6 +14,13 @@ use App\Http\Controllers\SprintController;
 use App\Http\Controllers\SprintSummaryController;
 use App\Http\Controllers\TareaController;
 use App\Http\Controllers\UserController;
+use App\Models\Cliente;
+use App\Models\EntregableIA;
+use App\Models\Factura;
+use App\Models\Hito;
+use App\Models\Proyecto;
+use App\Models\Tarea;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // -----------------------------------------------------------------------------
@@ -32,59 +40,100 @@ Route::get('/dashboard', function () {
     // Números del dashboard actual. Para Cliente se limitan a su empresa.
     $datos = [
         'esCliente' => $esCliente,
-        'totalClientes' => $esCliente ? null : \App\Models\Cliente::count(),
-        'totalProyectos' => \App\Models\Proyecto::visiblePara($usuario)->count(),
-        'tareasPendientes' => \App\Models\Tarea::visiblePara($usuario)
+        'totalClientes' => $esCliente ? null : Cliente::count(),
+        'totalProyectos' => Proyecto::visiblePara($usuario)->count(),
+        'tareasPendientes' => Tarea::visiblePara($usuario)
             ->where('estado', 'pendiente')->count(),
-        'facturasPendientes' => \App\Models\Factura::visiblePara($usuario)
+        'facturasPendientes' => Factura::visiblePara($usuario)
             ->where('estado', 'pendiente')->count(),
-        'totalHitos' => \App\Models\Hito::visiblePara($usuario)->count(),
-        'totalEntregables' => \App\Models\EntregableIA::visiblePara($usuario)->count(),
+        'totalHitos' => Hito::visiblePara($usuario)->count(),
+        // El Cliente solo recibe entregables aprobados; el equipo cuenta todos.
+        'totalEntregables' => EntregableIA::visiblePara($usuario)
+            ->when($esCliente, fn ($q) => $q->where('estado', 'aprobado'))
+            ->count(),
     ];
-    
+
     // Hitos que vencen pronto o ya vencieron (no completados).
-        $datos['hitosProximos'] = \App\Models\Hito::visiblePara($usuario)
-            ->where('completado', false)
-            ->whereDate('fecha_objetivo', '<=', today()->addDays(7))
-            ->with('proyecto')
-            ->orderBy('fecha_objetivo')
-            ->take(6)
-            ->get();
+    $datos['hitosProximos'] = Hito::visiblePara($usuario)
+        ->where('completado', false)
+        ->whereDate('fecha_objetivo', '<=', today()->addDays(7))
+        ->with('proyecto')
+        ->orderBy('fecha_objetivo')
+        ->take(6)
+        ->get();
 
     // Los reportes son globales y nunca se calculan para el rol Cliente.
     if (! $esCliente) {
         $datos['proyectosPorEstado'] = [
-            'pendiente' => \App\Models\Proyecto::where('estado', 'pendiente')->count(),
-            'en_progreso' => \App\Models\Proyecto::where('estado', 'en_progreso')->count(),
-            'completado' => \App\Models\Proyecto::where('estado', 'completado')->count(),
-            'cancelado' => \App\Models\Proyecto::where('estado', 'cancelado')->count(),
+            'pendiente' => Proyecto::where('estado', 'pendiente')->count(),
+            'en_progreso' => Proyecto::where('estado', 'en_progreso')->count(),
+            'completado' => Proyecto::where('estado', 'completado')->count(),
+            'cancelado' => Proyecto::where('estado', 'cancelado')->count(),
         ];
 
         $datos['tareasPorEstado'] = [
-            'pendiente' => \App\Models\Tarea::where('estado', 'pendiente')->count(),
-            'en_progreso' => \App\Models\Tarea::where('estado', 'en_progreso')->count(),
-            'completada' => \App\Models\Tarea::where('estado', 'completada')->count(),
-            'cancelada' => \App\Models\Tarea::where('estado', 'cancelada')->count(),
+            'pendiente' => Tarea::where('estado', 'pendiente')->count(),
+            'en_progreso' => Tarea::where('estado', 'en_progreso')->count(),
+            'completada' => Tarea::where('estado', 'completada')->count(),
+            'cancelada' => Tarea::where('estado', 'cancelada')->count(),
         ];
 
-        $datos['totalFacturado'] = \App\Models\Factura::sum('monto');
+        $datos['totalFacturado'] = Factura::sum('monto');
 
         // Pendiente de cobro incluye facturas pendientes y vencidas: ninguna
         // de las dos fue pagada todavía.
-        $datos['totalPendienteCobro'] = \App\Models\Factura::whereIn(
+        $datos['totalPendienteCobro'] = Factura::whereIn(
             'estado',
             ['pendiente', 'vencida']
         )->sum('monto');
 
-        $datos['tareasVencidas'] = \App\Models\Tarea::whereDate('fecha_limite', '<', today())
+        $datos['tareasVencidas'] = Tarea::whereDate('fecha_limite', '<', today())
             ->whereNotIn('estado', ['completada', 'cancelada'])
             ->count();
+
+        // Facturacion por mes (ultimos 6 meses con movimiento) para el
+        // grafico del dashboard interno.
+        $porMes = Factura::selectRaw("DATE_FORMAT(fecha_emision, '%Y-%m') as mes, SUM(monto) as total")
+            ->groupBy('mes')
+            ->orderBy('mes')
+            ->get()
+            ->pluck('total', 'mes');
+        $meses = collect(range(5, 0))->map(fn ($i) => now()->subMonths($i)->format('Y-m'));
+        $datos['facturacionPorMes'] = $meses->map(fn ($mes) => [
+            'mes' => now()->createFromFormat('Y-m', $mes)->translatedFormat('M'),
+            'total' => (float) ($porMes[$mes] ?? 0),
+        ]);
+        // Detalle para el dashboard del Cliente: avance de sus proyectos.
+        $datos['misProyectos'] = $esCliente
+            ? Proyecto::visiblePara($usuario)
+                ->with('cliente')
+                ->withCount([
+                    'tareas',
+                    'tareas as tareas_completadas' => fn ($q) => $q->where('estado', 'completada'),
+                ])
+                ->take(6)
+                ->get()
+            : null;
     }
 
     return view('dashboard', $datos);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    // Notificaciones in-app: marcar una como leida o todas.
+    Route::post('/notificaciones/{id}/leer', function (Request $request, $id) {
+        $notificacion = $request->user()->notifications()->findOrFail($id);
+        $notificacion->markAsRead();
+
+        return back();
+    })->name('notificaciones.leer');
+
+    Route::post('/notificaciones/leer-todas', function (Request $request) {
+        $request->user()->unreadNotifications->markAsRead();
+
+        return back();
+    })->name('notificaciones.leer-todas');
+
     // Rutas del perfil nativas de Laravel Breeze
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -99,7 +148,7 @@ Route::middleware('auth')->group(function () {
  * El PM necesita ver la lista para saber a quién asignar tareas. El Jefe la ve
  * porque administra. PO/Programador/Cliente no entran.
  */
-Route::middleware(['auth', 'role:Jefe|PM'])->group(function () {
+Route::middleware(['auth', 'role:Jefe'])->group(function () {
     Route::get('/usuarios', [UserController::class, 'index'])->name('users.index');
 });
 
@@ -108,14 +157,22 @@ Route::middleware(['auth', 'role:Jefe|PM'])->group(function () {
  * sola persona para evitar escaladas de permisos.
  */
 Route::middleware(['auth', 'role:Jefe'])->group(function () {
+    // Bitácora de cambios del sistema (laravel-auditing): quién hizo qué y
+    // cuándo. Queda en Jefe porque es información sensible de administración.
+    Route::get('/auditoria', [AuditoriaController::class, 'index'])->name('auditoria.index');
+
     // Alta de usuarios. No hay registro público: las cuentas se crean acá y se
     // les asigna un rol. La contraseña que se pone es provisional; la persona
     // la cambia desde su perfil cuando entra.
     Route::get('/usuarios/crear', [UserController::class, 'create'])->name('users.create');
     Route::post('/usuarios', [UserController::class, 'store'])->name('users.store');
 
-    Route::get('/usuarios/{user}/roles', [UserController::class, 'editRoles'])->name('users.roles.edit');
+    // Cambio de rol (un solo rol por usuario) desde el modal de la lista.
     Route::put('/usuarios/{user}/roles', [UserController::class, 'updateRoles'])->name('users.roles.update');
+
+    // Edición y baja de usuarios (modales en la lista).
+    Route::put('/usuarios/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::delete('/usuarios/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 });
 
 Route::get('/tutorial', function () {
@@ -220,6 +277,10 @@ Route::middleware('auth')->group(function () {
     Route::resource('sprints', SprintController::class)->only(['index']);
     Route::resource('entregables', EntregableIAController::class)->only(['index', 'show']);
     Route::resource('facturas', FacturaController::class)->only(['index', 'show']);
+    // Descargar factura en PDF: es lectura, cualquier usuario autorizado
+    // puede bajar las facturas de los proyectos que puede ver.
+    Route::get('/facturas/{factura}/pdf', [FacturaController::class, 'descargarPdf'])
+        ->name('facturas.pdf');
 });
 
 // -----------------------------------------------------------------------------

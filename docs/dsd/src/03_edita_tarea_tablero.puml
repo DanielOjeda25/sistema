@@ -1,0 +1,20 @@
+@startuml
+skinparam dpi 200
+skinparam style strictuml
+actor "PM" as PROG
+boundary ":TareaController" as TC
+entity "t : Tarea" as T
+
+note over PROG : Clic en la tarjeta del tablero:\nel modal toma los datos de\ndata-tarea (JSON) y completa el formulario
+PROG -> TC : update(req : Request, t : Tarea)\n[PATCH /tareas/{id} - Accept: application/json]
+activate TC
+TC -> TC : validate(req) : array\n[titulo : string, descripcion : string,\nestado : string, prioridad : string,\nfecha_limite : date, proyecto_id : int,\nsprint_id : int|null, asignado_a : int,\nsolicitud_cambio_id : int|null]
+
+alt datos invalidos
+  TC --> PROG : 422 JSON {errors}
+else datos correctos
+  TC -> T : update(data : array) : bool\n[fill(data) + save()]
+  TC --> PROG : 200 JSON\nt->load(proyecto, asignado, sprint)\nel JS reemplaza la tarjeta en el tablero
+end
+deactivate TC
+@enduml

@@ -1,6 +1,28 @@
 <?php
 
+/*
+ |---------------------------------------------------------------
+ | CONTROLLER DE TAREAS
+ |---------------------------------------------------------------
+ | Atiende las dos caras del modulo:
+ |
+ | 1) VISTA LISTA (/tareas): index, show, create, edit, update y
+ |    destroy. El CRUD clasico con buscador, filtro por estado y
+ |    paginacion de 15.
+ |
+ | 2) TABLERO ESTILO TRELLO (/tareas/tablero): tablero() dibuja las
+ |    columnas (pendiente, en progreso, completada, cancelada) y
+ *    mover() guarda por AJAX el movimiento de las tarjetas: recibe
+ *    el estado y el orden final de cada columna y actualiza la base
+ *    sin recargar la pagina.
+ |
+ | Seguridad que aplica:
+ |   - visiblePara(): un Cliente solo ve las tareas de su empresa
+ |   - mover / crear / editar / eliminar: solo Jefe, PM y PO
+*/
+
 namespace App\Http\Controllers;
+
 
 use App\Models\Proyecto;
 use App\Models\SolicitudCambio;
@@ -12,31 +34,30 @@ use Illuminate\Http\Request;
 class TareaController extends Controller
 {
     public function index(Request $request)
-{
-    $tareas = Tarea::visiblePara($request->user())
-        ->with(['proyecto', 'asignado'])
-        ->when($request->filled('q'), function ($query) use ($request) {
-            $texto = $request->string('q')->trim()->toString();
+    {
+        $tareas = Tarea::visiblePara($request->user())
+            ->with(['proyecto', 'asignado'])
+            ->when($request->filled('q'), function ($query) use ($request) {
+                $texto = $request->string('q')->trim()->toString();
 
-            $query->where(function ($subquery) use ($texto) {
-                $subquery->where('titulo', 'like', "%{$texto}%")
-                    ->orWhere('descripcion', 'like', "%{$texto}%");
-            });
-        })
-        ->when($request->filled('estado'), fn ($query) =>
-            $query->where('estado', $request->string('estado')->toString())
-        )
-        ->latest()
-        ->paginate(15)
-        ->withQueryString();
+                $query->where(function ($subquery) use ($texto) {
+                    $subquery->where('titulo', 'like', "%{$texto}%")
+                        ->orWhere('descripcion', 'like', "%{$texto}%");
+                });
+            })
+            ->when($request->filled('estado'), fn ($query) => $query->where('estado', $request->string('estado')->toString())
+            )
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
 
-    $proyectos = Proyecto::orderBy('nombre')->get();
-    $usuarios = User::orderBy('name')->get();
-    $solicitudes = SolicitudCambio::orderBy('titulo')->get();
-    $sprints = Sprint::with('proyecto')->orderBy('proyecto_id')->orderBy('fecha_inicio')->get();
+        $proyectos = Proyecto::orderBy('nombre')->get();
+        $usuarios = User::orderBy('name')->get();
+        $solicitudes = SolicitudCambio::orderBy('titulo')->get();
+        $sprints = Sprint::with('proyecto')->orderBy('proyecto_id')->orderBy('fecha_inicio')->get();
 
-    return view('tareas.index', compact('tareas', 'proyectos', 'usuarios', 'solicitudes', 'sprints'));
-}
+        return view('tareas.index', compact('tareas', 'proyectos', 'usuarios', 'solicitudes', 'sprints'));
+    }
 
     public function tablero(Request $request)
     {
@@ -96,7 +117,10 @@ class TareaController extends Controller
         $data = $request->validate([
             'columnas' => ['required', 'array'],
             'columnas.*.estado' => ['required', 'in:pendiente,en_progreso,completada,cancelada'],
-            'columnas.*.ids' => ['required', 'array'],
+            // 'present' y no 'required': al mover la única tarjeta de una
+            // columna, la columna origen viaja con ids [] y required lo
+            // rechazaría con 422 aunque sea un movimiento válido.
+            'columnas.*.ids' => ['present', 'array'],
             'columnas.*.ids.*' => ['integer', 'exists:tareas,id'],
         ]);
 

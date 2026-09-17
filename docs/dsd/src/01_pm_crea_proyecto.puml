@@ -1,0 +1,29 @@
+@startuml
+skinparam dpi 200
+skinparam style strictuml
+actor "PM" as PM
+boundary ":ProyectoController" as PC
+entity ":Cliente" as CL
+entity ":User" as US
+entity "p : Proyecto" as PR
+
+PM -> PC : create()
+activate PC
+PC -> CL : orderBy('nombre')->get() : Collection<Cliente>
+PC -> US : orderBy('name')->get() : Collection<User>
+PC --> PM : view('proyectos.create', clientes, usuarios)
+deactivate PC
+
+PM -> PC : store(req : Request)
+activate PC
+PC -> PC : validate(req) : array\n[nombre : string, descripcion : string,\nfecha_inicio : date, fecha_fin_estimada : date,\nestado : string, cliente_id : int, pm_id : int]
+
+alt datos invalidos
+  PC --> PM : redirect back() con $errors
+else datos correctos
+  create PR
+  PC -> PR : create(data : array) : Proyecto
+  PC --> PM : redirect(desde_modal ? back() : proyectos.index)\ncon success : string "Proyecto creado correctamente."
+end
+deactivate PC
+@enduml

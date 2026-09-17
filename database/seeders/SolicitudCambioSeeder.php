@@ -11,10 +11,10 @@ class SolicitudCambioSeeder extends Seeder
 {
     public function run(): void
     {
-        $obraLR  = Proyecto::where('nombre', 'Sistema de obra L&R')->first();
-        $gestor  = Proyecto::where('nombre', 'Gestor de expedientes Gimenez')->first();
+        $obraLR = Proyecto::where('nombre', 'Sistema de obra L&R')->first();
+        $gestor = Proyecto::where('nombre', 'Gestor de expedientes Gimenez')->first();
         $cliente = User::where('email', 'cliente@example.com')->first();
-        $pm      = User::where('email', 'pm@example.com')->first();
+        $pm = User::where('email', 'pm@example.com')->first();
 
         $solicitudes = [
             [

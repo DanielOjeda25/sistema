@@ -4,10 +4,12 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Listado de Hitos
             </h2>
+            @hasanyrole('Jefe|PM|PO')
             <button type="button" data-abrir-modal="modal-hito-crear"
                     class="inline-flex items-center px-4 py-2 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63]">
                 + Nuevo Hito
             </button>
+            @endhasanyrole
         </div>
     </x-slot>
 
@@ -68,6 +70,12 @@
                                     <td class="px-6 py-4">{{ $hito->completado ? 'Completado' : 'Pendiente' }}</td>
                                     <td class="px-6 py-4 text-sm font-medium">
                                         <div class="flex items-center gap-3">
+                                            @hasanyrole('Jefe')
+                                                <a href="{{ route('auditoria.index', ['modelo' => 'App\Models\Hito', 'registro' => $hito->id]) }}"
+                                                   class="text-gray-400 hover:text-gray-700" title="Historial de cambios" aria-label="Historial">
+                                                    <x-heroicon-o-clock class="w-5 h-5" />
+                                                </a>
+                                            @endhasanyrole
                                             <a href="{{ route('hitos.show', $hito) }}" class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
                                                 <x-heroicon-o-eye class="w-5 h-5" />
                                             </a>
@@ -99,6 +107,7 @@
         </div>
     </div>
 
+    @hasanyrole('Jefe|PM|PO')
     <x-crud-modal id="modal-hito-crear" abrir-con-errores titulo="Nuevo Hito">
         <form method="POST" action="{{ route('hitos.store') }}" class="space-y-4">
             @csrf
@@ -110,7 +119,9 @@
             </div>
         </form>
     </x-crud-modal>
+    @endhasanyrole
 
+    @hasanyrole('Jefe|PM|PO')
     <x-crud-modal id="modal-hito-editar" titulo="Editar Hito">
         <form method="POST" action="{{ route('hitos.store') }}" class="space-y-4">
             @csrf
@@ -123,4 +134,5 @@
             </div>
         </form>
     </x-crud-modal>
+    @endhasanyrole
 </x-app-layout>

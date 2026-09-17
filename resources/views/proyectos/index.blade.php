@@ -71,6 +71,12 @@
                                     <td class="px-6 py-4">{{ $proyecto->fecha_inicio?->format('d/m/Y') ?? 'N/A' }}</td>
                                     <td class="px-6 py-4 text-sm font-medium">
                                         <div class="flex items-center gap-3">
+                                            @hasanyrole('Jefe')
+                                                <a href="{{ route('auditoria.index', ['modelo' => 'App\Models\Proyecto', 'registro' => $proyecto->id]) }}"
+                                                   class="text-gray-400 hover:text-gray-700" title="Historial de cambios" aria-label="Historial">
+                                                    <x-heroicon-o-clock class="w-5 h-5" />
+                                                </a>
+                                            @endhasanyrole
                                             <a href="{{ route('proyectos.show', $proyecto) }}" class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
                                                 <x-heroicon-o-eye class="w-5 h-5" />
                                             </a>
@@ -78,7 +84,7 @@
                                                 <x-heroicon-o-squares-2x2 class="w-5 h-5" />
                                             </a>
                                             @hasanyrole('Jefe|PM')
-                                                <button type="button" data-abrir-modal="modal-proyecto-crear"
+                                                <button type="button" data-abrir-modal="modal-proyecto-editar"
                                                         data-url="{{ route('proyectos.update', $proyecto) }}"
                                                         data-valores='@json($valoresProyecto)'
                                                         class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
@@ -107,6 +113,7 @@
         </div>
     </div>
 
+    @hasanyrole('Jefe|PM')
     <x-crud-modal id="modal-proyecto-crear" abrir-con-errores titulo="Nuevo Proyecto">
         <form method="POST" action="{{ route('proyectos.store') }}" class="space-y-4">
             @csrf
@@ -118,7 +125,9 @@
             </div>
         </form>
     </x-crud-modal>
+    @endhasanyrole
 
+    @hasanyrole('Jefe|PM')
     <x-crud-modal id="modal-proyecto-editar" titulo="Editar Proyecto">
         <form method="POST" action="{{ route('proyectos.store') }}" class="space-y-4">
             @csrf
@@ -131,4 +140,5 @@
             </div>
         </form>
     </x-crud-modal>
+    @endhasanyrole
 </x-app-layout>

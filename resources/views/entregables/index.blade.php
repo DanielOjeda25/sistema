@@ -63,6 +63,15 @@
                         <tbody class="bg-white divide-y divide-gray-200 text-gray-700">
                             @forelse ($entregables as $entregable)
                                 @php($valoresEntregable = $entregable->only(['titulo', 'contenido', 'tipo', 'estado', 'proyecto_id', 'generado_por']))
+                                @php($verEntregable = [
+                                    'titulo' => $entregable->titulo,
+                                    'contenido' => $entregable->contenido,
+                                    'tipo' => $entregable->tipo,
+                                    'estado' => $entregable->estado,
+                                    'proyecto' => $entregable->proyecto?->nombre,
+                                    'generador' => $entregable->generador?->name,
+                                    'fecha' => $entregable->generado_en?->format('d/m/Y'),
+                                ])
                                 <tr>
                                     <td class="px-6 py-4">{{ $entregable->titulo }}</td>
                                     <td class="px-6 py-4">{{ $entregable->proyecto?->nombre ?? 'N/A' }}</td>
@@ -71,11 +80,17 @@
                                     <td class="px-6 py-4">{{ $entregable->generador?->name ?? 'N/A' }}</td>
                                     <td class="px-6 py-4 text-sm font-medium">
                                         <div class="flex items-center gap-3">
-                                            <a href="{{ route('entregables.show', $entregable) }}" class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
+                                            @hasanyrole('Jefe')
+                                                <a href="{{ route('auditoria.index', ['modelo' => 'App\Models\EntregableIA', 'registro' => $entregable->id]) }}"
+                                                   class="text-gray-400 hover:text-gray-700" title="Historial de cambios" aria-label="Historial">
+                                                    <x-heroicon-o-clock class="w-5 h-5" />
+                                                </a>
+                                            @endhasanyrole
+                                            <button type="button" @click="ver = @js($verEntregable)" class="text-blue-600 hover:text-blue-800" title="Ver detalle" aria-label="Ver detalle">
                                                 <x-heroicon-o-eye class="w-5 h-5" />
-                                            </a>
+                                            </button>
                                             @hasanyrole('Jefe|PM|PO|Programador')
-                                                <button type="button" data-abrir-modal="modal-entregable-crear"
+                                                <button type="button" data-abrir-modal="modal-entregable-editar"
                                                         data-url="{{ route('entregables.update', $entregable) }}"
                                                         data-valores='@json($valoresEntregable)'
                                                         class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
@@ -104,6 +119,9 @@
         </div>
     </div>
 
+    <x-entregable-view-modal />
+
+    @hasanyrole('Jefe|PM|PO|Programador')
     <x-crud-modal id="modal-entregable-crear" abrir-con-errores titulo="Nuevo Entregable">
         <form method="POST" action="{{ route('entregables.store') }}" class="space-y-4">
             @csrf
@@ -115,7 +133,9 @@
             </div>
         </form>
     </x-crud-modal>
+    @endhasanyrole
 
+    @hasanyrole('Jefe|PM|PO|Programador')
     <x-crud-modal id="modal-entregable-editar" titulo="Editar Entregable">
         <form method="POST" action="{{ route('entregables.store') }}" class="space-y-4">
             @csrf
@@ -128,4 +148,5 @@
             </div>
         </form>
     </x-crud-modal>
+    @endhasanyrole
 </x-app-layout>

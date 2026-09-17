@@ -72,6 +72,12 @@
                                     <td class="px-6 py-4">{{ ucfirst($cliente->estado) }}</td>
                                     <td class="px-6 py-4 text-sm font-medium">
                                         <div class="flex items-center gap-3">
+                                            @hasanyrole('Jefe')
+                                                <a href="{{ route('auditoria.index', ['modelo' => 'App\Models\Cliente', 'registro' => $cliente->id]) }}"
+                                                   class="text-gray-400 hover:text-gray-700" title="Historial de cambios" aria-label="Historial">
+                                                    <x-heroicon-o-clock class="w-5 h-5" />
+                                                </a>
+                                            @endhasanyrole
                                             <a href="{{ route('clientes.show', $cliente) }}" class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
                                                 <x-heroicon-o-eye class="w-5 h-5" />
                                             </a>
@@ -106,6 +112,7 @@
     </div>
 
     @hasanyrole('Jefe|PM')
+        @hasanyrole('Jefe|PM')
         <x-crud-modal id="modal-cliente-crear" abrir-con-errores titulo="Nuevo Cliente">
             <form method="POST" action="{{ route('clientes.store') }}" class="space-y-4">
                 @csrf
@@ -117,7 +124,9 @@
                 </div>
             </form>
         </x-crud-modal>
+        @endhasanyrole
 
+        @hasanyrole('Jefe|PM')
         <x-crud-modal id="modal-cliente-editar" titulo="Editar Cliente">
             <form method="POST" action="{{ route('clientes.store') }}" class="space-y-4" data-crud-form>
                 @csrf
@@ -130,5 +139,6 @@
                 </div>
             </form>
         </x-crud-modal>
+        @endhasanyrole
     @endhasanyrole
 </x-app-layout>

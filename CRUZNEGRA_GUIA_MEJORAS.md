@@ -36,21 +36,21 @@ el código completo para copiar y pegar, y cómo comprobar que funciona.
 >   Jefe y PO).
 > - **Ya hay 48 tests** (`php artisan test`): TableroTareasTest,
 >   CorreccionesSeguridadTest, SprintSummaryEndpointTest, ProjectAIReportTest
->   + auth de Breeze. La sección 7 es para **ampliar** esa cobertura, no empezar
->     de cero.
+>     - auth de Breeze. La sección 7 es para **ampliar** esa cobertura, no empezar
+>       de cero.
 > - La paleta es **indigo** para acciones primarias (no azules sueltos).
 
 ## Índice — quién hace qué
 
-| Tarjeta en Trello                       | Responsable      | Backend                         | Frontend               |
-| --------------------------------------- | ---------------- | ------------------------------- | ---------------------- |
-| Visor de auditoría                     | **Marcos** | Controller + ruta (1.1)         | Vista + menú (1.2)    |
-| Dashboard de Cliente con métricas      | **Marcos** | Datos en dashboard (4.1)        | Barras de avance (4.2) |
-| Notificaciones de solicitudes de cambio | **Jesús** | Notification + controller (2.1) | Campanita (2.2)        |
-| Exportar facturas a PDF                 | **Jesús** | dompdf + plantilla (5.1)        | Botón (5.2)           |
-| Recordatorios de hitos por vencer       | **Dante**  | Query en dashboard (3.1)        | Tarjeta de hitos (3.2) |
-| Informe IA semanal automático          | **Lucas**  | Todo (sección 6)               | —                     |
-| Tests Feature de los módulos           | **Lucas**  | Todo (sección 7)               | —                     |
+| Tarjeta en Trello                       | Responsable | Backend                         | Frontend               |
+| --------------------------------------- | ----------- | ------------------------------- | ---------------------- |
+| Visor de auditoría                      | **Marcos**  | Controller + ruta (1.1)         | Vista + menú (1.2)     |
+| Dashboard de Cliente con métricas       | **Marcos**  | Datos en dashboard (4.1)        | Barras de avance (4.2) |
+| Notificaciones de solicitudes de cambio | **Jesús**   | Notification + controller (2.1) | Campanita (2.2)        |
+| Exportar facturas a PDF                 | **Jesús**   | dompdf + plantilla (5.1)        | Botón (5.2)            |
+| Recordatorios de hitos por vencer       | **Dante**   | Query en dashboard (3.1)        | Tarjeta de hitos (3.2) |
+| Informe IA semanal automático           | **Lucas**   | Todo (sección 6)                | —                      |
+| Tests Feature de los módulos            | **Lucas**   | Todo (sección 7)                | —                      |
 
 ---
 
@@ -229,7 +229,7 @@ justo **después** de la línea `SolicitudCambio::create($data);`, agregar:
         );
 ```
 
-*(Mejor aún: cambiar `SolicitudCambio::create($data)` por `$solicitud = SolicitudCambio::create($data);` y usar `$solicitud` en el aviso.)*
+_(Mejor aún: cambiar `SolicitudCambio::create($data)` por `$solicitud = SolicitudCambio::create($data);` y usar `$solicitud` en el aviso.)_
 
 **Ruta para marcar como leída** — en `routes/web.php`, dentro del grupo `auth` general:
 
@@ -411,7 +411,14 @@ la barra de avance.
 
 ### 5.1 BACKEND — Jesús
 
-Instalar la librería (una sola vez, en la raíz del proyecto):
+> **ACTUALIZACIÓN 15/09:** la librería **ya está instalada en main**
+> (commit con `composer require barryvdh/laravel-dompdf` v3.1). Tras hacer
+> `git pull` solo tenés que correr `composer install` para que aparezca en
+> tu `vendor/`. Si el error que ves es
+> `Class "Barryvdh\DomPDF\Facade\Pdf" not found`, es exactamente eso:
+> falta el `composer install`, no hay que cambiar código.
+
+Instalar la librería (ya hecho; solo si trabajás desde cero):
 
 ```bash
 composer require barryvdh/laravel-dompdf
@@ -431,12 +438,21 @@ adentro de la clase:
     }
 ```
 
-**Archivo: `routes/web.php`** — dentro del grupo que ya tiene el resource de
-facturas, agregar:
+**Archivo: `routes/web.php`** — **no** va dentro del grupo de escritura de
+facturas: descargar el PDF es una acción de lectura (el Cliente también tiene
+que poder bajar su factura). Agregala en el grupo de **lectura** (el mismo que
+tiene `facturas index/show`):
 
 ```php
     Route::get('/facturas/{factura}/pdf', [FacturaController::class, 'descargarPdf'])
         ->name('facturas.pdf');
+```
+
+Y en el método `descargarPdf` del controller, validá visibilidad igual que en
+`show` (el modelo Factura tiene `proyecto_id`, así que `puedeVer` funciona):
+
+```php
+        abort_unless($request->user()->puedeVer($factura), 403);
 ```
 
 **Archivo: `resources/views/facturas/pdf.blade.php`** (crear — es la plantilla del PDF)
@@ -469,6 +485,10 @@ facturas, agregar:
 </body>
 </html>
 ```
+
+> **Verificado contra el código (15/09):** la relación `emisor()` existe en el
+> modelo Factura y `fecha_emision`/`fecha_vencimiento` están casteadas como
+> date, así que el método y la plantilla de arriba funcionan tal cual.
 
 ### 5.2 FRONTEND — Jesús
 
@@ -650,15 +670,51 @@ Solicitudes, Entregables y Facturas.
 
 ---
 
+## 8) TESTEO IA ENTREGABLES — Solo Marcos (prueba manual)
+
+> **Agregada el 14/09.** Esta tarjeta no genera código: es recorrer el flujo de
+> informes IA de proyectos y anotar todo lo que falle. Hoy el generador activo es
+> el `FakeProjectReportGenerator` (`.env`: `AI_PROVIDER=fake`), así que el
+> contenido es de prueba — lo que se testea es el **flujo**, no el texto.
+
+### Preparación
+
+1. Laragon con MySQL (`Start All`), `php artisan serve` y `php migrate:fresh --seed`
+   si hace falta tener datos.
+2. Usuarios: `jefe@`, `pm@`, `dev@example.com` (password `1234` para todos) y
+   `cliente@example.com` para ver el lado Cliente.
+
+### Recorrido de prueba
+
+| #   | Qué probar                                                                  | Con quién              | Esperado                                                                       |
+| --- | --------------------------------------------------------------------------- | ---------------------- | ------------------------------------------------------------------------------ |
+| 1   | En un**proyecto con tareas y actualizaciones**, botón de generar informe IA | Jefe o PM              | Se crea un entregable en estado**borrador**, sin publicar                      |
+| 2   | El informe aparece en**Entregables** con su tipo/origen IA                  | mismo                  | Visible para el equipo, NO para el Cliente                                     |
+| 3   | Botón**Publicar** (publish)                                                 | Jefe/PM/PO             | Pasa a publicado y**el Cliente ya lo ve** en entregables                       |
+| 4   | Botón**Retirar** (unpublish)                                                | Jefe/PM/PO             | Vuelve a borrador; el Cliente deja de verlo                                    |
+| 5   | Intentar generar/publicar como**Programador**                               | `dev@example.com`      | Generar sí (sube el material), publicar/retirar →**403**                       |
+| 6   | Intentar ver un informe**no publicado** como **Cliente**                    | `cliente@example.com`  | No aparece en su listado; por URL directa →**403**                             |
+| 7   | Cliente de**otra empresa**: no ve informes de proyectos ajenos              | `cliente@example.com`  | Scoping por`visiblePara` respetado                                             |
+| 8   | **Resumen IA de sprint** (botón de chispas en `/sprints`)                   | Jefe/PM/PO/Programador | Genera resumen con OpenRouter; Regenerar lo re-hace; el Cliente no ve el botón |
+| 9   | Sin configurar OpenRouter (clave vacía en`.env`) + Regenerar                | Jefe                   | Modal con mensaje de error claro,**no** rompe la página                        |
+
+### Reporte
+
+Anotá número de paso, qué hiciste, qué esperabas y qué pasó (captura si es
+visual). Lo que falle va como comentario en la tarjeta de Trello; si está todo
+bien, la tarjeta pasa a DONE con el checklist marcado.
+
+---
+
 ## Si algo sale mal
 
-| Problema                                                       | Solución                                                                                                         |
-| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `Class "App\Http\Controllers\AuditoriaController" not found` | Falta el`use` arriba de `routes/web.php` o corre `php artisan optimize:clear`                               |
-| La campanita no aparece                                        | Revisá que el bloque esté dentro del`<nav>` de `navigation.blade.php`, donde el usuario ya está logueado   |
-| El PDF sale en blanco                                          | Corre`php artisan vendor:publish --provider="Barryvdh\DomPDF\ServiceProvider"` y `php artisan optimize:clear` |
-| Las notificaciones no se guardan                               | Corre`php artisan migrate` (la tabla `notifications` tiene que existir)                                       |
-| El comando del informe no envía nada                          | Tiene que existir al menos un`Sprint` con `estado = activo` y un usuario con rol `Jefe`                     |
+| Problema                                                     | Solución                                                                                                      |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| `Class "App\Http\Controllers\AuditoriaController" not found` | Falta el`use` arriba de `routes/web.php` o corre `php artisan optimize:clear`                                 |
+| La campanita no aparece                                      | Revisá que el bloque esté dentro del`<nav>` de `navigation.blade.php`, donde el usuario ya está logueado      |
+| El PDF sale en blanco                                        | Corre`php artisan vendor:publish --provider="Barryvdh\DomPDF\ServiceProvider"` y `php artisan optimize:clear` |
+| Las notificaciones no se guardan                             | Corre`php artisan migrate` (la tabla `notifications` tiene que existir)                                       |
+| El comando del informe no envía nada                         | Tiene que existir al menos un`Sprint` con `estado = activo` y un usuario con rol `Jefe`                       |
 
 ---
 

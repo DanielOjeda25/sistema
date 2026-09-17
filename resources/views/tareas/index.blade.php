@@ -73,6 +73,12 @@
                                     <td class="px-6 py-4">{{ $tarea->fecha_limite?->format('d/m/Y') ?? 'N/A' }}</td>
                                     <td class="px-6 py-4 text-sm font-medium">
                                         <div class="flex items-center gap-3">
+                                            @hasanyrole('Jefe')
+                                                <a href="{{ route('auditoria.index', ['modelo' => 'App\Models\Tarea', 'registro' => $tarea->id]) }}"
+                                                   class="text-gray-400 hover:text-gray-700" title="Historial de cambios" aria-label="Historial">
+                                                    <x-heroicon-o-clock class="w-5 h-5" />
+                                                </a>
+                                            @endhasanyrole
                                             <a href="{{ route('tareas.show', $tarea) }}" class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
                                                 <x-heroicon-o-eye class="w-5 h-5" />
                                             </a>
@@ -102,6 +108,7 @@
             </div>
         </div>
     </div>
+    @hasanyrole('Jefe|PM|PO')
     <x-crud-modal id="modal-tarea-crear" abrir-con-errores titulo="Nueva Tarea">
         <form method="POST" action="{{ route('tareas.store') }}" class="space-y-4">
             @csrf
@@ -113,7 +120,9 @@
             </div>
         </form>
     </x-crud-modal>
+    @endhasanyrole
 
+    @hasanyrole('Jefe|PM|PO')
     <x-crud-modal id="modal-tarea-editar" titulo="Editar Tarea">
         <form method="POST" action="{{ route('tareas.store') }}" class="space-y-4" data-crud-form>
             @csrf
@@ -126,4 +135,5 @@
             </div>
         </form>
     </x-crud-modal>
+    @endhasanyrole
 </x-app-layout>

@@ -13,7 +13,7 @@ class EntregableIASeeder extends Seeder
     {
         $obraLR = Proyecto::where('nombre', 'Sistema de obra L&R')->first();
         $gestor = Proyecto::where('nombre', 'Gestor de expedientes Gimenez')->first();
-        $po     = User::where('email', 'po@example.com')->first();
+        $po = User::where('email', 'po@example.com')->first();
 
         $entregables = [
             [

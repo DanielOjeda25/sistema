@@ -1,5 +1,6 @@
 <x-app-layout>
     @php
+        /** @var \App\Models\User $usuario */
         $usuario = Auth::user();
         $rol = $usuario->getRoleNames()->first() ?? 'Usuario';
         $nombre = Str::of($usuario->name)->before(' ');
@@ -17,15 +18,27 @@
                     <a href="{{ route('dashboard') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-[#00e5a0] bg-white/10 px-3 py-2.5 text-sm font-semibold text-white">
                         <x-heroicon-o-home class="h-5 w-5 shrink-0" /> Dashboard
                     </a>
+                    @role('Jefe')
+                    <a href="{{ route('users.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('users.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">
+                        <x-heroicon-o-users class="h-5 w-5 shrink-0" /> Usuarios y roles
+                    </a>
+                    <a href="{{ route('auditoria.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('auditoria.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">
+                        <x-heroicon-o-clock class="h-5 w-5 shrink-0" /> Auditoría
+                    </a>
+                    @endrole
                     <a href="{{ route('proyectos.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('proyectos.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">
-                        <x-heroicon-o-squares-2x2 class="h-5 w-5 shrink-0" /> Proyectos
-                    </a>eliminación o cración de clientra 
+                        <x-heroicon-o-squares-2x2 class="h-5 w-5 shrink-0" /> {{ $usuario->esCliente() ? 'Mis proyectos' : 'Proyectos' }}
+                    </a>
+                    @unless ($usuario->esCliente())
                     <a href="{{ route('tareas.tablero') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('tareas.tablero') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">
                         <x-heroicon-o-check-circle class="h-5 w-5 shrink-0" /> Mi trabajo
                     </a>
+                    @endunless
+                    @unless ($usuario->esCliente())
                     <a href="{{ route('tareas.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('tareas.*') && ! request()->routeIs('tareas.tablero') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">
                         <x-heroicon-o-queue-list class="h-5 w-5 shrink-0" /> Tareas
                     </a>
+                    @endunless
                     <a href="{{ route('facturas.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('facturas.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">
                         <x-heroicon-o-banknotes class="h-5 w-5 shrink-0" /> Facturas
                     </a>
@@ -33,8 +46,15 @@
 
                 <p class="mt-8 px-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Módulos</p>
                 <nav class="mt-2 space-y-1">
+                    @unless ($usuario->esCliente())
                     <a href="{{ route('sprints.index') }}" class="block rounded-lg border-l-4 border-transparent px-3 py-2 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('sprints.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">Sprints</a>
+                    @endunless
+                    @unless ($usuario->esCliente())
                     <a href="{{ route('hitos.index') }}" class="block rounded-lg border-l-4 border-transparent px-3 py-2 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('hitos.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">Hitos</a>
+                    @unless ($usuario->esCliente())
+                    <a href="{{ route('solicitudes-cambio.index') }}" class="block rounded-lg border-l-4 border-transparent px-3 py-2 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('solicitudes-cambio.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">Cambios</a>
+                    @endunless
+                    @endunless
                     <a href="{{ route('entregables.index') }}" class="block rounded-lg border-l-4 border-transparent px-3 py-2 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('entregables.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">Entregables</a>
                 </nav>
 
@@ -76,11 +96,27 @@
                             <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
                                 <div>
                                     <p class="text-xs font-medium text-slate-400">Resumen general</p>
-                                    <p class="mt-1 text-3xl font-bold text-slate-900">{{ $totalProyectos + $tareasPendientes + $totalHitos }}</p>
-                                    <p class="text-xs text-slate-500">elementos registrados para seguimiento</p>
+                                    <p class="mt-1 text-3xl font-bold text-slate-900">
+                                        @if ($usuario->esCliente())
+                                            {{ $totalProyectos + $totalHitos + $totalEntregables }}
+                                        @else
+                                            {{ $totalProyectos + $tareasPendientes + $totalHitos }}
+                                        @endif
+                                    </p>
+                                    <p class="text-xs text-slate-500">
+                                        @if ($usuario->esCliente())
+                                            proyectos, hitos y material para vos
+                                        @else
+                                            elementos registrados para seguimiento
+                                        @endif
+                                    </p>
                                 </div>
                                 <div class="flex gap-2">
+                                    @if ($usuario->esCliente())
+                                    <a href="{{ route('entregables.index') }}" class="rounded-lg bg-[#00b87d] px-3 py-2 text-xs font-semibold text-white hover:bg-[#008c63]">Ver entregables</a>
+                                    @else
                                     <a href="{{ route('tareas.tablero') }}" class="rounded-lg bg-[#00b87d] px-3 py-2 text-xs font-semibold text-white hover:bg-[#008c63]">Abrir tablero</a>
+                                    @endif
                                     <a href="{{ route('proyectos.index') }}" class="rounded-lg border border-[#d7eee6] px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-[#f0fff9]">Ver proyectos</a>
                                 </div>
                             </div>
@@ -90,16 +126,24 @@
                                 <div class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-[#00d99a]"></span><span><span class="block text-sm font-medium text-slate-700">Proyectos</span><span class="block text-xs text-slate-400">{{ $totalProyectos }} registrados</span></span></div>
                                 <span class="text-sm font-semibold text-slate-700">{{ $totalProyectos }}</span>
                             </a>
+                            @unless ($usuario->esCliente())
                             <a href="{{ route('tareas.index', ['estado' => 'pendiente']) }}" class="flex items-center justify-between px-4 py-3 hover:bg-[#f0fff9]">
                                 <div class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span><span><span class="block text-sm font-medium text-slate-700">Tareas pendientes</span><span class="block text-xs text-slate-400">Requieren seguimiento</span></span></div>
                                 <span class="text-sm font-semibold text-slate-700">{{ $tareasPendientes }}</span>
                             </a>
+                            @endunless
+                            @if ($usuario->esCliente())
+                            <a href="{{ route('facturas.index') }}" class="flex items-center justify-between px-4 py-3 hover:bg-[#f0fff9]">
+                                <div class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span><span><span class="block text-sm font-medium text-slate-700">Facturas pendientes de pago</span><span class="block text-xs text-slate-400">Tenés {{ $facturasPendientes }} en curso</span></span></div>
+                                <span class="text-sm font-semibold text-slate-700">{{ $facturasPendientes }}</span>
+                            </a>
+                            @endif
                             <a href="{{ route('hitos.index') }}" class="flex items-center justify-between px-4 py-3 hover:bg-[#f0fff9]">
                                 <div class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span><span><span class="block text-sm font-medium text-slate-700">Hitos</span><span class="block text-xs text-slate-400">Puntos de control</span></span></div>
                                 <span class="text-sm font-semibold text-slate-700">{{ $totalHitos }}</span>
                             </a>
                             <a href="{{ route('entregables.index') }}" class="flex items-center justify-between px-4 py-3 hover:bg-[#f0fff9]">
-                                <div class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-sky-500"></span><span><span class="block text-sm font-medium text-slate-700">Entregables</span><span class="block text-xs text-slate-400">Material del proyecto</span></span></div>
+                                <div class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-sky-500"></span><span><span class="block text-sm font-medium text-slate-700">Entregables</span><span class="block text-xs text-slate-400">{{ $usuario->esCliente() ? 'Material aprobado para vos' : 'Material del proyecto' }}</span></span></div>
                                 <span class="text-sm font-semibold text-slate-700">{{ $totalEntregables }}</span>
                             </a>
                             </div>
@@ -110,16 +154,24 @@
                                 <div class="rounded-xl border border-[#d7eee6] bg-white p-5 shadow-sm">
                                     <div class="flex items-center justify-between"><div><h2 class="font-semibold text-slate-800">Estado de proyectos</h2><p class="mt-1 text-xs text-slate-400">Distribución actual</p></div><a href="{{ route('proyectos.index') }}" class="text-xs font-semibold text-[#009d70]">Ver todo</a></div>
                                     <div class="mt-4 divide-y divide-slate-100 rounded-lg border border-slate-100">
+                                        @php($maxProyectos = max($proyectosPorEstado) ?: 1)
                                         @foreach (['pendiente' => ['Pendientes', 'bg-slate-100 text-slate-700'], 'en_progreso' => ['En progreso', 'bg-blue-50 text-blue-700'], 'completado' => ['Completados', 'bg-emerald-50 text-emerald-700'], 'cancelado' => ['Cancelados', 'bg-rose-50 text-rose-700']] as $estado => [$label, $style])
-                                            <a href="{{ route('proyectos.index', ['estado' => $estado]) }}" class="flex items-center justify-between px-4 py-3 hover:bg-[#f0fff9]"><span class="text-sm text-slate-700">{{ $label }}</span><span class="{{ $style }} rounded-md px-2 py-1 text-xs font-bold">{{ $proyectosPorEstado[$estado] }}</span></a>
+                                            <a href="{{ route('proyectos.index', ['estado' => $estado]) }}" class="block px-4 py-2.5 hover:bg-[#f0fff9]">
+                                                <div class="flex items-center justify-between"><span class="text-sm text-slate-700">{{ $label }}</span><span class="{{ $style }} rounded-md px-2 py-0.5 text-xs font-bold">{{ $proyectosPorEstado[$estado] }}</span></div>
+                                                <div class="mt-1.5 h-1.5 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-[#00b87d] rounded-full animar-alto" style="width: {{ round($proyectosPorEstado[$estado] / $maxProyectos * 100) }}%"></div></div>
+                                            </a>
                                         @endforeach
                                     </div>
                                 </div>
                                 <div class="rounded-xl border border-[#d7eee6] bg-white p-5 shadow-sm">
                                     <div class="flex items-center justify-between"><div><h2 class="font-semibold text-slate-800">Estado de tareas</h2><p class="mt-1 text-xs text-slate-400">Rendimiento del equipo</p></div><a href="{{ route('tareas.index') }}" class="text-xs font-semibold text-[#009d70]">Ver todo</a></div>
                                     <div class="mt-4 divide-y divide-slate-100 rounded-lg border border-slate-100">
+                                        @php($maxTareas = max($tareasPorEstado) ?: 1)
                                         @foreach (['pendiente' => ['Pendientes', 'bg-slate-100 text-slate-700'], 'en_progreso' => ['En progreso', 'bg-blue-50 text-blue-700'], 'completada' => ['Completadas', 'bg-emerald-50 text-emerald-700'], 'cancelada' => ['Canceladas', 'bg-rose-50 text-rose-700']] as $estado => [$label, $style])
-                                            <a href="{{ route('tareas.index', ['estado' => $estado]) }}" class="flex items-center justify-between px-4 py-3 hover:bg-[#f0fff9]"><span class="text-sm text-slate-700">{{ $label }}</span><span class="{{ $style }} rounded-md px-2 py-1 text-xs font-bold">{{ $tareasPorEstado[$estado] }}</span></a>
+                                            <a href="{{ route('tareas.index', ['estado' => $estado]) }}" class="block px-4 py-2.5 hover:bg-[#f0fff9]">
+                                                <div class="flex items-center justify-between"><span class="text-sm text-slate-700">{{ $label }}</span><span class="{{ $style }} rounded-md px-2 py-0.5 text-xs font-bold">{{ $tareasPorEstado[$estado] }}</span></div>
+                                                <div class="mt-1.5 h-1.5 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-indigo-400 rounded-full animar-alto" style="width: {{ round($tareasPorEstado[$estado] / $maxTareas * 100) }}%"></div></div>
+                                            </a>
                                         @endforeach
                                     </div>
                                 </div>
@@ -128,7 +180,26 @@
                                     <a href="{{ route('facturas.index') }}" class="flex items-center justify-between px-5 py-4 transition hover:bg-[#f0fff9]"><span><span class="block text-sm font-medium text-slate-700">Pendiente de cobro</span><span class="block text-xs text-slate-400">Facturas pendientes y vencidas</span></span><span class="text-lg font-bold text-[#d97706]">$ {{ number_format($totalPendienteCobro, 2, ',', '.') }}</span></a>
                                     <a href="{{ route('tareas.index', ['estado' => 'pendiente']) }}" class="flex items-center justify-between px-5 py-4 transition hover:bg-[#f0fff9]"><span><span class="block text-sm font-medium text-slate-700">Tareas vencidas</span><span class="block text-xs text-slate-400">Requieren atención</span></span><span class="text-lg font-bold text-[#dc2626]">{{ $tareasVencidas }}</span></a>
                                 </div>
+
+                                <div class="rounded-xl border border-[#d7eee6] bg-white p-5 shadow-sm xl:col-span-2">
+                                    <div class="flex items-center justify-between"><h2 class="font-semibold text-slate-800">Facturación por mes</h2><p class="text-xs text-slate-400">Últimos 6 meses</p></div>
+                                    @php($maxMes = max($facturacionPorMes->pluck('total')->max(), 1))
+                                    <div class="mt-4 flex items-end gap-3 h-36">
+                                        @foreach ($facturacionPorMes as $m)
+                                            <div class="flex flex-1 flex-col items-center justify-end h-full">
+                                                <span class="text-[10px] text-slate-500 mb-1">{{ $m['total'] > 0 ? '$ ' . number_format($m['total'] / 1000, 0) . 'k' : '—' }}</span>
+                                                <div class="w-full bg-[#00b87d] rounded-t-md animar-alto" style="height: {{ max(3, round($m['total'] / $maxMes * 100)) }}%"></div>
+                                                <span class="text-[10px] text-slate-400 mt-1">{{ $m['mes'] }}</span>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
                             </section>
+
+                            <style>
+                                @keyframes crecerAlto { from { height: 3%; } }
+                                .animar-alto { animation: crecerAlto 1s ease-out; }
+                            </style>
                         @endif
 
 @if (isset($hitosProximos) && $hitosProximos->isNotEmpty())

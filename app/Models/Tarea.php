@@ -1,6 +1,28 @@
 <?php
 
+/*
+ |---------------------------------------------------------------
+ | MODELO TAREA (tabla "tareas")
+ |---------------------------------------------------------------
+ | Es el ejemplo de tabla CON relaciones: una tarea no existe sola,
+ | siempre apunta a otras tablas mediante claves foraneas:
+ |
+ |   proyecto_id         -> a que proyecto pertenece  (belongsTo Proyecto)
+ |   asignado_a          -> quien la trabaja          (belongsTo User)
+ |   sprint_id           -> en que etapa/sprint esta  (belongsTo Sprint)
+ |   solicitud_cambio_id -> si nacio de un pedido del cliente (opcional)
+ |
+ | Relaciones POO:
+ |   $tarea->proyecto, $tarea->asignado, $tarea->sprint,
+ |   $tarea->solicitudCambio   (belongsTo)
+ |   Proyecto::tareas() es el lado inverso (hasMany)
+ |
+ | Ademas: scope visiblePara (un Cliente solo ve las tareas de su
+ | empresa) y auditoria automatica de cada cambio.
+*/
+
 namespace App\Models;
+
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

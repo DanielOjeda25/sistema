@@ -1,0 +1,23 @@
+@startuml
+skinparam dpi 200
+skinparam style strictuml
+actor "Programador" as PROG
+boundary ":TareaController" as TC
+entity "t : Tarea" as T
+
+PROG -> TC : index(req : Request)
+activate TC
+TC -> TC : Tarea::visiblePara(usuario : User)\nfiltra por cliente_id si el usuario tiene rol Cliente
+TC -> TC : when(q : string)\nbusca por titulo o descripcion (like)
+TC -> TC : when(estado : string)\nfiltro por estado
+TC -> TC : with(['proyecto','asignado'])->latest()\n->paginate(15) : LengthAwarePaginator<Tarea>
+TC --> PROG : view('tareas.index', tareas)
+deactivate TC
+
+PROG -> TC : show(t : Tarea)\n[Route Model Binding]
+activate TC
+TC -> TC : abort_unless(usuario->puedeVer(t), 403)
+TC -> T : load(proyecto : Proyecto,\nasignado : User, solicitudCambio : SolicitudCambio)
+TC --> PROG : view('tareas.show', t : Tarea)
+deactivate TC
+@enduml

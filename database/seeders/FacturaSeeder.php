@@ -14,7 +14,7 @@ class FacturaSeeder extends Seeder
         $obraLR = Proyecto::where('nombre', 'Sistema de obra L&R')->first();
         $gestor = Proyecto::where('nombre', 'Gestor de expedientes Gimenez')->first();
         $portal = Proyecto::where('nombre', 'Portal del socio — Cooperativa Union')->first();
-        $jefe   = User::where('email', 'jefe@example.com')->first();
+        $jefe = User::where('email', 'jefe@example.com')->first();
 
         $facturas = [
             [

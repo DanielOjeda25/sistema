@@ -5,35 +5,35 @@ namespace App\Http\Controllers;
 use App\Models\Proyecto;
 use App\Models\SolicitudCambio;
 use App\Models\User;
+use App\Notifications\SolicitudCambioCreada;
 use Illuminate\Http\Request;
 
 class SolicitudCambioController extends Controller
 {
     public function index(Request $request)
-{
-    $solicitudes = SolicitudCambio::visiblePara($request->user())
-        ->with(['proyecto', 'solicitante'])
-        ->when($request->filled('q'), function ($query) use ($request) {
-            $texto = $request->string('q')->trim()->toString();
+    {
+        $solicitudes = SolicitudCambio::visiblePara($request->user())
+            ->with(['proyecto', 'solicitante'])
+            ->when($request->filled('q'), function ($query) use ($request) {
+                $texto = $request->string('q')->trim()->toString();
 
-            $query->where(function ($subquery) use ($texto) {
-                $subquery->where('titulo', 'like', "%{$texto}%")
-                    ->orWhere('descripcion', 'like', "%{$texto}%");
-            });
-        })
-        ->when($request->filled('estado'), fn ($query) =>
-            $query->where('estado', $request->string('estado')->toString())
-        )
-        ->latest()
-        ->paginate(15)
-        ->withQueryString();
+                $query->where(function ($subquery) use ($texto) {
+                    $subquery->where('titulo', 'like', "%{$texto}%")
+                        ->orWhere('descripcion', 'like', "%{$texto}%");
+                });
+            })
+            ->when($request->filled('estado'), fn ($query) => $query->where('estado', $request->string('estado')->toString())
+            )
+            ->latest()
+            ->paginate(15)
+            ->withQueryString();
 
-    // Listas para los modales de crear/editar del listado.
-    $proyectos = Proyecto::orderBy('nombre')->get();
-    $usuarios = User::orderBy('name')->get();
+        // Listas para los modales de crear/editar del listado.
+        $proyectos = Proyecto::orderBy('nombre')->get();
+        $usuarios = User::orderBy('name')->get();
 
-    return view('solicitudes_cambio.index', compact('solicitudes', 'proyectos', 'usuarios'));
-}
+        return view('solicitudes_cambio.index', compact('solicitudes', 'proyectos', 'usuarios'));
+    }
 
     public function create()
     {
@@ -54,7 +54,13 @@ class SolicitudCambioController extends Controller
             'solicitado_por' => 'required|exists:users,id',
         ]);
 
-        SolicitudCambio::create($data);
+        // Se guarda el registro directamente en la variable $solicitud
+        $solicitud = SolicitudCambio::create($data);
+
+        // Avisar al Jefe y a los PM de la nueva solicitud utilizando la variable $solicitud recién creada
+        User::role(['Jefe', 'PM'])->get()->each(
+            fn (User $usuario) => $usuario->notify(new SolicitudCambioCreada($solicitud))
+        );
 
         return ($request->input('desde_modal') ? redirect()->back() : redirect()->route('solicitudes-cambio.index'))->with('success', 'Solicitud de cambio creada correctamente.');
     }
