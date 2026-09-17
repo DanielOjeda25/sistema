@@ -67,7 +67,7 @@
                         <span>{{ $progreso['porcentaje'] }}%</span>
                     </div>
                     <div class="w-full bg-gray-200 rounded-full h-3">
-                        <div class="bg-indigo-600 h-3 rounded-full"
+                        <div class="bg-[#00b87d] h-3 rounded-full"
                              style="width: {{ $progreso['porcentaje'] }}%"></div>
                     </div>
                     <p class="mt-2 text-xs text-gray-500">{{ $progreso['criterio'] }}</p>

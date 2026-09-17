@@ -6,13 +6,13 @@
     <div class="py-12 max-w-7xl mx-auto sm:px-6 lg:px-8">
         <form method="GET" class="mb-4 flex flex-wrap items-end gap-2">
             <div>
-                <x-input-label for="q" value="Buscar" />
+                <label for="q" class="block text-xs font-medium text-gray-500 uppercase mb-1">Buscar</label>
                 <input type="text" id="q" name="q" value="{{ request('q') }}" placeholder="Evento o modelo..."
-                       class="border-gray-300 rounded-md w-56">
+                       class="border-gray-300 rounded-lg w-56 focus:border-[#00b87d] focus:ring-[#00b87d]">
             </div>
             <div>
-                <x-input-label for="usuario" value="Usuario" />
-                <select id="usuario" name="usuario" class="border-gray-300 rounded-md">
+                <label for="usuario" class="block text-xs font-medium text-gray-500 uppercase mb-1">Usuario</label>
+                <select id="usuario" name="usuario" class="border-gray-300 rounded-lg focus:border-[#00b87d] focus:ring-[#00b87d]">
                     <option value="">Todos</option>
                     @foreach ($usuarios as $u)
                         <option value="{{ $u->id }}" @selected(request('usuario') == $u->id)>{{ $u->name }}</option>
@@ -20,8 +20,8 @@
                 </select>
             </div>
             <div>
-                <x-input-label for="accion" value="Acción" />
-                <select id="accion" name="accion" class="border-gray-300 rounded-md">
+                <label for="accion" class="block text-xs font-medium text-gray-500 uppercase mb-1">Acción</label>
+                <select id="accion" name="accion" class="border-gray-300 rounded-lg focus:border-[#00b87d] focus:ring-[#00b87d]">
                     <option value="">Todas</option>
                     @foreach (['created' => 'Creación', 'updated' => 'Modificación', 'deleted' => 'Eliminación'] as $valor => $etiqueta)
                         <option value="{{ $valor }}" @selected(request('accion') == $valor)>{{ $etiqueta }}</option>
@@ -33,8 +33,13 @@
                 <input type="hidden" name="registro" value="{{ request('registro') }}">
                 <span class="text-xs text-gray-500 pb-2">Historial de {{ class_basename(request('modelo')) }} #{{ request('registro') }}</span>
             @endif
-            <button class="px-4 py-2.5 bg-indigo-600 text-white rounded-md">Filtrar</button>
-            <a href="{{ route('auditoria.index') }}" class="text-xs text-gray-500 hover:underline pb-2">Limpiar</a>
+            <button class="px-4 py-2.5 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63] inline-flex items-center gap-1.5">
+                <x-heroicon-o-magnifying-glass class="w-4 h-4" />
+                Filtrar
+            </button>
+            @if (request()->filled('q') || request()->filled('usuario') || request()->filled('accion'))
+                <a href="{{ route('auditoria.index') }}" class="text-xs text-gray-500 hover:underline pb-2">Limpiar</a>
+            @endif
         </form>
 
         <div class="bg-white rounded-lg shadow overflow-x-auto">

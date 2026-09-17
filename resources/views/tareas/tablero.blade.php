@@ -150,7 +150,7 @@
                                     @endif
                                     <div class="flex items-center justify-between gap-2">
                                         <button type="submit"
-                                                class="px-3 py-1.5 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+                                                class="px-3 py-1.5 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63]">
                                             Añadir
                                         </button>
                                         <button type="button" data-alternar-agregar
