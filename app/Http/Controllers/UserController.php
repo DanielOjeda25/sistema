@@ -10,6 +10,15 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Spatie\Permission\Models\Role;
 
+/**
+ * Gestion de Usuarios del sistema (solo accesible para el rol Jefe).
+ *
+ * Todo el flujo ocurre sobre el listado /usuarios con modales: alta con
+ * contrasena provisional (la persona la cambia despues desde su perfil),
+ * edicion, baja y cambio de rol. Un usuario tiene UN solo rol; si el rol es
+ * Cliente, la cuenta queda atada a una empresa (tabla clientes) y ese vinculo
+ * es lo que define que proyectos, tareas y facturas podra ver.
+ */
 class UserController extends Controller
 {
     // Guardar el rol elegido (uno solo) desde el modal de la lista

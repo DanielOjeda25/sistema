@@ -510,7 +510,18 @@ el botón:
 
 ---
 
-## 6) INFORME IA SEMANAL AUTOMÁTICO — Solo Lucas
+## 6) INFORME IA SEMANAL AUTOMÁTICO — ✅ HECHA (16/09, Daniel)
+
+> **Implementada.** Comando `informes:resumen-sprint-semanal` en
+> `app/Console/Commands/EnviarResumenSprintSemanal.php`, programado los lunes
+> 08:00 en `routes/console.php`. Envía el Mailable `ResumenSprintSemanal` al
+> Jefe por cada sprint activo; si la IA falla, igual avisa por mail. Cubierto
+> por `tests/Feature/InformeSemanalTest.php` (3 casos). Con `MAIL_MAILER=log`
+> los mails quedan en `storage/logs/laravel.log`.
+
+La especificación original queda abajo como referencia:
+
+--- Solo Lucas
 
 El endpoint `POST /sprints/{sprint}/resumen-ia` y el `SprintSummaryService` ya
 existen. Solo falta el comando programado y el email.
@@ -588,7 +599,17 @@ el log.
 
 ---
 
-## 7) TESTS FEATURE DE LOS MÓDULOS — Solo Lucas
+## 7) TESTS FEATURE DE LOS MÓDULOS — ✅ HECHA (16/09, Daniel)
+
+> **Cubierta.** La suite quedó en 78 tests / 296 assertions:
+> `CrudModulosTest` (ciclos CRUD completos por módulo, incluidos usuarios),
+> `CorreccionesSeguridadTest` (permisos y validaciones), `ClienteExperienciaTest`
+> (scope del Cliente), `HitosNotificacionesTest`, `ModulosTest` (listados y
+> permisos de lectura por rol + scoping por empresa) e `InformeSemanalTest`.
+
+La especificación original queda abajo como referencia:
+
+--- Solo Lucas
 
 > **Actualizado:** ya existen 48 tests (ver banner de arriba). Esta tarjeta ahora
 > es para **completar la cobertura que falta**: no hay tests de los CRUD de

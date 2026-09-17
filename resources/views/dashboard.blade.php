@@ -48,12 +48,8 @@
                 <nav class="mt-2 space-y-1">
                     @unless ($usuario->esCliente())
                     <a href="{{ route('sprints.index') }}" class="block rounded-lg border-l-4 border-transparent px-3 py-2 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('sprints.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">Sprints</a>
-                    @endunless
-                    @unless ($usuario->esCliente())
                     <a href="{{ route('hitos.index') }}" class="block rounded-lg border-l-4 border-transparent px-3 py-2 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('hitos.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">Hitos</a>
-                    @unless ($usuario->esCliente())
                     <a href="{{ route('solicitudes-cambio.index') }}" class="block rounded-lg border-l-4 border-transparent px-3 py-2 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('solicitudes-cambio.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">Cambios</a>
-                    @endunless
                     @endunless
                     <a href="{{ route('entregables.index') }}" class="block rounded-lg border-l-4 border-transparent px-3 py-2 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('entregables.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">Entregables</a>
                 </nav>
@@ -90,7 +86,6 @@
                         <p class="text-xs text-slate-400">Resumen de actividad</p>
                         <h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-900">Buen día, {{ $nombre }}.</h1>
                     </section>
-
                     <div>
                         <section class="rounded-xl border border-[#d7eee6] bg-white p-5 shadow-sm">
                             <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
@@ -170,7 +165,7 @@
                                         @foreach (['pendiente' => ['Pendientes', 'bg-slate-100 text-slate-700'], 'en_progreso' => ['En progreso', 'bg-blue-50 text-blue-700'], 'completada' => ['Completadas', 'bg-emerald-50 text-emerald-700'], 'cancelada' => ['Canceladas', 'bg-rose-50 text-rose-700']] as $estado => [$label, $style])
                                             <a href="{{ route('tareas.index', ['estado' => $estado]) }}" class="block px-4 py-2.5 hover:bg-[#f0fff9]">
                                                 <div class="flex items-center justify-between"><span class="text-sm text-slate-700">{{ $label }}</span><span class="{{ $style }} rounded-md px-2 py-0.5 text-xs font-bold">{{ $tareasPorEstado[$estado] }}</span></div>
-                                                <div class="mt-1.5 h-1.5 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-indigo-400 rounded-full animar-alto" style="width: {{ round($tareasPorEstado[$estado] / $maxTareas * 100) }}%"></div></div>
+                                                <div class="mt-1.5 h-1.5 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-[#00b87d] rounded-full animar-alto" style="width: {{ round($tareasPorEstado[$estado] / $maxTareas * 100) }}%"></div></div>
                                             </a>
                                         @endforeach
                                     </div>
@@ -203,17 +198,23 @@
                         @endif
 
 @if (isset($hitosProximos) && $hitosProximos->isNotEmpty())
-    <div class="bg-white rounded-lg shadow p-6 mb-6">
-        <h3 class="font-semibold text-gray-800 mb-3">Hitos por vencer</h3>
-        <ul class="divide-y">
+    <section class="mt-5 rounded-xl border border-[#d7eee6] bg-white shadow-sm overflow-hidden">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-[#d7eee6]">
+            <div>
+                <h2 class="font-semibold text-slate-800">Hitos por vencer</h2>
+                <p class="mt-1 text-xs text-slate-400">Puntos de control próximos</p>
+            </div>
+            <a href="{{ route('hitos.index') }}" class="text-xs font-semibold text-[#009d70]">Ver todo</a>
+        </div>
+        <ul class="divide-y divide-[#edf7f3]">
             @foreach ($hitosProximos as $hito)
-                <li class="py-2 flex justify-between items-center">
+                <li class="flex items-center justify-between px-5 py-3.5">
                     <div>
-                        <p class="font-medium">{{ $hito->nombre }}</p>
-                        <p class="text-xs text-gray-500">{{ $hito->proyecto->nombre }}</p>
+                        <p class="text-sm font-medium text-slate-700">{{ $hito->nombre }}</p>
+                        <p class="text-xs text-slate-400">{{ $hito->proyecto?->nombre }}</p>
                     </div>
-                    <span class="text-xs px-2 py-1 rounded-full
-                        {{ $hito->fecha_objetivo->isPast() ? 'bg-red-100 text-red-700 font-bold' : 'bg-yellow-100 text-yellow-700' }}">
+                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold
+                        {{ $hito->fecha_objetivo->isPast() ? 'bg-red-100 text-red-700 font-bold' : 'bg-amber-100 text-amber-800' }}">
                         @if ($hito->fecha_objetivo->isPast())
                             VENCIDO
                         @else
@@ -223,7 +224,7 @@
                 </li>
             @endforeach
         </ul>
-    </div>
+    </section>
 @endif
 
                     </div>

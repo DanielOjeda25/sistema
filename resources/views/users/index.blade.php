@@ -1,3 +1,12 @@
+{{--
+    Gestion de Usuarios (solo rol Jefe). Tres modales sobre el listado:
+    - modal-usuario-crear: alta con contrasena provisional y empresa si el
+      rol es Cliente.
+    - modal-usuario-editar: cambio de datos, estado, rol y contrasena opcional.
+    - modal-usuario-rol: cambio rapido de rol (un solo rol por usuario).
+    El borrado es un form directo con confirmacion; nadie puede eliminar su
+    propia cuenta ni al ultimo Jefe (protegido tambien en el controller).
+--}}
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -33,7 +42,7 @@
                     <div class="flex-1 min-w-[200px]">
                         <label for="q" class="block text-xs font-medium text-gray-500 uppercase mb-1">Buscar</label>
                         <input type="text" name="q" id="q" value="{{ request('q') }}" placeholder="Nombre o email..."
-                               class="w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+                               class="w-full rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
                     </div>
                     <button type="submit" class="px-4 py-2 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63] inline-flex items-center gap-1.5">
                         <x-heroicon-o-magnifying-glass class="w-4 h-4" />
@@ -73,7 +82,7 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     @forelse($user->roles as $role)
-                                        <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+                                        <span class="inline-flex items-center rounded-full bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5">
                                             {{ $role->name }}
                                         </span>
                                     @empty
@@ -82,7 +91,7 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     @if ($user->cliente)
-                                        <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+                                        <span class="inline-flex items-center rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-0.5">
                                             {{ $user->cliente->empresa ?? $user->cliente->nombre }}
                                         </span>
                                     @else

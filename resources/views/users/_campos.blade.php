@@ -1,3 +1,9 @@
+{{--
+    Campos del formulario de Usuario (crear y editar). Con Alpine, al elegir
+    el rol "Cliente" aparece el selector de empresa: es lo que define que
+    proyectos y facturas va a ver esa cuenta. La contrasena usa el componente
+    x-password-input (mostrar/ocultar + aviso en vivo de minimo y coincidencia).
+--}}
 <div class="grid gap-4 sm:grid-cols-2" x-data="{ rol: '{{ old('rol', '') }}' }">
     <div>
         <x-input-label for="name" value="Nombre" />

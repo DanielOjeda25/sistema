@@ -1,3 +1,8 @@
+{{--
+    Listado clasico de Tareas: buscador, filtro por estado y paginacion.
+    Crear y editar se hacen con modales (componente x-crud-modal + el JS
+    compartido crud-modal.js); los formularios reutilizan tareas/_campos.
+--}}
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
@@ -26,11 +31,11 @@
                     <div class="flex-1 min-w-[200px]">
                         <label for="q" class="block text-xs font-medium text-gray-500 uppercase mb-1">Buscar</label>
                         <input type="text" name="q" id="q" value="{{ request('q') }}" placeholder="Título o descripción..."
-                               class="w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+                               class="w-full rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
                     </div>
                     <div>
                         <label for="estado" class="block text-xs font-medium text-gray-500 uppercase mb-1">Estado</label>
-                        <select name="estado" id="estado" class="rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+                        <select name="estado" id="estado" class="rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
                             <option value="">Todos</option>
                             @foreach (['pendiente', 'en_progreso', 'completada', 'cancelada'] as $estado)
                                 <option value="{{ $estado }}" @selected(request('estado') === $estado)>
@@ -68,7 +73,7 @@
                                     <td class="px-6 py-4">{{ $tarea->titulo }}</td>
                                     <td class="px-6 py-4">{{ $tarea->proyecto?->nombre ?? 'N/A' }}</td>
                                     <td class="px-6 py-4">{{ $tarea->asignado?->name ?? 'N/A' }}</td>
-                                    <td class="px-6 py-4">{{ ucfirst(str_replace('_', ' ', $tarea->estado)) }}</td>
+                                    <td class="px-6 py-4"><x-estado-badge :estado="$tarea->estado" /></td>
                                     <td class="px-6 py-4">{{ ucfirst($tarea->prioridad) }}</td>
                                     <td class="px-6 py-4">{{ $tarea->fecha_limite?->format('d/m/Y') ?? 'N/A' }}</td>
                                     <td class="px-6 py-4 text-sm font-medium">

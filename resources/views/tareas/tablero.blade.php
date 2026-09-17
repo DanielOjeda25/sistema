@@ -1,3 +1,8 @@
+{{--
+    Tablero de Tareas estilo Trello: una columna por estado y tarjetas que
+    se arrastran (drag & drop). El movimiento lo guarda por AJAX el modulo
+    resources/js/tablero.js; aca solo dibujamos el HTML inicial.
+--}}
 @php
     $columnas = [
         'pendiente'   => ['Pendiente',   'bg-gray-100 text-gray-700'],
@@ -27,7 +32,7 @@
             <div class="flex items-center gap-3">
                 <form method="GET" action="{{ route('tareas.tablero') }}" class="flex items-center gap-2">
                     <select name="proyecto" onchange="this.form.submit()"
-                            class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm">
+                            class="border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm text-sm">
                         <option value="">— Todos los proyectos —</option>
                         @foreach ($proyectos as $p)
                             <option value="{{ $p->id }}" @selected($proyectoId == $p->id)>{{ $p->nombre }}</option>
@@ -36,7 +41,7 @@
                     @if ($proyectoId)
                         {{-- Los sprints son por proyecto: el selector aparece solo con un proyecto elegido. --}}
                         <select name="sprint" onchange="this.form.submit()"
-                                class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm">
+                                class="border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm text-sm">
                             <option value="">— Todos los sprints —</option>
                             @foreach ($sprints as $s)
                                 <option value="{{ $s->id }}" @selected($sprintId == $s->id)>{{ $s->nombre }}</option>
@@ -121,27 +126,27 @@
                                 <form data-agregar class="hidden space-y-2">
                                     <input type="hidden" name="estado" value="{{ $estado }}">
                                     <textarea name="titulo" rows="2" placeholder="Título de la tarea…"
-                                              class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm"></textarea>
+                                              class="block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm text-sm"></textarea>
                                     <div class="grid grid-cols-2 gap-2">
-                                        <select name="prioridad" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-xs">
+                                        <select name="prioridad" class="border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm text-xs">
                                             <option value="baja">Baja</option>
                                             <option value="media" selected>Media</option>
                                             <option value="alta">Alta</option>
                                         </select>
-                                        <select name="asignado_a" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-xs">
+                                        <select name="asignado_a" class="border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm text-xs">
                                             @foreach ($usuarios as $u)
                                                 <option value="{{ $u->id }}" @selected($u->is(auth()->user()))>{{ $u->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
-                                    <select name="proyecto_id" class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-xs">
+                                    <select name="proyecto_id" class="block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm text-xs">
                                         @foreach ($proyectos as $p)
                                             <option value="{{ $p->id }}" @selected($proyectoId == $p->id)>{{ $p->nombre }}</option>
                                         @endforeach
                                     </select>
                                     @if ($proyectoId && $sprints->isNotEmpty())
                                         {{-- Con un proyecto filtrado, la tarjeta nueva puede asignarse directo a un sprint suyo. --}}
-                                        <select name="sprint_id" class="block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-xs">
+                                        <select name="sprint_id" class="block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm text-xs">
                                             <option value="">Sin sprint</option>
                                             @foreach ($sprints as $s)
                                                 <option value="{{ $s->id }}">{{ $s->nombre }}</option>
@@ -150,7 +155,7 @@
                                     @endif
                                     <div class="flex items-center justify-between gap-2">
                                         <button type="submit"
-                                                class="px-3 py-1.5 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+                                                class="px-3 py-1.5 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63]">
                                             Añadir
                                         </button>
                                         <button type="button" data-alternar-agregar
@@ -214,13 +219,13 @@
                         <div>
                             <x-input-label for="editar-descripcion" value="Descripción (opcional)" />
                             <textarea id="editar-descripcion" name="descripcion" rows="3"
-                                      class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"></textarea>
+                                      class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm"></textarea>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <x-input-label for="editar-estado" value="Estado" />
-                                <select id="editar-estado" name="estado" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                <select id="editar-estado" name="estado" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
                                     @foreach ($columnas as $estado => [$etiqueta, $color])
                                         <option value="{{ $estado }}">{{ $etiqueta }}</option>
                                     @endforeach
@@ -228,7 +233,7 @@
                             </div>
                             <div>
                                 <x-input-label for="editar-prioridad" value="Prioridad" />
-                                <select id="editar-prioridad" name="prioridad" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                <select id="editar-prioridad" name="prioridad" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
                                     <option value="baja">Baja</option>
                                     <option value="media">Media</option>
                                     <option value="alta">Alta</option>
@@ -243,7 +248,7 @@
                             </div>
                             <div>
                                 <x-input-label for="editar-proyecto" value="Proyecto" />
-                                <select id="editar-proyecto" name="proyecto_id" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                                <select id="editar-proyecto" name="proyecto_id" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
                                     @foreach ($proyectos as $p)
                                         <option value="{{ $p->id }}">{{ $p->nombre }}</option>
                                     @endforeach
@@ -253,7 +258,7 @@
 
                         <div>
                             <x-input-label for="editar-asignado" value="Asignar a" />
-                            <select id="editar-asignado" name="asignado_a" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                            <select id="editar-asignado" name="asignado_a" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
                                 @foreach ($usuarios as $u)
                                     <option value="{{ $u->id }}">{{ $u->name }}</option>
                                 @endforeach
@@ -262,7 +267,7 @@
 
                         <div>
                             <x-input-label for="editar-sprint" value="Sprint (opcional)" />
-                            <select id="editar-sprint" name="sprint_id" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                            <select id="editar-sprint" name="sprint_id" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
                                 <option value="">Sin sprint</option>
                                 @foreach ($sprintsPorProyecto as $nombreProyecto => $sprintsProyecto)
                                     <optgroup label="{{ $nombreProyecto }}">
