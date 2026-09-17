@@ -21,6 +21,16 @@ class User extends Authenticatable implements Auditable
     use \OwenIt\Auditing\Auditable;
 
     /**
+     * Campos que la auditoría no debe registrar: el password es un hash
+     * sensible y el remember_token lo rotea Laravel en cada login, así que
+     * ensuciaría el visor con un cambio falso cada vez que alguien entra.
+     */
+    protected $auditExclude = [
+        'password',
+        'remember_token',
+    ];
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
