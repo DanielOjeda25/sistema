@@ -105,7 +105,17 @@ class TareaController extends Controller
         $sprintsPorProyecto = Sprint::visiblePara($usuario)
             ->with('proyecto')
             ->get()
-            ->sortBy(fn ($s) => [$s->proyecto?->nombre, $s->fecha_inicio?->format('Y-m-d'), $s->id])
+            ->sortBy(function ($s) {
+                $fecha = null;
+
+                if ($s->fecha_inicio instanceof \DateTimeInterface) {
+                    $fecha = $s->fecha_inicio->format('Y-m-d');
+                } elseif ($s->fecha_inicio) {
+                    $fecha = (string) $s->fecha_inicio;
+                }
+
+                return [$s->proyecto?->nombre ?? '', $fecha ?? '', $s->id];
+            })
             ->groupBy('proyecto.nombre');
 
         return view('tareas.tablero', compact('tareas', 'proyectos', 'usuarios', 'proyectoId', 'sprints', 'sprintId', 'sprintsPorProyecto', 'puedeMover'));
