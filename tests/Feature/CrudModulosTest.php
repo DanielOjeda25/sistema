@@ -239,6 +239,34 @@ class CrudModulosTest extends TestCase
     }
 
     /** @test */
+    public function cualquier_usuario_cambia_su_propia_password_desde_su_perfil(): void
+    {
+        $user = User::create([
+            'name' => 'Cambia', 'apellido' => 'Clave', 'email' => 'cambia@x.com',
+            'estado' => 'activo', 'password' => Hash::make('1234'),
+        ]);
+
+        // Cambio con la contraseña actual correcta.
+        $this->actingAs($user)->put(route('password.update'), [
+            'current_password' => '1234',
+            'password' => 'nueva-clave-123',
+            'password_confirmation' => 'nueva-clave-123',
+        ])->assertRedirect()->assertSessionHasNoErrors();
+
+        $this->assertTrue(Hash::check('nueva-clave-123', $user->fresh()->password));
+
+        // Con la vieja como "actual" el cambio se rechaza y la clave no se toca.
+        // El formulario de perfil valida en su propio error bag ("updatePassword").
+        $this->actingAs($user)->put(route('password.update'), [
+            'current_password' => '1234',
+            'password' => 'otra-clave-123',
+            'password_confirmation' => 'otra-clave-123',
+        ])->assertInvalid('current_password', 'updatePassword');
+
+        $this->assertTrue(Hash::check('nueva-clave-123', $user->fresh()->password));
+    }
+
+    /** @test */
     public function un_usuario_sin_rol_interno_no_puede_crear_nada(): void
     {
         $cliente = User::where('email', 'cliente@example.com')->firstOrFail();
