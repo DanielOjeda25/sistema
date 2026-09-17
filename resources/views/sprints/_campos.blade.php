@@ -6,7 +6,7 @@
 --}}
 <div>
     <x-input-label for="nombre" value="Nombre del Sprint" />
-    <x-text-input id="nombre" name="nombre" type="text" class="mt-1 block w-full" :value="old('nombre', $sprint->nombre ?? '')" required />
+    <x-text-input maxlength="255" id="nombre" name="nombre" type="text" class="mt-1 block w-full" :value="old('nombre', $sprint->nombre ?? '')" required />
     <x-input-error class="mt-2" :messages="$errors->get('nombre')" />
 </div>
 

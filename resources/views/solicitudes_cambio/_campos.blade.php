@@ -4,7 +4,7 @@
 --}}
 <div>
     <x-input-label for="titulo" value="Título" />
-    <x-text-input id="titulo" name="titulo" type="text" class="mt-1 block w-full" :value="old('titulo', $solicitud->titulo ?? '')" required />
+    <x-text-input maxlength="255" id="titulo" name="titulo" type="text" class="mt-1 block w-full" :value="old('titulo', $solicitud->titulo ?? '')" required />
     <x-input-error class="mt-2" :messages="$errors->get('titulo')" />
 </div>
 

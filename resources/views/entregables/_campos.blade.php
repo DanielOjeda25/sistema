@@ -4,7 +4,7 @@
 --}}
 <div>
     <x-input-label for="titulo" value="Título" />
-    <x-text-input id="titulo" name="titulo" type="text" class="mt-1 block w-full" :value="old('titulo', $entregable->titulo ?? '')" required />
+    <x-text-input maxlength="255" id="titulo" name="titulo" type="text" class="mt-1 block w-full" :value="old('titulo', $entregable->titulo ?? '')" required />
     <x-input-error class="mt-2" :messages="$errors->get('titulo')" />
 </div>
 
@@ -17,7 +17,7 @@
 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     <div>
         <x-input-label for="tipo" value="Tipo (ej: documento, informe, resumen)" />
-        <x-text-input id="tipo" name="tipo" type="text" class="mt-1 block w-full" :value="old('tipo', $entregable->tipo ?? 'documento')" required />
+        <x-text-input maxlength="255" id="tipo" name="tipo" type="text" class="mt-1 block w-full" :value="old('tipo', $entregable->tipo ?? 'documento')" required />
         <x-input-error class="mt-2" :messages="$errors->get('tipo')" />
     </div>
     <div>

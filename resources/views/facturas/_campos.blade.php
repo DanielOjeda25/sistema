@@ -4,14 +4,14 @@
 --}}
 <div>
     <x-input-label for="numero" value="Número de Factura (no se puede repetir)" />
-    <x-text-input id="numero" name="numero" type="text" class="mt-1 block w-full" :value="old('numero', $factura->numero ?? '')" required />
+    <x-text-input maxlength="255" id="numero" name="numero" type="text" class="mt-1 block w-full" :value="old('numero', $factura->numero ?? '')" required />
     <x-input-error class="mt-2" :messages="$errors->get('numero')" />
 </div>
 
 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     <div>
         <x-input-label for="monto" value="Monto (máximo $10.000.000)" />
-        <x-text-input id="monto" name="monto" type="number" step="0.01" min="0" max="10000000" class="mt-1 block w-full" :value="old('monto', $factura->monto ?? '')" required />
+        <x-text-input id="monto" name="monto" min="0" max="10000000" step="0.01" type="number" step="0.01" min="0" max="10000000" class="mt-1 block w-full" :value="old('monto', $factura->monto ?? '')" required />
         <x-input-error class="mt-2" :messages="$errors->get('monto')" />
     </div>
     <div>
