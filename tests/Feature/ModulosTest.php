@@ -101,4 +101,35 @@ class ModulosTest extends TestCase
             $this->get("/{$ruta}")->assertRedirect(route('login'));
         }
     }
+
+    public function test_el_listado_de_tareas_filtra_por_prioridad_y_responsable(): void
+    {
+        $pm = $this->usuarioConRol('PM', 'pm.filtros@test.com');
+        $sofi = $this->usuarioConRol('Programador', 'sofi.filtros@test.com');
+        $roberto = $this->usuarioConRol('Programador', 'roberto.filtros@test.com');
+        Role::firstOrCreate(['name' => 'Cliente']);
+        $cliente = \App\Models\Cliente::create([
+            'nombre' => 'F', 'apellido' => 'Test', 'email' => uniqid().'@test.com',
+            'empresa' => 'Empresa Filtros', 'estado' => 'activo',
+        ]);
+        $proyecto = \App\Models\Proyecto::create([
+            'nombre' => 'Proyecto Filtros', 'fecha_inicio' => today(),
+            'estado' => 'en_progreso', 'cliente_id' => $cliente->id, 'pm_id' => $pm->id,
+        ]);
+
+        $alta = \App\Models\Tarea::create(['titulo' => 'Tarea Alta', 'estado' => 'pendiente', 'prioridad' => 'alta', 'proyecto_id' => $proyecto->id, 'asignado_a' => $sofi->id]);
+        $media = \App\Models\Tarea::create(['titulo' => 'Tarea Media', 'estado' => 'pendiente', 'prioridad' => 'media', 'proyecto_id' => $proyecto->id, 'asignado_a' => $roberto->id]);
+
+        // Por prioridad: solo aparece la alta.
+        $resp = $this->actingAs($pm)->get('/tareas?prioridad=alta')->assertOk();
+        $resp->assertSee('Tarea Alta')->assertDontSee('Tarea Media');
+
+        // Por responsable: solo las de Sofi.
+        $resp = $this->actingAs($pm)->get("/tareas?asignado_a={$sofi->id}")->assertOk();
+        $resp->assertSee('Tarea Alta')->assertDontSee('Tarea Media');
+
+        // Combinado no matchea nada si no existe la combinacion.
+        $resp = $this->actingAs($pm)->get("/tareas?asignado_a={$roberto->id}&prioridad=alta")->assertOk();
+        $resp->assertSee('No hay tareas registradas');
+    }
 }
