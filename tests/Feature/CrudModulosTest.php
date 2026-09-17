@@ -10,6 +10,7 @@ use App\Models\SolicitudCambio;
 use App\Models\Sprint;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 /**
@@ -198,6 +199,43 @@ class CrudModulosTest extends TestCase
         // El vinculo con la empresa y el rol quedan asignados.
         $this->assertSame(1, (int) $usuario->cliente_id);
         $this->assertTrue($usuario->hasRole('Cliente'));
+    }
+
+    /** @test */
+    public function el_jefe_edita_cambia_rol_y_elimina_un_usuario(): void
+    {
+        $jefe = $this->jefe();
+
+        $this->actingAs($jefe)->post(route('users.store'), [
+            'name' => 'Editable', 'apellido' => 'Usuario', 'email' => 'editable@x.com',
+            'estado' => 'activo', 'password' => 'contrasena123',
+            'password_confirmation' => 'contrasena123',
+            'rol' => 'Programador',
+        ])->assertRedirect();
+
+        $usuario = User::where('email', 'editable@x.com')->firstOrFail();
+
+        // Edición: cambia datos, estado y rol en un solo PUT.
+        $this->actingAs($jefe)->put(route('users.update', $usuario), [
+            'name' => 'Editable v2', 'apellido' => 'Usuario', 'email' => 'editable@x.com',
+            'estado' => 'inactivo', 'rol' => 'PO',
+        ])->assertRedirect();
+
+        $usuario->refresh();
+        $this->assertSame('Editable v2', $usuario->name);
+        $this->assertSame('inactivo', $usuario->estado);
+        $this->assertTrue($usuario->hasRole('PO'));
+        $this->assertFalse($usuario->hasRole('Programador'));
+
+        // Sin re-ingresar contraseña, la clave sigue siendo la misma.
+        $this->assertTrue(Hash::check('contrasena123', $usuario->password));
+
+        // Nadie borra su propia cuenta ni al único Jefe del sistema.
+        $this->actingAs($jefe)->delete(route('users.destroy', $jefe))->assertForbidden();
+        $this->assertDatabaseHas('users', ['id' => $jefe->id]);
+
+        $this->actingAs($jefe)->delete(route('users.destroy', $usuario))->assertRedirect();
+        $this->assertDatabaseMissing('users', ['id' => $usuario->id]);
     }
 
     /** @test */

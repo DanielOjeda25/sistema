@@ -167,8 +167,12 @@ Route::middleware(['auth', 'role:Jefe'])->group(function () {
     Route::get('/usuarios/crear', [UserController::class, 'create'])->name('users.create');
     Route::post('/usuarios', [UserController::class, 'store'])->name('users.store');
 
-    Route::get('/usuarios/{user}/roles', [UserController::class, 'editRoles'])->name('users.roles.edit');
+    // Cambio de rol (un solo rol por usuario) desde el modal de la lista.
     Route::put('/usuarios/{user}/roles', [UserController::class, 'updateRoles'])->name('users.roles.update');
+
+    // Edición y baja de usuarios (modales en la lista).
+    Route::put('/usuarios/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::delete('/usuarios/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 });
 
 Route::get('/tutorial', function () {

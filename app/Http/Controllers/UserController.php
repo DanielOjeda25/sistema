@@ -6,30 +6,22 @@ use App\Models\Cliente;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
-    // Mostrar el formulario con los roles
-    public function editRoles(User $user)
-    {
-        // Traemos todos los roles de la base de datos
-        $roles = Role::all();
-
-        return view('users.roles', compact('user', 'roles'));
-    }
-
-    // Guardar los roles seleccionados
+    // Guardar el rol elegido (uno solo) desde el modal de la lista
     public function updateRoles(Request $request, User $user)
     {
-        // Spatie tiene un método mágico llamado "syncRoles".
-        // Lo que hace es: mira los roles que llegaron del formulario,
-        // se los asigna al usuario, y le quita los que no estén marcados.
-        $user->syncRoles($request->roles);
+        $data = $request->validate([
+            'rol' => 'required|exists:roles,name',
+        ]);
 
-        // Volvemos a la página anterior con un mensaje de éxito
-        return redirect()->back()->with('success', 'Roles actualizados correctamente.');
+        $user->syncRoles([$data['rol']]);
+
+        return redirect()->back()->with('success', 'Rol actualizado correctamente.');
     }
 
     /**
@@ -123,16 +115,56 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, User $user)
     {
-        //
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'apellido' => 'required|string|max:255',
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'estado' => 'required|in:activo,inactivo',
+            'rol' => 'required|exists:roles,name',
+            'cliente_id' => 'nullable|exists:clientes,id|required_if:rol,Cliente',
+            // En edición la contraseña es opcional: vacía = no cambia.
+            'password' => ['nullable', 'confirmed', Password::min(8)],
+        ]);
+
+        $user->fill([
+            'name' => $data['name'],
+            'apellido' => $data['apellido'],
+            'email' => $data['email'],
+            'estado' => $data['estado'],
+            // Igual que al crear: solo las cuentas Cliente quedan atadas a una empresa.
+            'cliente_id' => $data['rol'] === 'Cliente' ? $data['cliente_id'] : null,
+        ]);
+
+        if (! empty($data['password'])) {
+            $user->password = Hash::make($data['password']);
+        }
+
+        $user->save();
+        $user->syncRoles([$data['rol']]);
+
+        return ($request->input('desde_modal') ? redirect()->back() : redirect()->route('users.index'))
+            ->with('success', 'Usuario actualizado correctamente.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(User $user)
     {
-        //
+        // Nadie borra su propia cuenta desde la lista.
+        abort_if($user->id === auth()->id(), 403, 'No podés eliminar tu propia cuenta.');
+
+        // Evitamos quedarnos sin ningún Jefe: es el único rol que gestiona usuarios.
+        if ($user->hasRole('Jefe') && User::role('Jefe')->count() <= 1) {
+            return redirect()->back()->with('error', 'No podés eliminar al único Jefe del sistema.');
+        }
+
+        // Si era una cuenta Cliente, su ficha de empresa no debe quedar huérfana.
+        $user->cliente?->delete();
+        $user->delete();
+
+        return redirect()->route('users.index')->with('success', 'Usuario eliminado correctamente.');
     }
 }
