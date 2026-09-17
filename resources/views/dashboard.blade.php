@@ -11,7 +11,7 @@
         <div class="flex h-screen w-full overflow-hidden bg-white shadow-sm">
             <aside class="scroll-oscuro hidden w-60 shrink-0 overflow-y-auto bg-[#202225] px-4 py-5 text-slate-300 lg:block">
                 <a href="{{ route('dashboard') }}" class="block border-b border-white/10 px-3 pb-6">
-                    <img src="{{ asset('images/cruznegra-logo-light.png') }}" alt="Cruz Negra" class="h-14 w-full object-contain object-left">
+                    <img src="{{ asset('images/cruznegra-logo-light.png') }}" alt="Cruz Negra" class="h-14 w-full object-contain object-center">
                 </a>
 
                 <nav class="mt-6 space-y-1">
