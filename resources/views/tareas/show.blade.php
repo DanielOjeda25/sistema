@@ -1,3 +1,7 @@
+{{--
+    Detalle de una Tarea. Solo lectura: la edicion se hace desde el mismo
+    modal del listado (x-crud-modal), que recibe los valores via data-valores.
+--}}
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">

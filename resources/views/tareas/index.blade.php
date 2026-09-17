@@ -1,3 +1,8 @@
+{{--
+    Listado clasico de Tareas: buscador, filtro por estado y paginacion.
+    Crear y editar se hacen con modales (componente x-crud-modal + el JS
+    compartido crud-modal.js); los formularios reutilizan tareas/_campos.
+--}}
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">

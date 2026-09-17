@@ -1,3 +1,12 @@
+{{--
+    Gestion de Usuarios (solo rol Jefe). Tres modales sobre el listado:
+    - modal-usuario-crear: alta con contrasena provisional y empresa si el
+      rol es Cliente.
+    - modal-usuario-editar: cambio de datos, estado, rol y contrasena opcional.
+    - modal-usuario-rol: cambio rapido de rol (un solo rol por usuario).
+    El borrado es un form directo con confirmacion; nadie puede eliminar su
+    propia cuenta ni al ultimo Jefe (protegido tambien en el controller).
+--}}
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">

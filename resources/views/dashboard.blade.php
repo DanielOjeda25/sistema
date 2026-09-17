@@ -86,7 +86,6 @@
                         <p class="text-xs text-slate-400">Resumen de actividad</p>
                         <h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-900">Buen día, {{ $nombre }}.</h1>
                     </section>
-
                     <div>
                         <section class="rounded-xl border border-[#d7eee6] bg-white p-5 shadow-sm">
                             <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
