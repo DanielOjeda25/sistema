@@ -68,7 +68,7 @@
                                     <td class="px-6 py-4">{{ $tarea->titulo }}</td>
                                     <td class="px-6 py-4">{{ $tarea->proyecto?->nombre ?? 'N/A' }}</td>
                                     <td class="px-6 py-4">{{ $tarea->asignado?->name ?? 'N/A' }}</td>
-                                    <td class="px-6 py-4">{{ ucfirst(str_replace('_', ' ', $tarea->estado)) }}</td>
+                                    <td class="px-6 py-4"><x-estado-badge :estado="$tarea->estado" /></td>
                                     <td class="px-6 py-4">{{ ucfirst($tarea->prioridad) }}</td>
                                     <td class="px-6 py-4">{{ $tarea->fecha_limite?->format('d/m/Y') ?? 'N/A' }}</td>
                                     <td class="px-6 py-4 text-sm font-medium">

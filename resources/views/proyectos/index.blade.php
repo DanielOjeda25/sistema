@@ -67,7 +67,7 @@
                                     <td class="px-6 py-4">{{ $proyecto->nombre }}</td>
                                     <td class="px-6 py-4">{{ $proyecto->cliente?->nombre ?? 'N/A' }}</td>
                                     <td class="px-6 py-4">{{ $proyecto->pm?->name ?? 'N/A' }}</td>
-                                    <td class="px-6 py-4">{{ ucfirst(str_replace('_', ' ', $proyecto->estado)) }}</td>
+                                    <td class="px-6 py-4"><x-estado-badge :estado="$proyecto->estado" /></td>
                                     <td class="px-6 py-4">{{ $proyecto->fecha_inicio?->format('d/m/Y') ?? 'N/A' }}</td>
                                     <td class="px-6 py-4 text-sm font-medium">
                                         <div class="flex items-center gap-3">

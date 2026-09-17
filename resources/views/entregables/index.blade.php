@@ -76,7 +76,7 @@
                                     <td class="px-6 py-4">{{ $entregable->titulo }}</td>
                                     <td class="px-6 py-4">{{ $entregable->proyecto?->nombre ?? 'N/A' }}</td>
                                     <td class="px-6 py-4">{{ ucfirst($entregable->tipo) }}</td>
-                                    <td class="px-6 py-4">{{ ucfirst($entregable->estado) }}</td>
+                                    <td class="px-6 py-4"><x-estado-badge :estado="$entregable->estado" /></td>
                                     <td class="px-6 py-4">{{ $entregable->generador?->name ?? 'N/A' }}</td>
                                     <td class="px-6 py-4 text-sm font-medium">
                                         <div class="flex items-center gap-3">

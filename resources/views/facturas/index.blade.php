@@ -68,7 +68,7 @@
                                     <td class="px-6 py-4">{{ $factura->proyecto?->nombre ?? 'N/A' }}</td>
                                     <td class="px-6 py-4">${{ number_format($factura->monto, 2) }}</td>
                                     <td class="px-6 py-4">{{ $factura->fecha_emision?->format('d/m/Y') ?? 'N/A' }}</td>
-                                    <td class="px-6 py-4">{{ ucfirst($factura->estado) }}</td>
+                                    <td class="px-6 py-4"><x-estado-badge :estado="$factura->estado" /></td>
                                     <td class="px-6 py-4 text-sm font-medium">
                                         <div class="flex items-center gap-3">
                                             @hasanyrole('Jefe')

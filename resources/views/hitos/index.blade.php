@@ -67,7 +67,7 @@
                                     <td class="px-6 py-4">{{ $hito->nombre }}</td>
                                     <td class="px-6 py-4">{{ $hito->proyecto?->nombre ?? 'N/A' }}</td>
                                     <td class="px-6 py-4">{{ $hito->fecha_objetivo?->format('d/m/Y') ?? 'N/A' }}</td>
-                                    <td class="px-6 py-4">{{ $hito->completado ? 'Completado' : 'Pendiente' }}</td>
+                                    <td class="px-6 py-4"><x-estado-badge :estado="$hito->completado ? 'Completado' : 'Pendiente'" :crudo="false" /></td>
                                     <td class="px-6 py-4 text-sm font-medium">
                                         <div class="flex items-center gap-3">
                                             @hasanyrole('Jefe')

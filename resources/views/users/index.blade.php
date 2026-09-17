@@ -73,7 +73,7 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     @forelse($user->roles as $role)
-                                        <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+                                        <span class="inline-flex items-center rounded-full bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5">
                                             {{ $role->name }}
                                         </span>
                                     @empty
@@ -82,7 +82,7 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     @if ($user->cliente)
-                                        <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+                                        <span class="inline-flex items-center rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-0.5">
                                             {{ $user->cliente->empresa ?? $user->cliente->nombre }}
                                         </span>
                                     @else

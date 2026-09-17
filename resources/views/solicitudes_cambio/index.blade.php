@@ -68,7 +68,7 @@
                                     <td class="px-6 py-4">{{ $solicitud->titulo }}</td>
                                     <td class="px-6 py-4">{{ $solicitud->proyecto?->nombre ?? 'N/A' }}</td>
                                     <td class="px-6 py-4">{{ $solicitud->solicitante?->name ?? 'N/A' }}</td>
-                                    <td class="px-6 py-4">{{ ucfirst($solicitud->estado) }}</td>
+                                    <td class="px-6 py-4"><x-estado-badge :estado="$solicitud->estado" /></td>
                                     <td class="px-6 py-4">{{ ucfirst($solicitud->prioridad) }}</td>
                                     <td class="px-6 py-4 text-sm font-medium">
                                         <div class="flex items-center gap-3">
