@@ -61,7 +61,7 @@
 
                         <div class="mt-10 border-t border-white/10 pt-4">
                             <p class="px-3 text-xs font-semibold text-white">{{ Auth::user()->name }}</p>
-                            <p class="px-3 pt-1 text-[11px] text-slate-500">{{ Auth::user()->getRoleNames()->first() ?? 'Usuario' }}</p>
+                            <p class="px-3 pt-1 text-[11px] text-slate-500">{{ Auth::user() instanceof \App\Models\User ? Auth::user()->getRoleNames()->first() : 'Usuario' }}</p>
                             <a href="{{ route('profile.edit') }}" class="mt-4 flex items-center gap-3 rounded-lg border-l-4 px-3 py-2 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('profile.*') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}">Perfil</a>
                             <form method="POST" action="{{ route('logout') }}" class="mt-1">
                                 @csrf
@@ -91,7 +91,7 @@
                                     @endif
                                 </button>
                                 <div x-show="abierto" @click.outside="abierto = false" x-cloak
-                                     class="absolute right-0 z-50 mt-2 w-80 rounded-xl border border-gray-100 bg-white shadow-xl">
+                                    class="absolute right-0 z-50 mt-2 w-80 rounded-xl border border-gray-100 bg-white shadow-xl">
                                     <div class="flex items-center justify-between border-b border-gray-100 px-4 py-2.5">
                                         <span class="text-sm font-semibold text-gray-700">Notificaciones</span>
                                         @if ($totalSinLeer > 0)
