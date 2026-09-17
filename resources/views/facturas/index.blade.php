@@ -87,10 +87,10 @@
                                                     <x-heroicon-o-pencil-square class="w-5 h-5" />
                                                 </button>
                                                 @if (auth()->user()->hasAnyRole('Jefe', 'PM'))
-                                                    <form method="POST" action="{{ route('facturas.destroy', $factura) }}" onsubmit="return confirm('¿Querés eliminar esta factura? Esta acción no se puede deshacer.');">
+                                                    <form method="POST" action="{{ route('facturas.destroy', $factura) }}">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="text-red-600 hover:text-red-800" title="Eliminar" aria-label="Eliminar">
+                                                        <button type="submit" data-confirmar="¿Querés eliminar esta factura? Esta acción no se puede deshacer." class="text-red-600 hover:text-red-800" title="Eliminar" aria-label="Eliminar">
                                                             <x-heroicon-o-trash class="w-5 h-5" />
                                                         </button>
                                                     </form>
@@ -134,4 +134,5 @@
     @hasanyrole('Jefe|PM')
     @include('facturas._modal_editar')
     @endhasanyrole
+    <x-confirmar-eliminar />
 </x-app-layout>

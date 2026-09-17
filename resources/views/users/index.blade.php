@@ -114,10 +114,11 @@
                                             <x-heroicon-o-pencil-square class="w-5 h-5" />
                                         </button>
                                         @if ($user->id !== auth()->id())
-                                        <form method="POST" action="{{ route('users.destroy', $user) }}" onsubmit="return confirm('¿Querés eliminar este usuario? Esta acción no se puede deshacer.');">
+                                        <form method="POST" action="{{ route('users.destroy', $user) }}">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-800" title="Eliminar" aria-label="Eliminar">
+                                            <button type="submit" data-confirmar="¿Querés eliminar este usuario? Esta acción no se puede deshacer."
+                                                    class="text-red-600 hover:text-red-800" title="Eliminar" aria-label="Eliminar">
                                                 <x-heroicon-o-trash class="w-5 h-5" />
                                             </button>
                                         </form>
@@ -241,4 +242,5 @@
             </form>
         </x-crud-modal>
     @endhasrole
+    <x-confirmar-eliminar />
 </x-app-layout>

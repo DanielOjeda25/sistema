@@ -58,4 +58,42 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('[data-crud-modal]:not(.hidden)').forEach(el =>
             el.classList.add('hidden'));
     });
+
+    /*
+     * Confirmación de borrado con modal (nada de alert() nativo).
+     *
+     * El botón de eliminar lleva data-confirmar (el texto del aviso) y vive
+     * DENTRO del <form method="POST"> de borrado. Al clickearlo se abre el
+     * modal data-crud-modal#modal-confirmar; si la persona acepta, se envía
+     * ese formulario.
+     */
+    let formularioPendiente = null;
+
+    document.addEventListener('click', evento => {
+        const boton = evento.target.closest('[data-confirmar]');
+        if (!boton) return;
+
+        evento.preventDefault();
+        formularioPendiente = boton.closest('form');
+        const el = modal('modal-confirmar');
+        if (!el || !formularioPendiente) return;
+
+        el.querySelector('[data-confirmar-mensaje]').textContent =
+            boton.dataset.confirmar;
+        document.body.appendChild(el);
+        el.classList.remove('hidden');
+        el.querySelector('[data-confirmar-aceptar]')?.focus();
+    });
+
+    document.addEventListener('click', evento => {
+        if (evento.target.closest('[data-confirmar-cancelar]')) {
+            evento.target.closest('[data-crud-modal]')?.classList.add('hidden');
+            formularioPendiente = null;
+        }
+        if (evento.target.closest('[data-confirmar-aceptar]')) {
+            evento.target.closest('[data-crud-modal]')?.classList.add('hidden');
+            formularioPendiente?.submit();
+            formularioPendiente = null;
+        }
+    });
 });
