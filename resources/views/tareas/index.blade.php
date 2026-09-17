@@ -91,6 +91,14 @@
                                                 <button type="button" data-abrir-modal="modal-tarea-editar" data-url="{{ route('tareas.update', $tarea) }}" data-valores='@json($valoresTarea)' class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
                                                     <x-heroicon-o-pencil-square class="w-5 h-5" />
                                                 </button>
+                                                <form method="POST" action="{{ route('tareas.destroy', $tarea) }}" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" data-confirmar="¿Querés eliminar esta tarea? Esta acción no se puede deshacer."
+                                                            class="text-red-600 hover:text-red-800" title="Eliminar" aria-label="Eliminar">
+                                                        <x-heroicon-o-trash class="w-5 h-5" />
+                                                    </button>
+                                                </form>
                                             @endhasanyrole
                                         </div>
                                     </td>
@@ -130,4 +138,5 @@
     @hasanyrole('Jefe|PM|PO')
     @include('tareas._modal_editar')
     @endhasanyrole
+    <x-confirmar-eliminar />
 </x-app-layout>
