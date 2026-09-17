@@ -85,6 +85,16 @@
                                                     class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
                                                 <x-heroicon-o-pencil-square class="w-5 h-5" />
                                             </button>
+                                            @hasrole('Jefe')
+                                            <form method="POST" action="{{ route('hitos.destroy', $hito) }}" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" data-confirmar="¿Querés eliminar este hito? Esta acción no se puede deshacer."
+                                                        class="text-red-600 hover:text-red-800" title="Eliminar" aria-label="Eliminar">
+                                                    <x-heroicon-o-trash class="w-5 h-5" />
+                                                </button>
+                                            </form>
+                                            @endhasrole
                                         </div>
                                     </td>
                                 </tr>
@@ -124,4 +134,5 @@
     @hasanyrole('Jefe|PM|PO')
     @include('hitos._modal_editar')
     @endhasanyrole
+    <x-confirmar-eliminar />
 </x-app-layout>

@@ -198,8 +198,8 @@ Route::get('/tutorial', function () {
  * el cliente y por la plata: el Jefe y el PM.
  */
 Route::middleware(['auth', 'role:Jefe|PM'])->group(function () {
-    Route::resource('clientes', ClienteController::class)->only(['store', 'update', 'destroy']);
-    Route::resource('proyectos', ProyectoController::class)->only(['store', 'update', 'destroy']);
+    Route::resource('clientes', ClienteController::class)->only(['store', 'update']);
+    Route::resource('proyectos', ProyectoController::class)->only(['store', 'update']);
     Route::resource('facturas', FacturaController::class)->only(['store', 'update']);
 });
 
@@ -220,9 +220,22 @@ Route::middleware(['auth', 'role:Jefe|PM|PO'])->group(function () {
     // posición final de cada tarea movida.
     Route::patch('tareas/mover', [TareaController::class, 'mover'])->name('tareas.mover');
     Route::resource('tareas', TareaController::class)->only(['store', 'update', 'destroy']);
-    Route::resource('hitos', HitoController::class)->only(['store', 'update', 'destroy']);
-    Route::resource('solicitudes-cambio', SolicitudCambioController::class)->only(['store', 'update', 'destroy']);
+    Route::resource('hitos', HitoController::class)->only(['store', 'update']);
+    Route::resource('solicitudes-cambio', SolicitudCambioController::class)->only(['store', 'update']);
     Route::resource('sprints', SprintController::class)->only(['store', 'update', 'destroy']);
+});
+
+/*
+ * BAJAS — solo el Jefe elimina fichas de clientes, proyectos, hitos,
+ * solicitudes y entregables. La edicion sigue repartida por rol en los
+ * grupos de arriba; borrar es decision exclusiva de quien responde por todo.
+ */
+Route::middleware(['auth', 'role:Jefe'])->group(function () {
+    Route::delete('clientes/{cliente}', [ClienteController::class, 'destroy'])->name('clientes.destroy');
+    Route::delete('proyectos/{proyecto}', [ProyectoController::class, 'destroy'])->name('proyectos.destroy');
+    Route::delete('hitos/{hito}', [HitoController::class, 'destroy'])->name('hitos.destroy');
+    Route::delete('solicitudes-cambio/{solicitudes_cambio}', [SolicitudCambioController::class, 'destroy'])->name('solicitudes-cambio.destroy');
+    Route::delete('entregables/{entregable}', [EntregableIAController::class, 'destroy'])->name('entregables.destroy');
 });
 
 /*
@@ -230,7 +243,7 @@ Route::middleware(['auth', 'role:Jefe|PM|PO'])->group(function () {
  * Suma al Programador, que es quien produce el material que se entrega.
  */
 Route::middleware(['auth', 'role:Jefe|PM|PO|Programador'])->group(function () {
-    Route::resource('entregables', EntregableIAController::class)->only(['store', 'update', 'destroy']);
+    Route::resource('entregables', EntregableIAController::class)->only(['store', 'update']);
     Route::post('proyectos/{proyecto}/actualizaciones', [ActualizacionProyectoController::class, 'store'])
         ->name('proyectos.actualizaciones.store');
     Route::post('proyectos/{proyecto}/informes-ia', [InformeIAController::class, 'store'])

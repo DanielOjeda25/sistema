@@ -90,7 +90,18 @@
                                                         class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
                                                     <x-heroicon-o-pencil-square class="w-5 h-5" />
                                                 </button>
-                                            @endhasanyrole
+                                            
+                                                @hasrole('Jefe')
+                                                <form method="POST" action="{{ route('proyectos.destroy', $proyecto) }}" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" data-confirmar="¿Querés eliminar este proyecto? Sus tareas y facturas asociadas quedan sin dueño. Esta acción no se puede deshacer."
+                                                            class="text-red-600 hover:text-red-800" title="Eliminar" aria-label="Eliminar">
+                                                        <x-heroicon-o-trash class="w-5 h-5" />
+                                                    </button>
+                                                </form>
+                                                @endhasrole
+                                                @endhasanyrole
                                         </div>
                                     </td>
                                 </tr>
@@ -130,4 +141,5 @@
     @hasanyrole('Jefe|PM')
     @include('proyectos._modal_editar')
     @endhasanyrole
+    <x-confirmar-eliminar />
 </x-app-layout>

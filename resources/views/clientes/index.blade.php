@@ -88,7 +88,18 @@
                                                         class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
                                                     <x-heroicon-o-pencil-square class="w-5 h-5" />
                                                 </button>
-                                            @endhasanyrole
+                                            
+                                                @hasrole('Jefe')
+                                                <form method="POST" action="{{ route('clientes.destroy', $cliente) }}" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" data-confirmar="¿Querés eliminar este cliente y su ficha? Esta acción no se puede deshacer."
+                                                            class="text-red-600 hover:text-red-800" title="Eliminar" aria-label="Eliminar">
+                                                        <x-heroicon-o-trash class="w-5 h-5" />
+                                                    </button>
+                                                </form>
+                                                @endhasrole
+                                                @endhasanyrole
                                         </div>
                                     </td>
                                 </tr>
@@ -128,4 +139,5 @@
         @hasanyrole('Jefe|PM')
     @include('clientes._modal_editar')
         @endhasanyrole
+    <x-confirmar-eliminar />
 </x-app-layout>
