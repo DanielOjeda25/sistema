@@ -53,19 +53,24 @@
                             <td class="px-4 py-3">{{ $registro->created_at->format('d/m/Y H:i') }}</td>
                             <td class="px-4 py-3">{{ $registro->user->name ?? 'Sistema' }}</td>
                             <td class="px-4 py-3">
-                                <span class="px-2 py-1 rounded-full text-xs
-                                    {{ $registro->event === 'created' ? 'bg-green-100 text-green-800' : '' }}
+                                <span class="inline-flex px-2 py-1 rounded-full text-xs font-semibold
+                                    {{ $registro->event === 'created' ? 'bg-emerald-100 text-emerald-800' : '' }}
                                     {{ $registro->event === 'updated' ? 'bg-blue-100 text-blue-800' : '' }}
                                     {{ $registro->event === 'deleted' ? 'bg-red-100 text-red-800' : '' }}">
-                                    {{ $registro->event }}
+                                    {{ ['created' => 'Creación', 'updated' => 'Modificación', 'deleted' => 'Eliminación'][$registro->event] ?? $registro->event }}
                                 </span>
                             </td>
                             <td class="px-4 py-3">
-                                {{ class_basename($registro->auditable_type) }} #{{ $registro->auditable_id }}
-                                @if ($registro->event === 'updated' && is_array($registro->getModified()))
-                                    <div class="mt-1 text-xs text-gray-500">
-                                        @foreach ($registro->getModified() as $campo => $cambio)
-                                            <div><span class="font-medium">{{ $campo }}:</span> «{{ $cambio['old'] ?? '—' }}» → «{{ $cambio['new'] ?? '—' }}»</div>
+                                <span class="font-medium text-gray-900">{{ $registro->titulo_auditoria }}</span>
+                                @if (! empty($registro->cambios_auditoria))
+                                    <div class="mt-1 space-y-0.5 text-xs text-gray-600">
+                                        @foreach ($registro->cambios_auditoria as $cambio)
+                                            <div class="flex flex-wrap items-baseline gap-1">
+                                                <span class="font-semibold text-gray-500">{{ $cambio['campo'] }}:</span>
+                                                <span class="line-through decoration-red-400 text-gray-400">{{ $cambio['viejo'] }}</span>
+                                                <span class="text-gray-400">&rarr;</span>
+                                                <span class="font-medium text-[#008c63]">{{ $cambio['nuevo'] }}</span>
+                                            </div>
                                         @endforeach
                                     </div>
                                 @endif
