@@ -92,12 +92,14 @@
                                             <button type="button" @click="verFactura = @js($verFacturaFila)" class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
                                                 <x-heroicon-o-eye class="w-5 h-5" />
                                             </button>
-                                            <button type="button" data-abrir-modal="modal-factura-editar"
+                                            @hasanyrole('Jefe|PM')
+                                                <button type="button" data-abrir-modal="modal-factura-editar"
                                                         data-url="{{ route('facturas.update', $factura) }}"
                                                         data-valores='@json($valoresFactura)'
                                                         class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
                                                     <x-heroicon-o-pencil-square class="w-5 h-5" />
                                                 </button>
+                                            @endhasanyrole
                                                 @if (auth()->user()->hasAnyRole('Jefe', 'PM'))
                                                     <form method="POST" action="{{ route('facturas.destroy', $factura) }}">
                                                         @csrf
