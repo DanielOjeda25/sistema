@@ -16,7 +16,9 @@
     </x-slot>
 
     <div class="py-8">
-        <div class="max-w-5xl mx-auto px-6 space-y-6">
+        <div class="max-w-7xl mx-auto px-6 grid gap-6 xl:grid-cols-[1fr_320px] xl:items-start">
+
+            <div class="space-y-6 min-w-0">
 
             {{-- Resumen de avance --}}
             <div class="bg-white rounded-2xl shadow-sm p-6">
@@ -192,6 +194,9 @@
 
             </div>
 
+            </div>
+
+            <aside class="space-y-6 xl:sticky xl:top-24">
             {{-- Novedades visibles para el cliente --}}
             <div class="bg-white rounded-2xl shadow-sm p-6">
                 <h3 class="text-lg font-bold text-gray-800 mb-3">Novedades del equipo</h3>
@@ -252,6 +257,7 @@
                     <p class="text-sm text-gray-400">Todavía no hay material aprobado para este proyecto.</p>
                 @endforelse
             </div>
+            </aside>
 
         </div>
     </div>
