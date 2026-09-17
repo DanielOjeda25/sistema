@@ -23,7 +23,6 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\Proyecto;
 use App\Models\SolicitudCambio;
 use App\Models\Sprint;
@@ -152,16 +151,6 @@ class TareaController extends Controller
         return response()->json(['ok' => true]);
     }
 
-    public function create()
-    {
-        $proyectos = Proyecto::orderBy('nombre')->get();
-        $usuarios = User::orderBy('name')->get();
-        $solicitudes = SolicitudCambio::orderBy('titulo')->get();
-        $sprints = Sprint::with('proyecto')->orderBy('proyecto_id')->orderBy('fecha_inicio')->get();
-
-        return view('tareas.create', compact('proyectos', 'usuarios', 'solicitudes', 'sprints'));
-    }
-
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -196,17 +185,12 @@ class TareaController extends Controller
 
         $tarea->load(['proyecto', 'asignado', 'solicitudCambio']);
 
-        return view('tareas.show', compact('tarea'));
-    }
-
-    public function edit(Tarea $tarea)
-    {
         $proyectos = Proyecto::orderBy('nombre')->get();
         $usuarios = User::orderBy('name')->get();
         $solicitudes = SolicitudCambio::orderBy('titulo')->get();
         $sprints = Sprint::with('proyecto')->orderBy('proyecto_id')->orderBy('fecha_inicio')->get();
 
-        return view('tareas.edit', compact('tarea', 'proyectos', 'usuarios', 'solicitudes', 'sprints'));
+        return view('tareas.show', compact('tarea', 'proyectos', 'usuarios', 'solicitudes', 'sprints'));
     }
 
     public function update(Request $request, Tarea $tarea)

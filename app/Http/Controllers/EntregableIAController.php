@@ -37,14 +37,6 @@ class EntregableIAController extends Controller
         return view('entregables.index', compact('entregables', 'proyectos', 'usuarios'));
     }
 
-    public function create()
-    {
-        $proyectos = Proyecto::orderBy('nombre')->get();
-        $usuarios = User::orderBy('name')->get();
-
-        return view('entregables.create', compact('proyectos', 'usuarios'));
-    }
-
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -67,15 +59,10 @@ class EntregableIAController extends Controller
 
         $entregable->load(['proyecto', 'generador']);
 
-        return view('entregables.show', compact('entregable'));
-    }
-
-    public function edit(EntregableIA $entregable)
-    {
         $proyectos = Proyecto::orderBy('nombre')->get();
         $usuarios = User::orderBy('name')->get();
 
-        return view('entregables.edit', compact('entregable', 'proyectos', 'usuarios'));
+        return view('entregables.show', compact('entregable', 'proyectos', 'usuarios'));
     }
 
     public function update(Request $request, EntregableIA $entregable)

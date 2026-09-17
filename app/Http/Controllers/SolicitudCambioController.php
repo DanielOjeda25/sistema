@@ -35,14 +35,6 @@ class SolicitudCambioController extends Controller
         return view('solicitudes_cambio.index', compact('solicitudes', 'proyectos', 'usuarios'));
     }
 
-    public function create()
-    {
-        $proyectos = Proyecto::orderBy('nombre')->get();
-        $usuarios = User::orderBy('name')->get();
-
-        return view('solicitudes_cambio.create', compact('proyectos', 'usuarios'));
-    }
-
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -71,15 +63,10 @@ class SolicitudCambioController extends Controller
 
         $solicitudes_cambio->load(['proyecto', 'solicitante', 'tareas']);
 
-        return view('solicitudes_cambio.show', ['solicitud' => $solicitudes_cambio]);
-    }
-
-    public function edit(SolicitudCambio $solicitudes_cambio)
-    {
         $proyectos = Proyecto::orderBy('nombre')->get();
         $usuarios = User::orderBy('name')->get();
 
-        return view('solicitudes_cambio.edit', [
+        return view('solicitudes_cambio.show', [
             'solicitud' => $solicitudes_cambio,
             'proyectos' => $proyectos,
             'usuarios' => $usuarios,

@@ -19,9 +19,13 @@
                 <p><strong>Detalle:</strong> {{ $factura->detalle ?? 'Sin detalle' }}</p>
 
                 <div class="pt-4 flex items-center gap-4 border-t">
-                    <a href="{{ route('facturas.edit', $factura) }}" class="text-yellow-600 hover:text-yellow-800 inline-flex" title="Editar" aria-label="Editar">
+                    @php($valoresFactura = $factura->only(['numero', 'monto', 'estado', 'detalle', 'proyecto_id', 'emitida_por']) + ['fecha_emision' => $factura->fecha_emision?->format('Y-m-d'), 'fecha_vencimiento' => $factura->fecha_vencimiento?->format('Y-m-d')])
+                    <button type="button" data-abrir-modal="modal-factura-editar"
+                            data-url="{{ route('facturas.update', $factura) }}"
+                            data-valores='@json($valoresFactura)'
+                            class="text-yellow-600 hover:text-yellow-800 inline-flex" title="Editar" aria-label="Editar">
                         <x-heroicon-o-pencil-square class="w-5 h-5" />
-                    </a>
+                    </button>
                     <a href="{{ route('facturas.pdf', $factura) }}" class="inline-flex items-center gap-1.5 text-indigo-600 hover:text-indigo-800" title="Descargar PDF">
                         <x-heroicon-o-arrow-down-tray class="w-5 h-5" />
                         Descargar PDF
@@ -32,4 +36,7 @@
             </div>
         </div>
     </div>
+    @hasanyrole('Jefe|PM')
+    @include('facturas._modal_editar')
+    @endhasanyrole
 </x-app-layout>

@@ -52,14 +52,6 @@ class ProyectoController extends Controller
 
     }
 
-    public function create()
-    {
-        $clientes = Cliente::orderBy('nombre')->get();
-        $usuarios = User::orderBy('name')->get();
-
-        return view('proyectos.create', compact('clientes', 'usuarios'));
-    }
-
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -172,15 +164,10 @@ class ProyectoController extends Controller
 
         $progreso = $contextBuilder->build($proyecto)['progreso'];
 
-        return view('proyectos.show', compact('proyecto', 'actualizaciones', 'informes', 'progreso'));
-    }
-
-    public function edit(Proyecto $proyecto)
-    {
         $clientes = Cliente::orderBy('nombre')->get();
         $usuarios = User::orderBy('name')->get();
 
-        return view('proyectos.edit', compact('proyecto', 'clientes', 'usuarios'));
+        return view('proyectos.show', compact('proyecto', 'actualizaciones', 'informes', 'progreso', 'clientes', 'usuarios'));
     }
 
     public function update(Request $request, Proyecto $proyecto)

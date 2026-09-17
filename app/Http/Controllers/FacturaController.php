@@ -35,14 +35,6 @@ class FacturaController extends Controller
         return view('facturas.index', compact('facturas', 'proyectos', 'usuarios'));
     }
 
-    public function create()
-    {
-        $proyectos = Proyecto::orderBy('nombre')->get();
-        $usuarios = User::orderBy('name')->get();
-
-        return view('facturas.create', compact('proyectos', 'usuarios'));
-    }
-
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -67,15 +59,10 @@ class FacturaController extends Controller
 
         $factura->load(['proyecto', 'emisor']);
 
-        return view('facturas.show', compact('factura'));
-    }
-
-    public function edit(Factura $factura)
-    {
         $proyectos = Proyecto::orderBy('nombre')->get();
         $usuarios = User::orderBy('name')->get();
 
-        return view('facturas.edit', compact('factura', 'proyectos', 'usuarios'));
+        return view('facturas.show', compact('factura', 'proyectos', 'usuarios'));
     }
 
     public function update(Request $request, Factura $factura)

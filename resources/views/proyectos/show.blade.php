@@ -53,9 +53,15 @@
 
                 <div class="pt-4 flex gap-4 border-t">
                     @hasanyrole('Jefe|PM')
-                    <a href="{{ route('proyectos.edit', $proyecto) }}" class="text-yellow-600 hover:text-yellow-800 inline-flex" title="Editar" aria-label="Editar">
+                    @hasanyrole('Jefe|PM')
+                    @php($valoresProyecto = $proyecto->only(['nombre', 'descripcion', 'estado', 'cliente_id', 'pm_id']) + ['fecha_inicio' => $proyecto->fecha_inicio?->format('Y-m-d'), 'fecha_fin_estimada' => $proyecto->fecha_fin_estimada?->format('Y-m-d')])
+                    <button type="button" data-abrir-modal="modal-proyecto-editar"
+                            data-url="{{ route('proyectos.update', $proyecto) }}"
+                            data-valores='@json($valoresProyecto)'
+                            class="text-yellow-600 hover:text-yellow-800 inline-flex" title="Editar" aria-label="Editar">
                         <x-heroicon-o-pencil-square class="w-5 h-5" />
-                    </a>
+                    </button>
+                    @endhasanyrole
                     @endhasanyrole
                     <a href="{{ route('proyectos.index') }}" class="text-gray-600 hover:underline">Volver al listado</a>
             </div>
@@ -166,9 +172,12 @@
 
                             @hasanyrole('Jefe|PM|PO')
                                 <div class="flex flex-wrap gap-4">
-                                <a href="{{ route('entregables.edit', $informe) }}"
-                                   class="text-indigo-600 hover:text-indigo-800 inline-flex items-center gap-1">
-                                    <x-heroicon-o-pencil-square class="w-4 h-4" /> Editar borrador</a>
+                                @php($valoresInforme = $informe->only(['titulo', 'contenido', 'tipo', 'estado', 'proyecto_id', 'generado_por']))
+                                <button type="button" data-abrir-modal="modal-entregable-editar"
+                                        data-url="{{ route('entregables.update', $informe) }}"
+                                        data-valores='@json($valoresInforme)'
+                                        class="text-indigo-600 hover:text-indigo-800 inline-flex items-center gap-1">
+                                    <x-heroicon-o-pencil-square class="w-4 h-4" /> Editar borrador</button>
                                 @if ($informe->visible_cliente)
                                     <form method="POST" action="{{ route('informes-ia.unpublish', $informe) }}">
                                         @csrf
@@ -194,4 +203,10 @@
         </div>
         </div>
     </div>
+    @hasanyrole('Jefe|PM')
+    @include('proyectos._modal_editar')
+    @endhasanyrole
+    @hasanyrole('Jefe|PM|PO|Programador')
+    @include('entregables._modal_editar')
+    @endhasanyrole
 </x-app-layout>

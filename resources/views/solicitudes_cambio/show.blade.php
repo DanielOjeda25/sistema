@@ -29,9 +29,15 @@
 
                 <div class="pt-4 flex gap-4 border-t">
                     @hasanyrole('Jefe|PM|PO')
-                    <a href="{{ route('solicitudes-cambio.edit', $solicitud) }}" class="text-yellow-600 hover:text-yellow-800 inline-flex" title="Editar" aria-label="Editar">
+                    @hasanyrole('Jefe|PM|PO')
+                    @php($valoresSolicitud = $solicitud->only(['titulo', 'descripcion', 'estado', 'prioridad', 'proyecto_id', 'solicitado_por']))
+                    <button type="button" data-abrir-modal="modal-solicitud-editar"
+                            data-url="{{ route('solicitudes-cambio.update', $solicitud) }}"
+                            data-valores='@json($valoresSolicitud)'
+                            class="text-yellow-600 hover:text-yellow-800 inline-flex" title="Editar" aria-label="Editar">
                         <x-heroicon-o-pencil-square class="w-5 h-5" />
-                    </a>
+                    </button>
+                    @endhasanyrole
                     @endhasanyrole
                     <a href="{{ route('solicitudes-cambio.index') }}" class="text-gray-600 hover:underline">Volver al listado</a>
                 </div>
@@ -39,4 +45,7 @@
             </div>
         </div>
     </div>
+    @hasanyrole('Jefe|PM|PO')
+    @include('solicitudes_cambio._modal_editar')
+    @endhasanyrole
 </x-app-layout>

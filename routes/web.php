@@ -161,10 +161,9 @@ Route::middleware(['auth', 'role:Jefe'])->group(function () {
     // cuándo. Queda en Jefe porque es información sensible de administración.
     Route::get('/auditoria', [AuditoriaController::class, 'index'])->name('auditoria.index');
 
-    // Alta de usuarios. No hay registro público: las cuentas se crean acá y se
-    // les asigna un rol. La contraseña que se pone es provisional; la persona
-    // la cambia desde su perfil cuando entra.
-    Route::get('/usuarios/crear', [UserController::class, 'create'])->name('users.create');
+    // Alta de usuarios desde el modal del listado. No hay registro público: las
+    // cuentas se crean acá y se les asigna un rol. La contraseña que se pone es
+    // provisional; la persona la cambia desde su perfil cuando entra.
     Route::post('/usuarios', [UserController::class, 'store'])->name('users.store');
 
     // Cambio de rol (un solo rol por usuario) desde el modal de la lista.
@@ -189,9 +188,9 @@ Route::get('/tutorial', function () {
 // puede LEER (index y show), pero ESCRIBIR (create, store, edit, update y
 // destroy) queda limitado a los roles que correspondan.
 //
-// El orden importa: los grupos de escritura van PRIMERO porque definen rutas
-// literales como /clientes/create. Si fueran después, la ruta de lectura
-// /clientes/{cliente} tomaría "create" como si fuera un id y daría 404.
+// El orden importa: los grupos de escritura van PRIMERO; si fueran después,
+// la ruta de lectura /clientes/{cliente} tomaría verbos de escritura como
+// si fueran un id y daría 404.
 
 /*
  * ESCRITURA — parte comercial y facturación.
@@ -199,9 +198,9 @@ Route::get('/tutorial', function () {
  * el cliente y por la plata: el Jefe y el PM.
  */
 Route::middleware(['auth', 'role:Jefe|PM'])->group(function () {
-    Route::resource('clientes', ClienteController::class)->except(['index', 'show']);
-    Route::resource('proyectos', ProyectoController::class)->except(['index', 'show']);
-    Route::resource('facturas', FacturaController::class)->except(['index', 'show', 'destroy']);
+    Route::resource('clientes', ClienteController::class)->only(['store', 'update', 'destroy']);
+    Route::resource('proyectos', ProyectoController::class)->only(['store', 'update', 'destroy']);
+    Route::resource('facturas', FacturaController::class)->only(['store', 'update']);
 });
 
 // Eliminar facturas sigue la regla del resto del módulo comercial: Jefe y PM
@@ -220,10 +219,10 @@ Route::middleware(['auth', 'role:Jefe|PM|PO'])->group(function () {
     // Movimiento de tarjetas del tablero (drag & drop): recibe el estado y la
     // posición final de cada tarea movida.
     Route::patch('tareas/mover', [TareaController::class, 'mover'])->name('tareas.mover');
-    Route::resource('tareas', TareaController::class)->except(['index', 'show']);
-    Route::resource('hitos', HitoController::class)->except(['index', 'show']);
-    Route::resource('solicitudes-cambio', SolicitudCambioController::class)->except(['index', 'show']);
-    Route::resource('sprints', SprintController::class)->except(['index', 'show']);
+    Route::resource('tareas', TareaController::class)->only(['store', 'update', 'destroy']);
+    Route::resource('hitos', HitoController::class)->only(['store', 'update', 'destroy']);
+    Route::resource('solicitudes-cambio', SolicitudCambioController::class)->only(['store', 'update', 'destroy']);
+    Route::resource('sprints', SprintController::class)->only(['store', 'update', 'destroy']);
 });
 
 /*
@@ -231,7 +230,7 @@ Route::middleware(['auth', 'role:Jefe|PM|PO'])->group(function () {
  * Suma al Programador, que es quien produce el material que se entrega.
  */
 Route::middleware(['auth', 'role:Jefe|PM|PO|Programador'])->group(function () {
-    Route::resource('entregables', EntregableIAController::class)->except(['index', 'show']);
+    Route::resource('entregables', EntregableIAController::class)->only(['store', 'update', 'destroy']);
     Route::post('proyectos/{proyecto}/actualizaciones', [ActualizacionProyectoController::class, 'store'])
         ->name('proyectos.actualizaciones.store');
     Route::post('proyectos/{proyecto}/informes-ia', [InformeIAController::class, 'store'])

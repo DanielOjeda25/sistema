@@ -34,13 +34,6 @@ class SprintController extends Controller
         return view('sprints.index', compact('sprints', 'proyectos'));
     }
 
-    public function create()
-    {
-        $proyectos = Proyecto::visiblePara(request()->user())->orderBy('nombre')->get();
-
-        return view('sprints.create', compact('proyectos'));
-    }
-
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -55,13 +48,6 @@ class SprintController extends Controller
         Sprint::create($data);
 
         return ($request->input('desde_modal') ? redirect()->back() : redirect()->route('sprints.index'))->with('success', 'Sprint creado correctamente.');
-    }
-
-    public function edit(Sprint $sprint)
-    {
-        $proyectos = Proyecto::visiblePara(request()->user())->orderBy('nombre')->get();
-
-        return view('sprints.edit', compact('sprint', 'proyectos'));
     }
 
     public function update(Request $request, Sprint $sprint)

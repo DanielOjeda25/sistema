@@ -36,13 +36,6 @@ class HitoController extends Controller
         return view('hitos.index', compact('hitos', 'proyectos'));
     }
 
-    public function create()
-    {
-        $proyectos = Proyecto::orderBy('nombre')->get();
-
-        return view('hitos.create', compact('proyectos'));
-    }
-
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -64,14 +57,9 @@ class HitoController extends Controller
 
         $hito->load('proyecto');
 
-        return view('hitos.show', compact('hito'));
-    }
-
-    public function edit(Hito $hito)
-    {
         $proyectos = Proyecto::orderBy('nombre')->get();
 
-        return view('hitos.edit', compact('hito', 'proyectos'));
+        return view('hitos.show', compact('hito', 'proyectos'));
     }
 
     public function update(Request $request, Hito $hito)
