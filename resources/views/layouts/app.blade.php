@@ -62,15 +62,6 @@
                             <a href="{{ route('entregables.index') }}" class="block rounded-lg border-l-4 px-3 py-2 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('entregables.*') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}">Entregables</a>
                         </nav>
 
-                        <div class="mt-10 border-t border-white/10 pt-4">
-                            <p class="px-3 text-xs font-semibold text-white">{{ Auth::user()->name }}</p>
-                            <p class="px-3 pt-1 text-[11px] text-slate-500">{{ Auth::user() instanceof \App\Models\User ? Auth::user()->getRoleNames()->first() : 'Usuario' }}</p>
-                            <a href="{{ route('profile.edit') }}" class="mt-4 flex items-center gap-3 rounded-lg border-l-4 px-3 py-2 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('profile.*') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}">Perfil</a>
-                            <form method="POST" action="{{ route('logout') }}" class="mt-1">
-                                @csrf
-                                <button type="submit" class="flex w-full items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2 text-left text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white">Cerrar sesión</button>
-                            </form>
-                        </div>
                     </aside>
 
                     <main class="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#f5fffb]">
