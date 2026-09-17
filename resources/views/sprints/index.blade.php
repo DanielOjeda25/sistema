@@ -24,7 +24,7 @@
                     </div>
                     <div>
                         <x-input-label for="proyecto" value="Proyecto" />
-                        <select id="proyecto" name="proyecto" class="mt-1 block w-56 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                        <select id="proyecto" name="proyecto" class="mt-1 block w-56 border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
                             <option value="">— Todos —</option>
                             @foreach ($proyectos as $p)
                                 <option value="{{ $p->id }}" @selected(request('proyecto') == $p->id)>{{ $p->nombre }}</option>

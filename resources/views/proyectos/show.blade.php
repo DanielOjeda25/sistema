@@ -134,7 +134,7 @@
                         </div>
                         <label class="flex items-center gap-2 self-end pb-2">
                             <input type="checkbox" name="visible_cliente" value="1"
-                                   class="rounded border-gray-300 text-indigo-600 shadow-sm">
+                                   class="rounded border-gray-300 text-[#00b87d] shadow-sm">
                             <span class="text-sm">Puede incluirse en el informe del Cliente</span>
                         </label>
                         <div class="md:col-span-2">

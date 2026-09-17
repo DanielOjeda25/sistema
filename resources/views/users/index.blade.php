@@ -33,7 +33,7 @@
                     <div class="flex-1 min-w-[200px]">
                         <label for="q" class="block text-xs font-medium text-gray-500 uppercase mb-1">Buscar</label>
                         <input type="text" name="q" id="q" value="{{ request('q') }}" placeholder="Nombre o email..."
-                               class="w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:ring-indigo-500">
+                               class="w-full rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
                     </div>
                     <button type="submit" class="px-4 py-2 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63] inline-flex items-center gap-1.5">
                         <x-heroicon-o-magnifying-glass class="w-4 h-4" />
