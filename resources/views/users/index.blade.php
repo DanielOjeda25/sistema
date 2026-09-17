@@ -195,12 +195,12 @@
                     </div>
                     <div class="sm:col-span-2 border-t border-gray-200 pt-4">
                         <x-input-label for="edit_password" value="Nueva contraseña (dejá vacío para no cambiarla)" />
-                        <input id="edit_password" name="password" type="password" autocomplete="new-password" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" placeholder="••••••••" />
+                        <x-password-input id="edit_password" name="password" :minimo="8" placeholder="••••••••" />
                         <x-input-error class="mt-2" :messages="$errors->get('password')" />
                     </div>
                     <div class="sm:col-span-2">
                         <x-input-label for="edit_password_confirmation" value="Repetir nueva contraseña" />
-                        <input id="edit_password_confirmation" name="password_confirmation" type="password" autocomplete="new-password" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" placeholder="••••••••" />
+                        <x-password-input id="edit_password_confirmation" name="password_confirmation" confirma-de="edit_password" placeholder="••••••••" />
                     </div>
                 </div>
                 <div class="flex items-center justify-end gap-4 border-t border-gray-200 pt-3">

@@ -1,7 +1,7 @@
 <div class="grid gap-4 sm:grid-cols-2">
     <div class="sm:col-span-2">
         <x-input-label for="titulo" value="Título" />
-        <x-text-input id="titulo" name="titulo" type="text" class="mt-1 block w-full" :value="old('titulo', $tarea?->titulo)" required autofocus />
+        <x-text-input id="titulo" name="titulo" type="text" maxlength="255" class="mt-1 block w-full" :value="old('titulo', $tarea?->titulo)" required autofocus />
         <x-input-error class="mt-2" :messages="$errors->get('titulo')" />
     </div>
 
