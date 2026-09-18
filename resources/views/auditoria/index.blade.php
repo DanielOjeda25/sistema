@@ -11,14 +11,42 @@
                        class="border-gray-300 rounded-lg w-56 focus:border-[#00b87d] focus:ring-[#00b87d]">
             </div>
             <div>
+                <label for="rol" class="block text-xs font-medium text-gray-500 uppercase mb-1">Rol</label>
+                <select id="rol" name="rol" onchange="filtrarUsuariosPorRol()" class="border-gray-300 rounded-lg focus:border-[#00b87d] focus:ring-[#00b87d]">
+                    <option value="">Todos</option>
+                    @foreach ($roles as $nombreRol)
+                        <option value="{{ $nombreRol }}" @selected(request('rol') === $nombreRol)>{{ $nombreRol }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
                 <label for="usuario" class="block text-xs font-medium text-gray-500 uppercase mb-1">Usuario</label>
                 <select id="usuario" name="usuario" class="border-gray-300 rounded-lg focus:border-[#00b87d] focus:ring-[#00b87d]">
                     <option value="">Todos</option>
                     @foreach ($usuarios as $u)
-                        <option value="{{ $u->id }}" @selected(request('usuario') == $u->id)>{{ $u->name }}</option>
+                        <option value="{{ $u->id }}" data-roles="{{ $u->roles->pluck('name')->implode(',') }}" @selected(request('usuario') == $u->id)>
+                            {{ $u->name }} ({{ $u->roles->pluck('name')->implode(', ') ?: 'sin rol' }})
+                        </option>
                     @endforeach
                 </select>
             </div>
+            <script>
+                // Al elegir un rol, el desplegable de usuario queda solo con
+                // los que cumplen ese rol; si el usuario elegido no cumple,
+                // se resetea a Todos.
+                function filtrarUsuariosPorRol() {
+                    const rol = document.getElementById('rol').value;
+                    const select = document.getElementById('usuario');
+                    let hayElegidoVisible = false;
+                    select.querySelectorAll('option').forEach(opcion => {
+                        if (opcion.value === '') { opcion.hidden = false; return; }
+                        opcion.hidden = rol !== '' && !opcion.dataset.roles.split(',').includes(rol);
+                        if (!opcion.hidden && opcion.selected) hayElegidoVisible = true;
+                    });
+                    if (!hayElegidoVisible) select.value = '';
+                }
+                document.addEventListener('DOMContentLoaded', filtrarUsuariosPorRol);
+            </script>
             <div>
                 <label for="accion" class="block text-xs font-medium text-gray-500 uppercase mb-1">Acción</label>
                 <select id="accion" name="accion" class="border-gray-300 rounded-lg focus:border-[#00b87d] focus:ring-[#00b87d]">
@@ -37,7 +65,7 @@
                 <x-heroicon-o-magnifying-glass class="w-4 h-4" />
                 Filtrar
             </button>
-            @if (request()->filled('q') || request()->filled('usuario') || request()->filled('accion'))
+            @if (request()->filled('q') || request()->filled('usuario') || request()->filled('accion') || request()->filled('rol'))
                 <a href="{{ route('auditoria.index') }}" class="text-xs text-gray-500 hover:underline pb-2">Limpiar</a>
             @endif
         </form>
