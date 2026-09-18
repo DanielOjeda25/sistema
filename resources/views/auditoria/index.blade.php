@@ -76,6 +76,7 @@
                     <tr>
                         <th class="px-4 py-3">Fecha</th>
                         <th class="px-4 py-3">Usuario</th>
+                        <th class="px-4 py-3">Rol</th>
                         <th class="px-4 py-3">Evento</th>
                         <th class="px-4 py-3">Registro</th>
                     </tr>
@@ -85,6 +86,15 @@
                         <tr class="border-t">
                             <td class="px-4 py-3">{{ $registro->created_at->format('d/m/Y H:i') }}</td>
                             <td class="px-4 py-3">{{ $registro->user->name ?? 'Sistema' }}</td>
+                            <td class="px-4 py-3">
+                                @if ($registro->user)
+                                    <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-gray-100 text-gray-700">
+                                        {{ $registro->user->roles->pluck('name')->implode(', ') ?: 'sin rol' }}
+                                    </span>
+                                @else
+                                    <span class="text-gray-400">—</span>
+                                @endif
+                            </td>
                             <td class="px-4 py-3">
                                 <span class="inline-flex px-2 py-1 rounded-full text-xs font-semibold
                                     {{ $registro->event === 'created' ? 'bg-emerald-100 text-emerald-800' : '' }}
@@ -110,7 +120,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="4" class="px-4 py-6 text-center text-gray-500">Sin registros.</td></tr>
+                        <tr><td colspan="5" class="px-4 py-6 text-center text-gray-500">Sin registros.</td></tr>
                     @endforelse
                 </tbody>
             </table>

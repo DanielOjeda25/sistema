@@ -11,7 +11,7 @@ class AuditoriaController extends Controller
 {
     public function index(Request $request)
     {
-        $auditoria = Audit::with('user')
+        $auditoria = Audit::with('user.roles')
             ->latest()
             // Busqueda libre: evento o modelo auditado.
             ->when($request->filled('q'), function ($query) use ($request) {
