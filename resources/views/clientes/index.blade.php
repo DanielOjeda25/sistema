@@ -78,9 +78,15 @@
                                                     <x-heroicon-o-clock class="w-5 h-5" />
                                                 </a>
                                             @endhasanyrole
-                                            <a href="{{ route('clientes.show', $cliente) }}" class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
+                                            <button type="button" @click="verCliente = @js([
+                                                    'nombre' => $cliente->nombre.' '.$cliente->apellido,
+                                                    'email' => $cliente->email,
+                                                    'telefono' => $cliente->telefono ?? '—',
+                                                    'empresa' => $cliente->empresa ?? 'Sin empresa',
+                                                    'estado' => $cliente->estado,
+                                                ])" class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
                                                 <x-heroicon-o-eye class="w-5 h-5" />
-                                            </a>
+                                            </button>
                                             @hasanyrole('Jefe|PM')
                                                 <button type="button" data-abrir-modal="modal-cliente-editar"
                                                         data-url="{{ route('clientes.update', $cliente) }}"
@@ -140,4 +146,5 @@
     @include('clientes._modal_editar')
         @endhasanyrole
     <x-confirmar-eliminar />
+    <x-cliente-view-modal />
 </x-app-layout>

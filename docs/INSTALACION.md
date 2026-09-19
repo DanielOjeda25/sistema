@@ -212,3 +212,13 @@ npm run dev               # terminal 2
 ## SIGUIENTE PASO
 
 Una vez que el proyecto corre, ver [CRUZNEGRA_TAREAS.md](CRUZNEGRA_TAREAS.md) para entender qué tablas se están construyendo y en qué paso va el equipo.
+
+## Rendimiento en desarrollo local
+
+El `.env` de ejemplo viene con `SESSION_DRIVER=file`, `QUEUE_CONNECTION=sync`
+y `CACHE_STORE=file`: en Laragon evitan queries extra de sesion/cache a MySQL
+en cada pagina y hacen que los jobs corran al instante. Si preferis los
+drivers `database`, tambien funcionan (corre `php artisan migrate` para crear
+las tablas `sessions`, `cache` y `jobs`); en produccion multi-servidor esa es
+la opcion recomendada. Al cambiar estos valores corre `php artisan config:clear`
+y volves a iniciar sesion.

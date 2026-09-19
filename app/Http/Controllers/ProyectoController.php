@@ -166,8 +166,11 @@ class ProyectoController extends Controller
 
         $clientes = Cliente::orderBy('nombre')->get();
         $usuarios = User::orderBy('name')->get();
+        // La vista incluye los modales de actualizaciones e informes IA,
+        // cuyos campos necesitan la lista de proyectos para sus selects.
+        $proyectos = Proyecto::orderBy('nombre')->get();
 
-        return view('proyectos.show', compact('proyecto', 'actualizaciones', 'informes', 'progreso', 'clientes', 'usuarios'));
+        return view('proyectos.show', compact('proyecto', 'actualizaciones', 'informes', 'progreso', 'clientes', 'usuarios', 'proyectos'));
     }
 
     public function update(Request $request, Proyecto $proyecto)

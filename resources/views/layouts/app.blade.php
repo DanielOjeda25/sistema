@@ -18,7 +18,7 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased" x-data="{ ver: null, verFactura: null }">
+    <body class="font-sans antialiased" x-data="{ ver: null, verFactura: null, verCliente: null, verProyecto: null }">
         @if (request()->routeIs('dashboard'))
             {{ $slot }}
         @else
