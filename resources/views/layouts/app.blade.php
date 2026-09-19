@@ -29,38 +29,28 @@
                             <img src="{{ asset('images/cruznegra-logo-light.png') }}" alt="Cruz Negra" class="h-14 w-full object-contain object-center">
                         </a>
 
+@php($menuAccesos = \App\Support\Acceso::menu(auth()->user()))
                         <nav class="mt-6 space-y-1">
-                            <a href="{{ route('dashboard') }}" class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('dashboard') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"><x-heroicon-o-home class="h-5 w-5 shrink-0" /> Dashboard</a>
-                            @role('Jefe')
-                                <a href="{{ route('users.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('users.*') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"><x-heroicon-o-users class="h-5 w-5 shrink-0" /> Usuarios y roles</a>
-                            @endhasanyrole
-                            @hasanyrole('Jefe')
-                                <a href="{{ route('auditoria.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('auditoria.*') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"><x-heroicon-o-clock class="h-5 w-5 shrink-0" /> Auditoría</a>
-                            @endhasanyrole
-                            <a href="{{ route('proyectos.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('proyectos.*') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"><x-heroicon-o-squares-2x2 class="h-5 w-5 shrink-0" /> {{ auth()->user()->esCliente() ? 'Mis proyectos' : 'Proyectos' }}</a>
-                            @unless (auth()->user()->esCliente())
-                            <a href="{{ route('tareas.tablero') }}" class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('tareas.tablero') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"><x-heroicon-o-check-circle class="h-5 w-5 shrink-0" /> Mi trabajo</a>
-                            @endunless
-                            @unless (auth()->user()->esCliente())
-                            <a href="{{ route('tareas.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('tareas.*') && ! request()->routeIs('tareas.tablero') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"><x-heroicon-o-queue-list class="h-5 w-5 shrink-0" /> Tareas</a>
-                            @endunless
-                            <a href="{{ route('facturas.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('facturas.*') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"><x-heroicon-o-banknotes class="h-5 w-5 shrink-0" /> Facturas</a>
-                            @unless (auth()->user()->esCliente())
-                            <a href="{{ route('clientes.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('clientes.*') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"><x-heroicon-o-building-office-2 class="h-5 w-5 shrink-0" /> Clientes y empresas</a>
-                            @endunless
+                            @foreach ($menuAccesos as $enlace)
+                                @continue(isset($enlace['seccion']))
+                                <a href="{{ route($enlace['ruta']) }}" class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs(str_replace('.index', '.*', $enlace['ruta']) === $enlace['ruta'] ? $enlace['ruta'] : str_replace('.index', '.*', $enlace['ruta'])) ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}">
+                                    @if ($enlace['icono'])
+                                        <x-dynamic-component :component="$enlace['icono']" class="h-5 w-5 shrink-0" />
+                                    @endif
+                                    {{ auth()->user()->esCliente() ? ($enlace['label_cliente'] ?? $enlace['label']) : $enlace['label'] }}
+                                </a>
+                            @endforeach
                         </nav>
 
+                        @if (collect($menuAccesos)->contains(fn ($e) => ($e['seccion'] ?? null) === 'Modulos'))
                         <p class="mt-8 px-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Módulos</p>
                         <nav class="mt-2 space-y-1">
-                            @unless (auth()->user()->esCliente())
-                            <a href="{{ route('sprints.index') }}" class="block rounded-lg border-l-4 px-3 py-2 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('sprints.*') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}">Sprints</a>
-                            @endunless
-                            @unless (auth()->user()->esCliente())
-                            <a href="{{ route('hitos.index') }}" class="block rounded-lg border-l-4 px-3 py-2 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('hitos.*') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}">Hitos</a>
-                            <a href="{{ route('solicitudes-cambio.index') }}" class="block rounded-lg border-l-4 px-3 py-2 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('solicitudes-cambio.*') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}">Cambios</a>
-                            @endunless
-                            <a href="{{ route('entregables.index') }}" class="block rounded-lg border-l-4 px-3 py-2 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs('entregables.*') ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}">Entregables</a>
+                            @foreach ($menuAccesos as $enlace)
+                                @continue(($enlace['seccion'] ?? null) !== 'Modulos')
+                                <a href="{{ route($enlace['ruta']) }}" class="block rounded-lg border-l-4 px-3 py-2 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs(str_replace('.index', '.*', $enlace['ruta'])) ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}">{{ $enlace['label'] }}</a>
+                            @endforeach
                         </nav>
+                        @endif
 
                     </aside>
 
@@ -72,10 +62,8 @@
                                 </a>
                                 <span class="hidden text-xs text-slate-400 sm:inline">{{ now()->translatedFormat('d \d\e F \d\e Y') }}</span>
                             </div>
-                            @php
-                                $sinLeer = auth()->user()->unreadNotifications()->take(8)->get();
-                                $totalSinLeer = auth()->user()->unreadNotifications()->count();
-                            @endphp
+                            @php($sinLeer = auth()->user()->unreadNotifications()->take(8)->get())
+                            @php($totalSinLeer = auth()->user()->unreadNotifications()->count())
                             <div class="flex items-center gap-1">
                             <div class="relative" x-data="{ abierto: false }">
                                 <button @click="abierto = !abierto" class="relative rounded-lg p-2 text-slate-500 transition hover:bg-[#f0fff9] hover:text-slate-700" aria-label="Notificaciones">
