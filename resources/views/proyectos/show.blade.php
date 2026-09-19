@@ -11,7 +11,10 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8" x-data="{ tab: 'resumen' }">
+        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8" x-data="{
+        tab: localStorage.getItem('tab-proyecto-{{ $proyecto->id }}') || 'resumen',
+        ir(destino) { this.tab = destino; localStorage.setItem('tab-proyecto-{{ $proyecto->id }}', destino); },
+    }">
             @if (session('success'))
                 <div class="mb-5 p-4 bg-green-100 text-green-700 rounded-lg">
                     {{ session('success') }}
@@ -28,22 +31,22 @@
                 @php($contTareas = $proyecto->tareas->count())
                 @php($contAct = $actualizaciones->count())
                 @php($contInf = $informes->count())
-                <button type="button" @click="tab = 'resumen'"
+                <button type="button" @click="ir('resumen')"
                         class="px-3.5 py-2 rounded-lg text-xs font-semibold uppercase tracking-widest transition"
                         :class="tab === 'resumen' ? 'bg-[#00b87d] text-white' : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'">
                     Resumen
                 </button>
-                <button type="button" @click="tab = 'tareas'"
+                <button type="button" @click="ir('tareas')"
                         class="px-3.5 py-2 rounded-lg text-xs font-semibold uppercase tracking-widest transition"
                         :class="tab === 'tareas' ? 'bg-[#00b87d] text-white' : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'">
                     Tareas <span class="opacity-70">({{ $contTareas }})</span>
                 </button>
-                <button type="button" @click="tab = 'actualizaciones'"
+                <button type="button" @click="ir('actualizaciones')"
                         class="px-3.5 py-2 rounded-lg text-xs font-semibold uppercase tracking-widest transition"
                         :class="tab === 'actualizaciones' ? 'bg-[#00b87d] text-white' : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'">
                     Actualizaciones <span class="opacity-70">({{ $contAct }})</span>
                 </button>
-                <button type="button" @click="tab = 'informes'"
+                <button type="button" @click="ir('informes')"
                         class="px-3.5 py-2 rounded-lg text-xs font-semibold uppercase tracking-widest transition"
                         :class="tab === 'informes' ? 'bg-[#00b87d] text-white' : 'bg-white border border-gray-300 text-gray-600 hover:bg-gray-50'">
                     Informes IA <span class="opacity-70">({{ $contInf }})</span>
