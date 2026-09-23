@@ -16,15 +16,18 @@
             <header class="border-b border-white/15 px-6 py-5 sm:px-10 lg:px-16">
                 <div class="mx-auto flex max-w-[1280px] items-center justify-between">
                     <a href="/" class="flex items-center gap-3">
-                        <img src="{{ asset('images/cruznegra-logo-light.png') }}" alt="Cruz Negra" class="h-10 w-auto">
+                        <img src="{{ asset('images/cruznegra-logo-light.png') }}" alt="Cruz Negra" class="h-8 w-auto sm:h-10">
+                    </a>
+                    <a href="{{ route('login') }}" class="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-semibold text-[#101416] transition hover:bg-slate-200 sm:px-6 sm:py-2.5 sm:text-sm">
+                        Ingresar <span class="text-base leading-none">→</span>
                     </a>
                 </div>
             </header>
 
-            <section class="mx-auto grid min-h-[calc(100vh-81px)] max-w-[1280px] items-center gap-12 px-6 py-14 sm:px-10 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16 lg:px-16 lg:py-20">
+            <section class="mx-auto grid min-h-[calc(100vh-81px)] max-w-[1280px] items-center gap-10 px-4 py-10 sm:px-10 sm:py-14 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16 lg:px-16 lg:py-20">
                 <div>
                     <p class="text-sm font-medium uppercase tracking-[0.08em] text-slate-300">Sistema de gestión interna</p>
-                    <h1 class="mt-6 max-w-xl text-5xl font-extrabold leading-[0.98] tracking-[-0.045em] sm:text-6xl lg:text-7xl">
+                    <h1 class="mt-4 max-w-xl text-4xl font-extrabold leading-[1.02] tracking-[-0.045em] sm:mt-6 sm:text-6xl lg:text-7xl">
                         Gestioná mejor.<br>Trabajá más rápido.
                     </h1>
                     <p class="mt-8 max-w-lg text-base leading-7 text-slate-300">
@@ -39,11 +42,11 @@
                     </div>
                 </div>
 
-                <div id="vista-general" class="relative mx-auto w-full max-w-[620px] lg:justify-self-end">
+                <div id="vista-general" class="relative mx-auto w-full max-w-[620px] px-2 sm:px-0 lg:justify-self-end">
                     <div class="absolute -inset-12 rounded-full bg-[#39545a]/30 blur-3xl"></div>
                     <div class="relative rounded-[1.5rem] border-2 border-[#70797b] bg-[#171b1d] p-2 shadow-[0_30px_80px_rgba(0,0,0,0.65)]">
                         <div class="overflow-hidden rounded-[1rem] bg-[#f5f7f8] text-slate-900">
-                            <div class="flex min-h-[300px] sm:min-h-[390px]">
+                            <div class="flex min-h-[240px] sm:min-h-[390px]">
                                 <aside class="hidden w-32 shrink-0 bg-[#1d2023] p-4 text-[9px] text-slate-500 sm:block">
                                     <div class="text-[10px] font-bold text-white">CRUZNEGRA</div>
                                     <div class="mt-8 space-y-4">
