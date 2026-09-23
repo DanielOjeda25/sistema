@@ -17,7 +17,8 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans text-gray-900 antialiased">
-        <div class="min-h-screen flex flex-col lg:flex-row">
+        <div class="min-h-screen flex flex-col">
+        <div class="flex flex-1 flex-col lg:flex-row">
 
             {{-- Panel de marca --}}
             <div class="lg:w-5/12 bg-[radial-gradient(circle_at_75%_45%,#202a2d_0%,#101416_42%,#0b0d0e_100%)] text-white px-8 py-10 lg:px-12 lg:py-16 flex flex-col justify-between">
@@ -45,9 +46,7 @@
                     </ul>
                 </div>
 
-                <p class="hidden lg:block text-sm text-slate-400 mt-10">
-                    &copy; {{ date('Y') }} CRUZNEGRA
-                </p>
+
             </div>
 
             {{-- Panel del formulario --}}
@@ -57,6 +56,9 @@
                 </div>
             </div>
 
+        </div>
+
+        <x-footer-sitio class="!border-white/10" />
         </div>
     </body>
 </html>

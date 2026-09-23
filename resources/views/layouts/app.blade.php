@@ -137,6 +137,7 @@
                         <div class="scroll-suave flex-1 overflow-y-auto p-5 sm:p-8">
                             {{ $slot }}
                         </div>
+                        <x-footer-sitio class="!bg-[#202225] !border-white/10" />
                     </main>
                 </div>
             </div>

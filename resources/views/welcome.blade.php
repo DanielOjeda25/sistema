@@ -81,6 +81,8 @@
                     </div>
                 </div>
             </section>
+
+            <x-footer-sitio class="!border-white/15 !bg-transparent" />
         </main>
     </body>
 </html>

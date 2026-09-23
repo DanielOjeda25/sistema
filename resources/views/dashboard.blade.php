@@ -217,6 +217,7 @@
 
                     </div>
                 </div>
+                <x-footer-sitio class="!bg-[#202225] !border-white/10" />
             </main>
         </div>
     </div>
