@@ -30,6 +30,17 @@
                                class="w-full rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
                     </div>
                     <div>
+                        <label for="proyecto_id" class="block text-xs font-medium text-gray-500 uppercase mb-1">Proyecto</label>
+                        <select name="proyecto_id" id="proyecto_id" class="rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] min-w-[180px]">
+                            <option value="">Todos</option>
+                            @foreach ($proyectos as $proyecto)
+                                <option value="{{ $proyecto->id }}" @selected(request('proyecto_id') == $proyecto->id)>
+                                    {{ $proyecto->nombre }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
                         <label for="estado" class="block text-xs font-medium text-gray-500 uppercase mb-1">Estado</label>
                         <select name="estado" id="estado" class="rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
                             <option value="">Todos</option>
@@ -40,11 +51,30 @@
                             @endforeach
                         </select>
                     </div>
+                    <div>
+                        <label for="fecha_objetivo" class="block text-xs font-medium text-gray-500 uppercase mb-1">Fecha objetivo</label>
+                        <select name="fecha_objetivo" id="fecha_objetivo" class="rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] min-w-[180px]">
+                            <option value="">Todas</option>
+                            @foreach (['vencidos' => 'Vencidos', 'proximos_7_dias' => 'Próximos 7 días', 'rango' => 'Rango'] as $valor => $etiqueta)
+                                <option value="{{ $valor }}" @selected(request('fecha_objetivo') === $valor)>{{ $etiqueta }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label for="fecha_desde" class="block text-xs font-medium text-gray-500 uppercase mb-1">Desde</label>
+                        <input type="date" name="fecha_desde" id="fecha_desde" value="{{ request('fecha_desde') }}"
+                               class="rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
+                    </div>
+                    <div>
+                        <label for="fecha_hasta" class="block text-xs font-medium text-gray-500 uppercase mb-1">Hasta</label>
+                        <input type="date" name="fecha_hasta" id="fecha_hasta" value="{{ request('fecha_hasta') }}"
+                               class="rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
+                    </div>
                     <button type="submit" class="px-4 py-2 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63] inline-flex items-center gap-1.5">
                         <x-heroicon-o-magnifying-glass class="w-4 h-4" />
                         Filtrar
                     </button>
-                    @if (request()->hasAny(['q', 'estado']))
+                    @if (request()->hasAny(['q', 'estado', 'proyecto_id', 'fecha_objetivo', 'fecha_desde', 'fecha_hasta']))
                         <a href="{{ route('hitos.index') }}" class="text-xs text-gray-500 hover:text-gray-700 underline">Limpiar</a>
                     @endif
                 </form>

@@ -107,6 +107,49 @@ class CrudModulosTest extends TestCase
     }
 
     /** @test */
+    public function el_listado_de_hitos_puede_filtrarse_por_proyecto_estado_y_fecha_objetivo(): void
+    {
+        $jefe = $this->jefe();
+        $proyectoA = Proyecto::firstOrFail();
+        $proyectoB = Proyecto::query()->whereKeyNot($proyectoA->id)->firstOrFail();
+
+        $hitoVencido = Hito::create([
+            'nombre' => 'Hito vencido filtrado',
+            'descripcion' => 'debe verse',
+            'fecha_objetivo' => today()->subDay(),
+            'completado' => false,
+            'proyecto_id' => $proyectoA->id,
+        ]);
+
+        $hitoCercano = Hito::create([
+            'nombre' => 'Hito cercano filtrado',
+            'descripcion' => 'no debe verse',
+            'fecha_objetivo' => today()->addDays(3),
+            'completado' => false,
+            'proyecto_id' => $proyectoA->id,
+        ]);
+
+        $hitoOtroProyecto = Hito::create([
+            'nombre' => 'Hito de otro proyecto',
+            'descripcion' => 'no debe verse',
+            'fecha_objetivo' => today()->subDay(),
+            'completado' => false,
+            'proyecto_id' => $proyectoB->id,
+        ]);
+
+        $this->actingAs($jefe)
+            ->get(route('hitos.index', [
+                'proyecto_id' => $proyectoA->id,
+                'estado' => 'pendiente',
+                'fecha_objetivo' => 'vencidos',
+            ]))
+            ->assertOk()
+            ->assertSee($hitoVencido->nombre)
+            ->assertDontSee($hitoCercano->nombre)
+            ->assertDontSee($hitoOtroProyecto->nombre);
+    }
+
+    /** @test */
     public function ciclo_completo_de_sprint(): void
     {
         $jefe = $this->jefe();

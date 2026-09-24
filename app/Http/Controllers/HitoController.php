@@ -27,6 +27,32 @@ class HitoController extends Controller
                     $query->where('completado', false);
                 }
             })
+            ->when($request->filled('proyecto_id'), function ($query) use ($request) {
+                $query->where('proyecto_id', $request->integer('proyecto_id'));
+            })
+            ->when($request->filled('fecha_objetivo'), function ($query) use ($request) {
+                $valor = $request->string('fecha_objetivo')->toString();
+
+                if ($valor === 'vencidos') {
+                    $query->where('completado', false)
+                        ->whereDate('fecha_objetivo', '<', today());
+                } elseif ($valor === 'proximos_7_dias') {
+                    $query->where('completado', false)
+                        ->whereDate('fecha_objetivo', '>=', today())
+                        ->whereDate('fecha_objetivo', '<=', today()->addDays(7));
+                } elseif ($valor === 'rango') {
+                    $desde = $request->input('fecha_desde');
+                    $hasta = $request->input('fecha_hasta');
+
+                    if ($desde) {
+                        $query->whereDate('fecha_objetivo', '>=', $desde);
+                    }
+
+                    if ($hasta) {
+                        $query->whereDate('fecha_objetivo', '<=', $hasta);
+                    }
+                }
+            })
             ->latest()
             ->paginate(15)
             ->withQueryString();
