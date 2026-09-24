@@ -11,6 +11,7 @@ use App\Models\Sprint;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
@@ -33,7 +34,7 @@ class CrudModulosTest extends TestCase
         return User::where('email', 'jefe@example.com')->firstOrFail();
     }
 
-    /** @test */
+        #[Test]
     public function ciclo_completo_de_cliente(): void
     {
         $jefe = $this->jefe();
@@ -56,7 +57,7 @@ class CrudModulosTest extends TestCase
         $this->assertDatabaseMissing('clientes', ['id' => $cliente->id]);
     }
 
-    /** @test */
+        #[Test]
     public function ciclo_completo_de_proyecto(): void
     {
         $jefe = $this->jefe();
@@ -82,7 +83,7 @@ class CrudModulosTest extends TestCase
         $this->assertDatabaseMissing('proyectos', ['id' => $proyecto->id]);
     }
 
-    /** @test */
+        #[Test]
     public function ciclo_completo_de_hito(): void
     {
         $jefe = $this->jefe();
@@ -106,7 +107,7 @@ class CrudModulosTest extends TestCase
         $this->assertDatabaseMissing('hitos', ['id' => $hito->id]);
     }
 
-    /** @test */
+        #[Test]
     public function el_listado_de_hitos_puede_filtrarse_por_proyecto_estado_y_fecha_objetivo(): void
     {
         $jefe = $this->jefe();
@@ -149,7 +150,7 @@ class CrudModulosTest extends TestCase
             ->assertDontSee($hitoOtroProyecto->nombre);
     }
 
-    /** @test */
+        #[Test]
     public function ciclo_completo_de_sprint(): void
     {
         $jefe = $this->jefe();
@@ -173,7 +174,7 @@ class CrudModulosTest extends TestCase
         $this->assertDatabaseMissing('sprints', ['id' => $sprint->id]);
     }
 
-    /** @test */
+        #[Test]
     public function ciclo_completo_de_solicitud_de_cambio(): void
     {
         $jefe = $this->jefe();
@@ -199,7 +200,7 @@ class CrudModulosTest extends TestCase
         $this->assertDatabaseMissing('solicitudes_cambio', ['id' => $solicitud->id]);
     }
 
-    /** @test */
+        #[Test]
     public function ciclo_completo_de_entregable_ia(): void
     {
         $jefe = $this->jefe();
@@ -225,7 +226,7 @@ class CrudModulosTest extends TestCase
         $this->assertDatabaseMissing('entregables_ia', ['id' => $entregable->id]);
     }
 
-    /** @test */
+        #[Test]
     public function el_jefe_crea_un_usuario_cliente_con_su_empresa(): void
     {
         $jefe = $this->jefe();
@@ -244,7 +245,7 @@ class CrudModulosTest extends TestCase
         $this->assertTrue($usuario->hasRole('Cliente'));
     }
 
-    /** @test */
+        #[Test]
     public function el_jefe_edita_cambia_rol_y_elimina_un_usuario(): void
     {
         $jefe = $this->jefe();
@@ -281,7 +282,7 @@ class CrudModulosTest extends TestCase
         $this->assertDatabaseMissing('users', ['id' => $usuario->id]);
     }
 
-    /** @test */
+        #[Test]
     public function cualquier_usuario_cambia_su_propia_password_desde_su_perfil(): void
     {
         $user = User::create([
@@ -309,7 +310,7 @@ class CrudModulosTest extends TestCase
         $this->assertTrue(Hash::check('nueva-clave-123', $user->fresh()->password));
     }
 
-    /** @test */
+        #[Test]
     public function un_usuario_sin_rol_interno_no_puede_crear_nada(): void
     {
         $cliente = User::where('email', 'cliente@example.com')->firstOrFail();

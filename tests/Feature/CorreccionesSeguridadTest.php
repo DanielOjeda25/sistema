@@ -6,6 +6,7 @@ use App\Models\Sprint;
 use App\Models\Tarea;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
@@ -35,7 +36,7 @@ class CorreccionesSeguridadTest extends TestCase
         ], $extras);
     }
 
-    /** @test */
+        #[Test]
     public function monto_maximo_de_10_millones_se_rechaza(): void
     {
         $jefe = User::where('email', 'jefe@example.com')->firstOrFail();
@@ -47,7 +48,7 @@ class CorreccionesSeguridadTest extends TestCase
         $this->assertDatabaseMissing('facturas', ['monto' => 10000001]);
     }
 
-    /** @test */
+        #[Test]
     public function monto_negativo_se_rechaza(): void
     {
         $jefe = User::where('email', 'jefe@example.com')->firstOrFail();
@@ -57,7 +58,7 @@ class CorreccionesSeguridadTest extends TestCase
             ->assertSessionHasErrors('monto');
     }
 
-    /** @test */
+        #[Test]
     public function vencimiento_anterior_a_emision_se_rechaza(): void
     {
         $jefe = User::where('email', 'jefe@example.com')->firstOrFail();
@@ -67,7 +68,7 @@ class CorreccionesSeguridadTest extends TestCase
             ->assertSessionHasErrors('fecha_vencimiento');
     }
 
-    /** @test */
+        #[Test]
     public function factura_valida_se_crea(): void
     {
         $jefe = User::where('email', 'jefe@example.com')->firstOrFail();
@@ -79,7 +80,7 @@ class CorreccionesSeguridadTest extends TestCase
         $this->assertDatabaseHas('facturas', ['monto' => 10000000]);
     }
 
-    /** @test */
+        #[Test]
     public function jefe_y_pm_pueden_eliminar_facturas(): void
     {
         // La eliminación sigue la misma regla que crear/editar: Jefe y PM
@@ -94,7 +95,7 @@ class CorreccionesSeguridadTest extends TestCase
         $this->assertDatabaseMissing('facturas', ['id' => 2]);
     }
 
-    /** @test */
+        #[Test]
     public function po_y_programador_no_pueden_eliminar_facturas(): void
     {
         $po = User::where('email', 'po@example.com')->firstOrFail();
@@ -105,7 +106,7 @@ class CorreccionesSeguridadTest extends TestCase
         $this->assertDatabaseHas('facturas', ['id' => 1]);
     }
 
-    /** @test */
+        #[Test]
     public function mover_tareas_ajenas_al_cliente_se_rechaza(): void
     {
         $cliente = User::where('email', 'cliente@example.com')->firstOrFail();
@@ -122,7 +123,7 @@ class CorreccionesSeguridadTest extends TestCase
         $this->assertDatabaseHas('tareas', ['id' => 4, 'estado' => $estadoOriginal]);
     }
 
-    /** @test */
+        #[Test]
     public function cliente_solo_ve_sprints_de_sus_proyectos_en_el_tablero(): void
     {
         $cliente = User::where('email', 'cliente@example.com')->firstOrFail();
