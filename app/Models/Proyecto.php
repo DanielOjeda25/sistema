@@ -9,6 +9,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use OwenIt\Auditing\Contracts\Auditable;
 
+/**
+ * @property int $id
+ * @property string $nombre
+ * @property string|null $descripcion
+ * @property \Illuminate\Support\Carbon\Carbon|\Illuminate\Support\Carbon\Interface|null $fecha_inicio
+ * @property \Illuminate\Support\Carbon\Carbon|\Illuminate\Support\Carbon\Interface|null $fecha_fin_estimada
+ * @property string|null $estado
+ * @property int|null $cliente_id
+ * @property int|null $pm_id
+ */
 class Proyecto extends Model implements Auditable
 {
     use HasFactory;

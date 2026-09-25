@@ -1,13 +1,20 @@
+{{--
+    Campos del formulario de Usuario (crear y editar). Con Alpine, al elegir
+    el rol "Cliente" aparece el selector de ficha: la cuenta se vincula a una
+    fila del modulo Clientes (la empresa que contrata) y ese vinculo es lo
+    que define que proyectos y facturas va a ver. La contrasena usa el
+    componente x-password-input (mostrar/ocultar + aviso en vivo).
+--}}
 <div class="grid gap-4 sm:grid-cols-2" x-data="{ rol: '{{ old('rol', '') }}' }">
     <div>
         <x-input-label for="name" value="Nombre" />
-        <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name')" required autofocus />
+        <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name')" required autofocus  maxlength="255" />
         <x-input-error class="mt-2" :messages="$errors->get('name')" />
     </div>
 
     <div>
         <x-input-label for="apellido" value="Apellido" />
-        <x-text-input id="apellido" name="apellido" type="text" class="mt-1 block w-full" :value="old('apellido')" required />
+        <x-text-input id="apellido" name="apellido" type="text" class="mt-1 block w-full" :value="old('apellido')" required  maxlength="255" />
         <x-input-error class="mt-2" :messages="$errors->get('apellido')" />
     </div>
 
@@ -38,9 +45,9 @@
     </div>
 
     <div x-show="rol === 'Cliente'" x-cloak class="sm:col-span-2 rounded-lg border border-emerald-100 bg-emerald-50 p-4">
-        <x-input-label for="cliente_id" value="Empresa del cliente" />
+        <x-input-label for="cliente_id" value="Cuenta para la ficha de cliente" />
         <select id="cliente_id" name="cliente_id" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
-            <option value="">— Seleccioná la empresa —</option>
+            <option value="">— Seleccioná la ficha de cliente —</option>
             @foreach ($clientes as $c)
                 <option value="{{ $c->id }}" @selected(old('cliente_id') == $c->id)>{{ $c->nombre }} {{ $c->apellido }}@if($c->empresa) · {{ $c->empresa }}@endif</option>
             @endforeach

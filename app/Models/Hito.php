@@ -8,6 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use OwenIt\Auditing\Contracts\Auditable;
 
+/**
+ * @property int $id
+ * @property string $nombre
+ * @property string|null $descripcion
+ * @property \Illuminate\Support\Carbon\Carbon|\Illuminate\Support\Carbon\Interface|null $fecha_objetivo
+ * @property bool $completado
+ * @property int $proyecto_id
+ */
 class Hito extends Model implements Auditable
 {
     use HasFactory;

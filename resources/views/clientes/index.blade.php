@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Listado de Clientes
+                Clientes y empresas
             </h2>
             @hasanyrole('Jefe|PM')
                 <button type="button" data-abrir-modal="modal-cliente-crear"
@@ -78,9 +78,15 @@
                                                     <x-heroicon-o-clock class="w-5 h-5" />
                                                 </a>
                                             @endhasanyrole
-                                            <a href="{{ route('clientes.show', $cliente) }}" class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
+                                            <button type="button" @click="verCliente = @js([
+                                                    'nombre' => $cliente->nombre.' '.$cliente->apellido,
+                                                    'email' => $cliente->email,
+                                                    'telefono' => $cliente->telefono ?? '—',
+                                                    'empresa' => $cliente->empresa ?? 'Sin empresa',
+                                                    'estado' => $cliente->estado,
+                                                ])" class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
                                                 <x-heroicon-o-eye class="w-5 h-5" />
-                                            </a>
+                                            </button>
                                             @hasanyrole('Jefe|PM')
                                                 <button type="button" data-abrir-modal="modal-cliente-editar"
                                                         data-url="{{ route('clientes.update', $cliente) }}"
@@ -88,7 +94,18 @@
                                                         class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
                                                     <x-heroicon-o-pencil-square class="w-5 h-5" />
                                                 </button>
-                                            @endhasanyrole
+                                            
+                                                @hasrole('Jefe')
+                                                <form method="POST" action="{{ route('clientes.destroy', $cliente) }}" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" data-confirmar="¿Querés eliminar este cliente y su ficha? Esta acción no se puede deshacer."
+                                                            class="text-red-600 hover:text-red-800" title="Eliminar" aria-label="Eliminar">
+                                                        <x-heroicon-o-trash class="w-5 h-5" />
+                                                    </button>
+                                                </form>
+                                                @endhasrole
+                                                @endhasanyrole
                                         </div>
                                     </td>
                                 </tr>
@@ -128,4 +145,6 @@
         @hasanyrole('Jefe|PM')
     @include('clientes._modal_editar')
         @endhasanyrole
+    <x-confirmar-eliminar />
+    <x-cliente-view-modal />
 </x-app-layout>

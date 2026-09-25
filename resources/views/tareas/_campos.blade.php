@@ -1,3 +1,9 @@
+{{--
+    Campos del formulario de Tarea, compartidos por los modales de crear y
+    editar (index) y por el tablero. $tarea viene null al crear; al editar,
+    cada campo arranca con old() (lo ultimo enviado si hubo error) o con el
+    valor actual del modelo.
+--}}
 <div class="grid gap-4 sm:grid-cols-2">
     <div class="sm:col-span-2">
         <x-input-label for="titulo" value="Título" />

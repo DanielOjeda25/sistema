@@ -1,3 +1,8 @@
+{{--
+    Listado clasico de Tareas: buscador, filtro por estado y paginacion.
+    Crear y editar se hacen con modales (componente x-crud-modal + el JS
+    compartido crud-modal.js); los formularios reutilizan tareas/_campos.
+--}}
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
@@ -39,11 +44,29 @@
                             @endforeach
                         </select>
                     </div>
+                    <div>
+                        <label for="prioridad" class="block text-xs font-medium text-gray-500 uppercase mb-1">Prioridad</label>
+                        <select name="prioridad" id="prioridad" class="rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
+                            <option value="">Todas</option>
+                            @foreach (['alta' => 'Alta', 'media' => 'Media', 'baja' => 'Baja'] as $valor => $etiqueta)
+                                <option value="{{ $valor }}" @selected(request('prioridad') === $valor)>{{ $etiqueta }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label for="asignado_a" class="block text-xs font-medium text-gray-500 uppercase mb-1">Asignado a</label>
+                        <select name="asignado_a" id="asignado_a" class="rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
+                            <option value="">Todos</option>
+                            @foreach ($usuarios as $u)
+                                <option value="{{ $u->id }}" @selected(request('asignado_a') == $u->id)>{{ $u->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                     <button type="submit" class="px-4 py-2 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63] inline-flex items-center gap-1.5">
                         <x-heroicon-o-magnifying-glass class="w-4 h-4" />
                         Filtrar
                     </button>
-                    @if (request()->hasAny(['q', 'estado']))
+                    @if (request()->hasAny(['q', 'estado', 'prioridad', 'asignado_a']))
                         <a href="{{ route('tareas.index') }}" class="text-xs text-gray-500 hover:text-gray-700 underline">Limpiar</a>
                     @endif
                 </form>
@@ -86,6 +109,14 @@
                                                 <button type="button" data-abrir-modal="modal-tarea-editar" data-url="{{ route('tareas.update', $tarea) }}" data-valores='@json($valoresTarea)' class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
                                                     <x-heroicon-o-pencil-square class="w-5 h-5" />
                                                 </button>
+                                                <form method="POST" action="{{ route('tareas.destroy', $tarea) }}" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" data-confirmar="¿Querés eliminar esta tarea? Esta acción no se puede deshacer."
+                                                            class="text-red-600 hover:text-red-800" title="Eliminar" aria-label="Eliminar">
+                                                        <x-heroicon-o-trash class="w-5 h-5" />
+                                                    </button>
+                                                </form>
                                             @endhasanyrole
                                         </div>
                                     </td>
@@ -125,4 +156,5 @@
     @hasanyrole('Jefe|PM|PO')
     @include('tareas._modal_editar')
     @endhasanyrole
+    <x-confirmar-eliminar />
 </x-app-layout>

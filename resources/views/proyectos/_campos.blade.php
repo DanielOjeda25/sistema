@@ -5,7 +5,7 @@
 --}}
 <div>
     <x-input-label for="nombre" value="Nombre del Proyecto" />
-    <x-text-input id="nombre" name="nombre" type="text" class="mt-1 block w-full" :value="old('nombre', $proyectoItem->nombre ?? '')" required />
+    <x-text-input maxlength="255" id="nombre" name="nombre" type="text" class="mt-1 block w-full" :value="old('nombre', $proyectoItem->nombre ?? '')" required />
     <x-input-error class="mt-2" :messages="$errors->get('nombre')" />
 </div>
 
@@ -22,7 +22,10 @@
         <x-input-error class="mt-2" :messages="$errors->get('fecha_inicio')" />
     </div>
     <div>
-        <x-input-label for="fecha_fin_estimada" value="Fecha de Fin Estimada (opcional)" />
+        <div class="flex items-baseline justify-between gap-2">
+            <x-input-label for="fecha_fin_estimada" value="Fin estimado" />
+            <span class="text-[11px] text-gray-400">opcional</span>
+        </div>
         <x-text-input id="fecha_fin_estimada" name="fecha_fin_estimada" type="date" class="mt-1 block w-full" :value="old('fecha_fin_estimada', $proyectoItem?->fecha_fin_estimada?->format('Y-m-d'))" />
         <x-input-error class="mt-2" :messages="$errors->get('fecha_fin_estimada')" />
     </div>

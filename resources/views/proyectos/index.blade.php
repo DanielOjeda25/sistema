@@ -77,9 +77,9 @@
                                                     <x-heroicon-o-clock class="w-5 h-5" />
                                                 </a>
                                             @endhasanyrole
-                                            <a href="{{ route('proyectos.show', $proyecto) }}" class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
-                                                <x-heroicon-o-eye class="w-5 h-5" />
-                                            </a>
+                                            <button type="button" data-panel="{{ route('proyectos.show', $proyecto) }}" class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
+                                                    <x-heroicon-o-eye class="w-5 h-5" />
+                                                </button>
                                             <a href="{{ route('tareas.tablero', ['proyecto' => $proyecto->id]) }}" class="text-indigo-600 hover:text-indigo-800" title="Ver tablero de tareas" aria-label="Ver tablero de tareas">
                                                 <x-heroicon-o-squares-2x2 class="w-5 h-5" />
                                             </a>
@@ -90,7 +90,18 @@
                                                         class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
                                                     <x-heroicon-o-pencil-square class="w-5 h-5" />
                                                 </button>
-                                            @endhasanyrole
+                                            
+                                                @hasrole('Jefe')
+                                                <form method="POST" action="{{ route('proyectos.destroy', $proyecto) }}" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" data-confirmar="¿Querés eliminar este proyecto? Sus tareas y facturas asociadas quedan sin dueño. Esta acción no se puede deshacer."
+                                                            class="text-red-600 hover:text-red-800" title="Eliminar" aria-label="Eliminar">
+                                                        <x-heroicon-o-trash class="w-5 h-5" />
+                                                    </button>
+                                                </form>
+                                                @endhasrole
+                                                @endhasanyrole
                                         </div>
                                     </td>
                                 </tr>
@@ -130,4 +141,6 @@
     @hasanyrole('Jefe|PM')
     @include('proyectos._modal_editar')
     @endhasanyrole
+    <x-confirmar-eliminar />
+    <x-panel-modal />
 </x-app-layout>

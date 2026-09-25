@@ -11,58 +11,32 @@
         <div class="flex h-screen w-full overflow-hidden bg-white shadow-sm">
             <aside class="scroll-oscuro hidden w-60 shrink-0 overflow-y-auto bg-[#202225] px-4 py-5 text-slate-300 lg:block">
                 <a href="{{ route('dashboard') }}" class="block border-b border-white/10 px-3 pb-6">
-                    <img src="{{ asset('images/cruznegra-logo-light.png') }}" alt="Cruz Negra" class="h-14 w-full object-contain object-left">
+                    <img src="{{ asset('images/cruznegra-logo-light.png') }}" alt="Cruz Negra" class="h-14 w-full object-contain object-center">
                 </a>
 
+@php($menuAccesos = \App\Support\Acceso::menu($usuario))
                 <nav class="mt-6 space-y-1">
-                    <a href="{{ route('dashboard') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-[#00e5a0] bg-white/10 px-3 py-2.5 text-sm font-semibold text-white">
-                        <x-heroicon-o-home class="h-5 w-5 shrink-0" /> Dashboard
-                    </a>
-                    @role('Jefe')
-                    <a href="{{ route('users.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('users.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">
-                        <x-heroicon-o-users class="h-5 w-5 shrink-0" /> Usuarios y roles
-                    </a>
-                    <a href="{{ route('auditoria.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('auditoria.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">
-                        <x-heroicon-o-clock class="h-5 w-5 shrink-0" /> Auditoría
-                    </a>
-                    @endrole
-                    <a href="{{ route('proyectos.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('proyectos.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">
-                        <x-heroicon-o-squares-2x2 class="h-5 w-5 shrink-0" /> {{ $usuario->esCliente() ? 'Mis proyectos' : 'Proyectos' }}
-                    </a>
-                    @unless ($usuario->esCliente())
-                    <a href="{{ route('tareas.tablero') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('tareas.tablero') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">
-                        <x-heroicon-o-check-circle class="h-5 w-5 shrink-0" /> Mi trabajo
-                    </a>
-                    @endunless
-                    @unless ($usuario->esCliente())
-                    <a href="{{ route('tareas.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('tareas.*') && ! request()->routeIs('tareas.tablero') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">
-                        <x-heroicon-o-queue-list class="h-5 w-5 shrink-0" /> Tareas
-                    </a>
-                    @endunless
-                    <a href="{{ route('facturas.index') }}" class="flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2.5 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('facturas.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">
-                        <x-heroicon-o-banknotes class="h-5 w-5 shrink-0" /> Facturas
-                    </a>
+                    @foreach ($menuAccesos as $enlace)
+                        @continue(isset($enlace['seccion']))
+                        <a href="{{ route($enlace['ruta']) }}" class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs(str_replace('.index', '.*', $enlace['ruta'])) ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}" {{ request()->routeIs('dashboard') ? 'style="border-color:#00e5a0;background:rgba(255,255,255,.1)"' : '' }}>
+                            @if ($enlace['icono'])
+                                <x-dynamic-component :component="$enlace['icono']" class="h-5 w-5 shrink-0" />
+                            @endif
+                            {{ $usuario->esCliente() ? ($enlace['label_cliente'] ?? $enlace['label']) : $enlace['label'] }}
+                        </a>
+                    @endforeach
                 </nav>
 
+                @if (collect($menuAccesos)->contains(fn ($e) => ($e['seccion'] ?? null) === 'Modulos'))
                 <p class="mt-8 px-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Módulos</p>
                 <nav class="mt-2 space-y-1">
-                    @unless ($usuario->esCliente())
-                    <a href="{{ route('sprints.index') }}" class="block rounded-lg border-l-4 border-transparent px-3 py-2 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('sprints.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">Sprints</a>
-                    <a href="{{ route('hitos.index') }}" class="block rounded-lg border-l-4 border-transparent px-3 py-2 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('hitos.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">Hitos</a>
-                    <a href="{{ route('solicitudes-cambio.index') }}" class="block rounded-lg border-l-4 border-transparent px-3 py-2 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('solicitudes-cambio.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">Cambios</a>
-                    @endunless
-                    <a href="{{ route('entregables.index') }}" class="block rounded-lg border-l-4 border-transparent px-3 py-2 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('entregables.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">Entregables</a>
+                    @foreach ($menuAccesos as $enlace)
+                        @continue(($enlace['seccion'] ?? null) !== 'Modulos')
+                        <a href="{{ route($enlace['ruta']) }}" class="block rounded-lg border-l-4 px-3 py-2 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs(str_replace('.index', '.*', $enlace['ruta'])) ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}">{{ $enlace['label'] }}</a>
+                    @endforeach
                 </nav>
+                @endif
 
-                <div class="mt-10 border-t border-white/10 pt-4">
-                    <p class="px-3 text-xs font-semibold text-white">{{ $usuario->name }}</p>
-                    <p class="px-3 pt-1 text-[11px] text-slate-500">{{ $rol }}</p>
-                    <a href="{{ route('profile.edit') }}" class="mt-4 flex items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2 text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white {{ request()->routeIs('profile.*') ? 'border-[#00e5a0] bg-white/10 text-white' : '' }}">Perfil</a>
-                    <form method="POST" action="{{ route('logout') }}" class="mt-1">
-                        @csrf
-                        <button type="submit" class="flex w-full items-center gap-3 rounded-lg border-l-4 border-transparent px-3 py-2 text-left text-sm transition hover:border-[#00e5a0] hover:bg-white/10 hover:text-white">Cerrar sesión</button>
-                    </form>
-                </div>
             </aside>
 
             <main class="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#f5fffb]">
@@ -74,8 +48,22 @@
                         <span class="hidden text-xs text-slate-400 sm:inline">{{ now()->translatedFormat('d \d\e F \d\e Y') }}</span>
                     </div>
                     <div class="flex items-center gap-3">
-                        <span class="hidden text-right sm:block"><span class="block text-xs font-semibold text-slate-700">{{ $usuario->name }}</span><span class="block text-[11px] text-slate-400">{{ $rol }}</span></span>
-                        <span class="flex h-8 w-8 items-center justify-center rounded-full bg-[#c9fbe8] text-xs font-bold text-[#008c63]">{{ Str::upper(Str::substr($nombre, 0, 1)) }}</span>
+                        <x-dropdown align="right" width="48">
+                            <x-slot name="trigger">
+                                <button class="inline-flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-slate-600 transition hover:bg-[#f0fff9] focus:outline-none">
+                                    <span class="hidden text-right sm:block"><span class="block text-xs font-semibold text-slate-700">{{ $usuario->name }}</span><span class="block text-[11px] text-slate-400">{{ $rol }}</span></span>
+                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-[#c9fbe8] text-xs font-bold text-[#008c63]">{{ Str::upper(Str::substr($nombre, 0, 1)) }}</span>
+                                    <x-heroicon-o-chevron-down class="h-4 w-4 shrink-0" />
+                                </button>
+                            </x-slot>
+                            <x-slot name="content">
+                                <x-dropdown-link :href="route('profile.edit')">Perfil</x-dropdown-link>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">Cerrar sesión</x-dropdown-link>
+                                </form>
+                            </x-slot>
+                        </x-dropdown>
                     </div>
                 </header>
 
@@ -86,7 +74,6 @@
                         <p class="text-xs text-slate-400">Resumen de actividad</p>
                         <h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-900">Buen día, {{ $nombre }}.</h1>
                     </section>
-
                     <div>
                         <section class="rounded-xl border border-[#d7eee6] bg-white p-5 shadow-sm">
                             <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
@@ -198,7 +185,7 @@
                             </style>
                         @endif
 
-@if (isset($hitosProximos) && $hitosProximos->isNotEmpty())
+@if ($interno && isset($hitosProximos) && $hitosProximos->isNotEmpty())
     <section class="mt-5 rounded-xl border border-[#d7eee6] bg-white shadow-sm overflow-hidden">
         <div class="flex items-center justify-between px-5 py-4 border-b border-[#d7eee6]">
             <div>
@@ -230,6 +217,7 @@
 
                     </div>
                 </div>
+                <x-footer-sitio class="!bg-[#202225] !border-white/10" />
             </main>
         </div>
     </div>

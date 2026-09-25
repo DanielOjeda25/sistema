@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use OwenIt\Auditing\Models\Audit;
+use Spatie\Permission\Models\Role;
 
 class AuditoriaController extends Controller
 {
     public function index(Request $request)
     {
-        $auditoria = Audit::with('user')
+        $auditoria = Audit::with('user.roles')
             ->latest()
             // Busqueda libre: evento o modelo auditado.
             ->when($request->filled('q'), function ($query) use ($request) {
@@ -23,6 +24,14 @@ class AuditoriaController extends Controller
             // Filtro por usuario responsable del cambio.
             ->when($request->filled('usuario'), function ($query) use ($request) {
                 $query->where('user_id', $request->string('usuario')->toString());
+            })
+            // Filtro por rol: queda solo la actividad de los usuarios que
+            // cumplen ese rol (Jefe, PM, etc.).
+            ->when($request->filled('rol'), function ($query) use ($request) {
+                $ids = User::query()
+                    ->whereHas('roles', fn ($rol) => $rol->where('name', $request->string('rol')->toString()))
+                    ->pluck('id');
+                $query->whereIn('user_id', $ids);
             })
             // Filtro por accion: created, updated o deleted.
             ->when($request->filled('accion'), function ($query) use ($request) {
@@ -46,9 +55,11 @@ class AuditoriaController extends Controller
             return $registro;
         });
 
-        $usuarios = User::orderBy('name')->get();
+        // Con roles cargados para que el filtro muestre "Sofia (Programador)".
+        $usuarios = User::with('roles')->orderBy('name')->get();
+        $roles = Role::orderBy('name')->pluck('name');
 
-        return view('auditoria.index', compact('auditoria', 'usuarios'));
+        return view('auditoria.index', compact('auditoria', 'usuarios', 'roles'));
     }
 
     /**

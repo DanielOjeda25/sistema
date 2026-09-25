@@ -62,6 +62,18 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200 text-gray-700">
                             @forelse ($facturas as $factura)
+                                @php($verFacturaFila = [
+        'numero' => $factura->numero,
+        'monto' => '$ ' . number_format($factura->monto, 2, ',', '.'),
+        'estado' => $factura->estado,
+        'proyecto' => $factura->proyecto?->nombre ?? '—',
+        'emitida_por' => $factura->emisor?->name ?? '—',
+        'emision' => $factura->fecha_emision?->format('d/m/Y') ?? '—',
+        'vencimiento' => $factura->fecha_vencimiento?->format('d/m/Y') ?? 'Sin vencimiento',
+        'detalle' => $factura->detalle,
+        'pdf' => route('facturas.pdf', $factura),
+    ])
+
                                 @php($valoresFactura = $factura->only(['numero', 'monto', 'estado', 'detalle', 'proyecto_id', 'emitida_por']) + ['fecha_emision' => $factura->fecha_emision?->format('Y-m-d'), 'fecha_vencimiento' => $factura->fecha_vencimiento?->format('Y-m-d')])
                                 <tr>
                                     <td class="px-6 py-4">{{ $factura->numero }}</td>
@@ -77,20 +89,22 @@
                                                     <x-heroicon-o-clock class="w-5 h-5" />
                                                 </a>
                                             @endhasanyrole
-                                            <a href="{{ route('facturas.show', $factura) }}" class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
+                                            <button type="button" @click="verFactura = @js($verFacturaFila)" class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
                                                 <x-heroicon-o-eye class="w-5 h-5" />
-                                            </a>
-                                            <button type="button" data-abrir-modal="modal-factura-editar"
+                                            </button>
+                                            @hasanyrole('Jefe|PM')
+                                                <button type="button" data-abrir-modal="modal-factura-editar"
                                                         data-url="{{ route('facturas.update', $factura) }}"
                                                         data-valores='@json($valoresFactura)'
                                                         class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
                                                     <x-heroicon-o-pencil-square class="w-5 h-5" />
                                                 </button>
+                                            @endhasanyrole
                                                 @if (auth()->user()->hasAnyRole('Jefe', 'PM'))
-                                                    <form method="POST" action="{{ route('facturas.destroy', $factura) }}" onsubmit="return confirm('¿Querés eliminar esta factura? Esta acción no se puede deshacer.');">
+                                                    <form method="POST" action="{{ route('facturas.destroy', $factura) }}">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="text-red-600 hover:text-red-800" title="Eliminar" aria-label="Eliminar">
+                                                        <button type="submit" data-confirmar="¿Querés eliminar esta factura? Esta acción no se puede deshacer." class="text-red-600 hover:text-red-800" title="Eliminar" aria-label="Eliminar">
                                                             <x-heroicon-o-trash class="w-5 h-5" />
                                                         </button>
                                                     </form>
@@ -134,4 +148,6 @@
     @hasanyrole('Jefe|PM')
     @include('facturas._modal_editar')
     @endhasanyrole
+    <x-confirmar-eliminar />
+    <x-factura-view-modal />
 </x-app-layout>

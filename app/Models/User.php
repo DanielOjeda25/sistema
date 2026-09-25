@@ -13,6 +13,16 @@ use Illuminate\Notifications\Notifiable;
 use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\Permission\Traits\HasRoles;
 
+/**
+ * @property int|null $cliente_id
+ * @property string $name
+ * @property string|null $apellido
+ * @property string $email
+ * @property string|null $estado
+ * @property string|null $password
+ * @property string|null $remember_token
+ * @property \Illuminate\Support\Carbon\Interface|\Illuminate\Support\Carbon\Carbon|null $email_verified_at
+ */
 class User extends Authenticatable implements Auditable
 {
     /** @use HasFactory<UserFactory> */

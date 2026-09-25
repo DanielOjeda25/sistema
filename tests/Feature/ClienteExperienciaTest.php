@@ -8,6 +8,7 @@ use App\Models\Proyecto;
 use App\Models\Sprint;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 /**
@@ -29,7 +30,7 @@ class ClienteExperienciaTest extends TestCase
         return User::where('email', 'cliente@example.com')->firstOrFail();
     }
 
-    /** @test */
+        #[Test]
     public function ningun_listado_le_muestra_botones_de_creacion(): void
     {
         $cliente = $this->cliente();
@@ -50,7 +51,7 @@ class ClienteExperienciaTest extends TestCase
         }
     }
 
-    /** @test */
+        #[Test]
     public function los_modales_de_crud_no_se_renderizan_para_el_cliente(): void
     {
         $cliente = $this->cliente();
@@ -63,7 +64,7 @@ class ClienteExperienciaTest extends TestCase
         }
     }
 
-    /** @test */
+        #[Test]
     public function entregables_solo_aprobados_y_solo_de_su_empresa(): void
     {
         $cliente = $this->cliente();
@@ -82,7 +83,7 @@ class ClienteExperienciaTest extends TestCase
         $this->assertStringNotContainsString('Esquema legal', $html);
     }
 
-    /** @test */
+        #[Test]
     public function el_menu_del_cliente_solo_muestra_lo_que_le_corresponde(): void
     {
         $html = $this->actingAs($this->cliente())->get('/proyectos')->getContent();
@@ -99,7 +100,7 @@ class ClienteExperienciaTest extends TestCase
         }
     }
 
-    /** @test */
+        #[Test]
     public function el_dashboard_del_cliente_no_muestra_reportes_internos(): void
     {
         $this->actingAs($this->cliente())
@@ -110,7 +111,7 @@ class ClienteExperienciaTest extends TestCase
             ->assertDontSee('Tareas vencidas');
     }
 
-    /** @test */
+        #[Test]
     public function acciones_de_escritura_por_url_son_rechazadas(): void
     {
         $cliente = $this->cliente();
@@ -122,7 +123,7 @@ class ClienteExperienciaTest extends TestCase
         $this->actingAs($cliente)->delete('/facturas/1')->assertForbidden();
     }
 
-    /** @test */
+        #[Test]
     public function el_detalle_del_proyecto_del_cliente_es_una_linea_de_tiempo(): void
     {
         $cliente = $this->cliente();

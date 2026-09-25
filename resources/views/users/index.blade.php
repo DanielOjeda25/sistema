@@ -1,3 +1,12 @@
+{{--
+    Gestion de Usuarios (solo rol Jefe). Tres modales sobre el listado:
+    - modal-usuario-crear: alta con contrasena provisional y empresa si el
+      rol es Cliente.
+    - modal-usuario-editar: cambio de datos, estado, rol y contrasena opcional.
+    - modal-usuario-rol: cambio rapido de rol (un solo rol por usuario).
+    El borrado es un form directo con confirmacion; nadie puede eliminar su
+    propia cuenta ni al ultimo Jefe (protegido tambien en el controller).
+--}}
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -105,10 +114,11 @@
                                             <x-heroicon-o-pencil-square class="w-5 h-5" />
                                         </button>
                                         @if ($user->id !== auth()->id())
-                                        <form method="POST" action="{{ route('users.destroy', $user) }}" onsubmit="return confirm('¿Querés eliminar este usuario? Esta acción no se puede deshacer.');">
+                                        <form method="POST" action="{{ route('users.destroy', $user) }}">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="text-red-600 hover:text-red-800" title="Eliminar" aria-label="Eliminar">
+                                            <button type="submit" data-confirmar="¿Querés eliminar este usuario? Esta acción no se puede deshacer."
+                                                    class="text-red-600 hover:text-red-800" title="Eliminar" aria-label="Eliminar">
                                                 <x-heroicon-o-trash class="w-5 h-5" />
                                             </button>
                                         </form>
@@ -152,12 +162,12 @@
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div>
                         <x-input-label for="edit_name" value="Nombre" />
-                        <x-text-input id="edit_name" name="name" type="text" class="mt-1 block w-full" :value="old('name')" required />
+                        <x-text-input maxlength="255" id="edit_name" name="name" type="text" class="mt-1 block w-full" :value="old('name')" required />
                         <x-input-error class="mt-2" :messages="$errors->get('name')" />
                     </div>
                     <div>
                         <x-input-label for="edit_apellido" value="Apellido" />
-                        <x-text-input id="edit_apellido" name="apellido" type="text" class="mt-1 block w-full" :value="old('apellido')" required />
+                        <x-text-input maxlength="255" id="edit_apellido" name="apellido" type="text" class="mt-1 block w-full" :value="old('apellido')" required />
                         <x-input-error class="mt-2" :messages="$errors->get('apellido')" />
                     </div>
                     <div class="sm:col-span-2">
@@ -184,9 +194,9 @@
                         <x-input-error class="mt-2" :messages="$errors->get('estado')" />
                     </div>
                     <div class="sm:col-span-2 rounded-lg border border-emerald-100 bg-emerald-50 p-4">
-                        <x-input-label for="edit_cliente_id" value="Empresa del cliente (solo rol Cliente)" />
+                        <x-input-label for="edit_cliente_id" value="Ficha de cliente (solo rol Cliente)" />
                         <select id="edit_cliente_id" name="cliente_id" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
-                            <option value="">— Sin empresa —</option>
+                            <option value="">— Sin ficha asignada —</option>
                             @foreach ($clientes as $c)
                                 <option value="{{ $c->id }}" @selected(old('cliente_id') == $c->id)>{{ $c->nombre }} {{ $c->apellido }}@if($c->empresa) · {{ $c->empresa }}@endif</option>
                             @endforeach
@@ -232,4 +242,5 @@
             </form>
         </x-crud-modal>
     @endhasrole
+    <x-confirmar-eliminar />
 </x-app-layout>

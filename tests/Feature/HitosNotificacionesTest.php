@@ -7,6 +7,7 @@ use App\Models\Proyecto;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class HitosNotificacionesTest extends TestCase
@@ -36,7 +37,7 @@ class HitosNotificacionesTest extends TestCase
         ], $extra));
     }
 
-    /** @test */
+        #[Test]
     public function el_comando_notifica_al_pm_del_proyecto(): void
     {
         $pm = User::where('email', 'pm@example.com')->firstOrFail();
@@ -49,7 +50,7 @@ class HitosNotificacionesTest extends TestCase
         $this->assertSame('hito_por_vencer', $pm->unreadNotifications->first()->data['tipo']);
     }
 
-    /** @test */
+        #[Test]
     public function no_duplica_avisos_del_mismo_hito(): void
     {
         $this->hitoProximo();
@@ -60,7 +61,7 @@ class HitosNotificacionesTest extends TestCase
         $this->assertDatabaseCount('notifications', 1);
     }
 
-    /** @test */
+        #[Test]
     public function no_notifica_hitos_completados(): void
     {
         $this->hitoProximo(['completado' => true]);
@@ -70,7 +71,7 @@ class HitosNotificacionesTest extends TestCase
         $this->assertDatabaseCount('notifications', 0);
     }
 
-    /** @test */
+        #[Test]
     public function la_campanita_aparece_en_el_layout_y_se_puede_marcar_leida(): void
     {
         $pm = User::where('email', 'pm@example.com')->firstOrFail();
@@ -99,7 +100,7 @@ class HitosNotificacionesTest extends TestCase
             ->assertRedirect();
     }
 
-    /** @test */
+        #[Test]
     public function otro_usuario_no_ve_ni_puede_marcar_las_notificaciones_ajenas(): void
     {
         $pm = User::where('email', 'pm@example.com')->firstOrFail();

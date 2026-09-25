@@ -1,3 +1,8 @@
+{{--
+    Tablero de Tareas estilo Trello: una columna por estado y tarjetas que
+    se arrastran (drag & drop). El movimiento lo guarda por AJAX el modulo
+    resources/js/tablero.js; aca solo dibujamos el HTML inicial.
+--}}
 @php
     $columnas = [
         'pendiente'   => ['Pendiente',   'bg-gray-100 text-gray-700'],
