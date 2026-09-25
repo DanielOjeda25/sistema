@@ -20,7 +20,9 @@ class SolicitudCambioCreada extends Notification
     public function toArray(object $notifiable): array
     {
         return [
+            'tipo' => 'solicitud_cambio_creada',
             'titulo' => $this->solicitud->titulo,
+            'detalle' => "Nueva solicitud de cambio en {$this->solicitud->proyecto->nombre}.",
             'proyecto' => $this->solicitud->proyecto->nombre,
             'url' => route('solicitudes-cambio.show', $this->solicitud),
         ];

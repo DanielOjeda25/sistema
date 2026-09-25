@@ -6,6 +6,7 @@ use App\Models\Proyecto;
 use App\Models\SolicitudCambio;
 use App\Models\User;
 use App\Notifications\SolicitudCambioCreada;
+use App\Notifications\SolicitudCambioEstadoCambiado;
 use Illuminate\Http\Request;
 
 class SolicitudCambioController extends Controller
@@ -49,9 +50,9 @@ class SolicitudCambioController extends Controller
         // Se guarda el registro directamente en la variable $solicitud
         $solicitud = SolicitudCambio::create($data);
 
-        // Avisar al Jefe y a los PM de la nueva solicitud utilizando la variable $solicitud recién creada
-        User::role(['Jefe', 'PM'])->get()->each(
-            fn (User $usuario) => $usuario->notify(new SolicitudCambioCreada($solicitud))
+        $this->notificarResponsablesDelProyecto(
+            $solicitud,
+            new SolicitudCambioCreada($solicitud)
         );
 
         return ($request->input('desde_modal') ? redirect()->back() : redirect()->route('solicitudes-cambio.index'))->with('success', 'Solicitud de cambio creada correctamente.');
@@ -84,7 +85,15 @@ class SolicitudCambioController extends Controller
             'solicitado_por' => 'required|exists:users,id',
         ]);
 
+        $estadoAnterior = $solicitudes_cambio->estado;
         $solicitudes_cambio->update($data);
+
+        if ($estadoAnterior !== $solicitudes_cambio->estado) {
+            $this->notificarResponsablesDelProyecto(
+                $solicitudes_cambio,
+                new SolicitudCambioEstadoCambiado($solicitudes_cambio, $estadoAnterior)
+            );
+        }
 
         return ($request->input('desde_modal') ? redirect()->back() : redirect()->route('solicitudes-cambio.index'))->with('success', 'Solicitud de cambio actualizada correctamente.');
     }
@@ -94,5 +103,23 @@ class SolicitudCambioController extends Controller
         $solicitudes_cambio->delete();
 
         return redirect()->route('solicitudes-cambio.index')->with('success', 'Solicitud de cambio eliminada correctamente.');
+    }
+
+    private function notificarResponsablesDelProyecto(
+        SolicitudCambio $solicitud,
+        \Illuminate\Notifications\Notification $notificacion,
+    ): void {
+        $solicitud->loadMissing('proyecto.pm');
+
+        $destinatarios = User::role('Jefe')->get();
+        $pm = $solicitud->proyecto?->pm;
+
+        if ($pm?->hasRole('PM')) {
+            $destinatarios->push($pm);
+        }
+
+        $destinatarios
+            ->unique('id')
+            ->each(fn (User $usuario) => $usuario->notify($notificacion));
     }
 }
