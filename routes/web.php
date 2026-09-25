@@ -21,6 +21,7 @@ use App\Models\Hito;
 use App\Models\Proyecto;
 use App\Models\Tarea;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 // -----------------------------------------------------------------------------
@@ -93,7 +94,10 @@ Route::get('/dashboard', function () {
 
         // Facturacion por mes (ultimos 6 meses con movimiento) para el
         // grafico del dashboard interno.
-        $porMes = Factura::selectRaw("DATE_FORMAT(fecha_emision, '%Y-%m') as mes, SUM(monto) as total")
+        $formatoMes = DB::connection()->getDriverName() === 'sqlite'
+            ? "strftime('%Y-%m', fecha_emision)"
+            : "DATE_FORMAT(fecha_emision, '%Y-%m')";
+        $porMes = Factura::selectRaw("{$formatoMes} as mes, SUM(monto) as total")
             ->groupBy('mes')
             ->orderBy('mes')
             ->get()

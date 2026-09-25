@@ -1,0 +1,395 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [4 0 R 6 0 R 8 0 R 10 0 R 12 0 R 14 0 R] /Count 6 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 5 0 R >>
+endobj
+5 0 obj
+<< /Length 924 >>
+stream
+BT
+/F1 16 Tf
+50 790 Td
+/F1 16 Tf
+(Explicacion logica de dos CRUD - Proyecto Cruz Negra) Tj
+0 -18 Td
+() Tj
+0 -18 Td
+/F1 10 Tf
+(Que significa CRUD) Tj
+0 -18 Td
+/F1 10 Tf
+(CRUD representa cuatro operaciones basicas:) Tj
+0 -18 Td
+/F1 10 Tf
+(C - Create: crear un registro.) Tj
+0 -18 Td
+/F1 10 Tf
+(R - Read: consultar o listar registros.) Tj
+0 -18 Td
+/F1 10 Tf
+(U - Update: actualizar un registro.) Tj
+0 -18 Td
+/F1 10 Tf
+(D - Delete: eliminar un registro.) Tj
+0 -18 Td
+() Tj
+0 -18 Td
+/F1 10 Tf
+(Flujo general en Laravel) Tj
+0 -18 Td
+/F1 10 Tf
+(Vista Blade -> Ruta -> Controller -> Validacion -> Model -> Base de datos) Tj
+0 -18 Td
+() Tj
+0 -18 Td
+/F1 10 Tf
+(La vista muestra el formulario o la tabla. La ruta recibe la peticion) Tj
+0 -18 Td
+/F1 10 Tf
+(y llama al metodo correspondiente del Controller. El Controller valida) Tj
+0 -18 Td
+/F1 10 Tf
+(los datos y utiliza el Model Eloquent para leer o modificar la base.) Tj
+0 -18 Td
+ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 7 0 R >>
+endobj
+7 0 obj
+<< /Length 1046 >>
+stream
+BT
+/F1 16 Tf
+50 790 Td
+/F1 16 Tf
+(CRUD 1: Tareas - CRUD con dependencias) Tj
+0 -18 Td
+() Tj
+0 -18 Td
+/F1 10 Tf
+(Archivos principales) Tj
+0 -18 Td
+/F1 10 Tf
+(app/Http/Controllers/TareaController.php) Tj
+0 -18 Td
+/F1 10 Tf
+(app/Models/Tarea.php) Tj
+0 -18 Td
+/F1 10 Tf
+(resources/views/tareas/index.blade.php) Tj
+0 -18 Td
+/F1 10 Tf
+(routes/web.php) Tj
+0 -18 Td
+() Tj
+0 -18 Td
+/F1 10 Tf
+(Por que tiene dependencias) Tj
+0 -18 Td
+/F1 10 Tf
+(Una tarea se relaciona con otras entidades mediante claves foraneas:) Tj
+0 -18 Td
+/F1 10 Tf
+(proyecto_id -> proyecto al que pertenece.) Tj
+0 -18 Td
+/F1 10 Tf
+(sprint_id -> sprint o etapa de trabajo.) Tj
+0 -18 Td
+/F1 10 Tf
+(asignado_a -> usuario responsable.) Tj
+0 -18 Td
+/F1 10 Tf
+(solicitud_cambio_id -> solicitud de cambio opcional.) Tj
+0 -18 Td
+() Tj
+0 -18 Td
+/F1 10 Tf
+(El modelo Tarea define relaciones belongsTo con Proyecto, Sprint, User) Tj
+0 -18 Td
+/F1 10 Tf
+(y SolicitudCambio. Por eso, para completar una tarea se necesitan datos) Tj
+0 -18 Td
+/F1 10 Tf
+(que provienen de otras tablas.) Tj
+0 -18 Td
+ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 9 0 R >>
+endobj
+9 0 obj
+<< /Length 1060 >>
+stream
+BT
+/F1 16 Tf
+50 790 Td
+/F1 16 Tf
+(Logica del CRUD de Tareas) Tj
+0 -18 Td
+() Tj
+0 -18 Td
+/F1 11 Tf
+(1. Listar) Tj
+0 -18 Td
+/F1 10 Tf
+(TareaController::index obtiene las tareas visibles para el usuario.) Tj
+0 -18 Td
+/F1 10 Tf
+(Carga proyecto y usuario asignado con with\(\), aplica busqueda y filtros,) Tj
+0 -18 Td
+/F1 10 Tf
+(ordena, pagina y envia los datos a tareas.index.) Tj
+0 -18 Td
+() Tj
+0 -18 Td
+/F1 11 Tf
+(2. Crear) Tj
+0 -18 Td
+/F1 10 Tf
+(TareaController::store valida titulo, estado, prioridad y fecha.) Tj
+0 -18 Td
+/F1 10 Tf
+(Luego ejecuta Tarea::create\($data\) y redirige al listado.) Tj
+0 -18 Td
+() Tj
+0 -18 Td
+/F1 11 Tf
+(3. Editar) Tj
+0 -18 Td
+/F1 10 Tf
+(El boton de editar envia data-url y data-valores al modal.) Tj
+0 -18 Td
+/F1 10 Tf
+(crud-modal.js completa el formulario y cambia su action.) Tj
+0 -18 Td
+/F1 10 Tf
+(TareaController::update valida y ejecuta $tarea->update\($data\).) Tj
+0 -18 Td
+() Tj
+0 -18 Td
+/F1 11 Tf
+(4. Eliminar) Tj
+0 -18 Td
+/F1 10 Tf
+(TareaController::destroy ejecuta $tarea->delete\(\) y vuelve al listado.) Tj
+0 -18 Td
+ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 11 0 R >>
+endobj
+11 0 obj
+<< /Length 1080 >>
+stream
+BT
+/F1 16 Tf
+50 790 Td
+/F1 16 Tf
+(CRUD 2: Usuarios - entidad principal con relaciones) Tj
+0 -18 Td
+() Tj
+0 -18 Td
+/F1 10 Tf
+(Archivos principales) Tj
+0 -18 Td
+/F1 10 Tf
+(app/Http/Controllers/UserController.php) Tj
+0 -18 Td
+/F1 10 Tf
+(app/Models/User.php) Tj
+0 -18 Td
+/F1 10 Tf
+(resources/views/users/index.blade.php) Tj
+0 -18 Td
+/F1 10 Tf
+(routes/web.php) Tj
+0 -18 Td
+() Tj
+0 -18 Td
+/F1 11 Tf
+(1. Listar) Tj
+0 -18 Td
+/F1 10 Tf
+(UserController::index busca usuarios, carga el cliente asociado,) Tj
+0 -18 Td
+/F1 10 Tf
+(aplica busqueda por nombre, apellido o email y pagina los resultados.) Tj
+0 -18 Td
+/F1 10 Tf
+(Tambien obtiene los roles y clientes para los formularios.) Tj
+0 -18 Td
+() Tj
+0 -18 Td
+/F1 11 Tf
+(2. Crear) Tj
+0 -18 Td
+/F1 10 Tf
+(UserController::store valida nombre, email, estado, password y rol.) Tj
+0 -18 Td
+/F1 10 Tf
+(La regla unique evita emails repetidos y exists verifica que el rol exista.) Tj
+0 -18 Td
+/F1 10 Tf
+(La password se protege con Hash::make antes de guardarse.) Tj
+0 -18 Td
+/F1 10 Tf
+(Finalmente syncRoles asigna el rol seleccionado.) Tj
+0 -18 Td
+ET
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 13 0 R >>
+endobj
+13 0 obj
+<< /Length 1094 >>
+stream
+BT
+/F1 16 Tf
+50 790 Td
+/F1 16 Tf
+(Logica del CRUD de Usuarios) Tj
+0 -18 Td
+() Tj
+0 -18 Td
+/F1 11 Tf
+(3. Editar) Tj
+0 -18 Td
+/F1 10 Tf
+(El modal recibe los valores actuales mediante data-valores.) Tj
+0 -18 Td
+/F1 10 Tf
+(UserController::update valida los cambios y guarda el usuario.) Tj
+0 -18 Td
+/F1 10 Tf
+(La password es opcional: si queda vacia, conserva la anterior.) Tj
+0 -18 Td
+() Tj
+0 -18 Td
+/F1 11 Tf
+(4. Cambiar rol) Tj
+0 -18 Td
+/F1 10 Tf
+(updateRoles valida el rol y usa syncRoles para reemplazar el rol actual.) Tj
+0 -18 Td
+() Tj
+0 -18 Td
+/F1 11 Tf
+(5. Eliminar) Tj
+0 -18 Td
+/F1 10 Tf
+(destroy aplica reglas de negocio antes de borrar:) Tj
+0 -18 Td
+/F1 10 Tf
+(- No permite eliminar la propia cuenta.) Tj
+0 -18 Td
+/F1 10 Tf
+(- No permite eliminar al unico usuario con rol Jefe.) Tj
+0 -18 Td
+/F1 10 Tf
+(Luego ejecuta $user->delete\(\).) Tj
+0 -18 Td
+() Tj
+0 -18 Td
+/F1 10 Tf
+(El usuario se relaciona con Cliente y con el sistema de roles.) Tj
+0 -18 Td
+/F1 10 Tf
+(Por eso tiene dependencias, aunque sus datos principales pertenecen) Tj
+0 -18 Td
+/F1 10 Tf
+(a la tabla users.) Tj
+0 -18 Td
+ET
+endstream
+endobj
+14 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R >> >> /Contents 15 0 R >>
+endobj
+15 0 obj
+<< /Length 1126 >>
+stream
+BT
+/F1 16 Tf
+50 790 Td
+/F1 16 Tf
+(Guion breve para la exposicion) Tj
+0 -18 Td
+() Tj
+0 -18 Td
+/F1 10 Tf
+(En nuestro proyecto implementamos dos CRUD usando Laravel.) Tj
+0 -18 Td
+/F1 10 Tf
+(El CRUD de usuarios permite crear, listar, editar, cambiar roles) Tj
+0 -18 Td
+/F1 10 Tf
+(y eliminar cuentas. El Controller recibe las peticiones, valida) Tj
+0 -18 Td
+/F1 10 Tf
+(los datos, utiliza el modelo User y devuelve una vista o redireccion.) Tj
+0 -18 Td
+() Tj
+0 -18 Td
+/F1 10 Tf
+(El CRUD de tareas tiene una logica similar, pero agrega dependencias) Tj
+0 -18 Td
+/F1 10 Tf
+(con otras entidades. Una tarea pertenece a un proyecto, puede estar) Tj
+0 -18 Td
+/F1 10 Tf
+(asignada a un usuario, pertenecer a un sprint y relacionarse con) Tj
+0 -18 Td
+/F1 10 Tf
+(una solicitud de cambio. Por eso utiliza relaciones belongsTo.) Tj
+0 -18 Td
+() Tj
+0 -18 Td
+/F1 10 Tf
+(La diferencia principal es que el CRUD de tareas tiene dependencias) Tj
+0 -18 Td
+/F1 10 Tf
+(fuertes con otros modelos, mientras que el CRUD de usuarios administra) Tj
+0 -18 Td
+/F1 10 Tf
+(principalmente su propia entidad y agrega relaciones con roles y clientes.) Tj
+0 -18 Td
+ET
+endstream
+endobj
+xref
+0 16
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000154 00000 n 
+0000000224 00000 n 
+0000000350 00000 n 
+0000001325 00000 n 
+0000001451 00000 n 
+0000002549 00000 n 
+0000002675 00000 n 
+0000003787 00000 n 
+0000003915 00000 n 
+0000005048 00000 n 
+0000005176 00000 n 
+0000006323 00000 n 
+0000006451 00000 n 
+trailer
+<< /Size 16 /Root 1 0 R >>
+startxref
+7630
+%%EOF
