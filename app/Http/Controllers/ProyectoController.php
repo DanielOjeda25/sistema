@@ -40,6 +40,10 @@ class ProyectoController extends Controller
             })
             ->when($request->filled('estado'), fn ($query) => $query->where('estado', $request->string('estado')->toString())
             )
+            ->when($request->filled('cliente_id'), fn ($query) => $query->where('cliente_id', $request->integer('cliente_id')))
+            ->when($request->filled('pm_id'), fn ($query) => $query->where('pm_id', $request->integer('pm_id')))
+            ->when($request->filled('fecha_desde'), fn ($query) => $query->whereDate('fecha_inicio', '>=', $request->input('fecha_desde')))
+            ->when($request->filled('fecha_hasta'), fn ($query) => $query->whereDate('fecha_inicio', '<=', $request->input('fecha_hasta')))
             ->latest()
             ->paginate(15)
             ->withQueryString();
@@ -47,8 +51,10 @@ class ProyectoController extends Controller
         // Listas para los modales de crear/editar del listado.
         $clientes = Cliente::orderBy('nombre')->get();
         $usuarios = User::orderBy('name')->get();
+        // PMs disponibles para el filtro del listado.
+        $pms = User::whereHas('roles', fn ($q) => $q->where('name', 'PM'))->orderBy('name')->get();
 
-        return view('proyectos.index', compact('proyectos', 'clientes', 'usuarios'));
+        return view('proyectos.index', compact('proyectos', 'clientes', 'usuarios', 'pms'));
 
     }
 

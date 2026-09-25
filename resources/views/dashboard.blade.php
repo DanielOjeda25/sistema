@@ -41,10 +41,11 @@
 
             <main class="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#f5fffb]">
                 <header class="flex shrink-0 items-center justify-between border-b border-[#d7eee6] bg-white px-5 py-4 sm:px-8">
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2">
                         <a href="{{ route('dashboard') }}" class="lg:hidden">
                             <img src="{{ asset('images/cruznegra-logo.png') }}" alt="Cruz Negra" class="h-8 w-24 translate-x-1 object-contain object-left">
                         </a>
+                        <x-mobile-nav class="lg:hidden" />
                         <span class="hidden text-xs text-slate-400 sm:inline">{{ now()->translatedFormat('d \d\e F \d\e Y') }}</span>
                     </div>
                     <div class="flex items-center gap-3">
@@ -67,13 +68,7 @@
                     </div>
                 </header>
 
-                <x-mobile-nav class="shrink-0" />
-
                 <div class="scroll-suave w-full flex-1 space-y-5 overflow-y-auto p-5 sm:p-8">
-                    <section class="rounded-xl border border-[#d7eee6] bg-white px-5 py-4 shadow-sm">
-                        <p class="text-xs text-slate-400">Resumen de actividad</p>
-                        <h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-900">Buen día, {{ $nombre }}.</h1>
-                    </section>
                     <div>
                         <section class="rounded-xl border border-[#d7eee6] bg-white p-5 shadow-sm">
                             <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
@@ -216,8 +211,8 @@
 @endif
 
                     </div>
+                    <x-footer-sitio class="!bg-[#202225] !border-white/10" />
                 </div>
-                <x-footer-sitio class="!bg-[#202225] !border-white/10" />
             </main>
         </div>
     </div>

@@ -56,10 +56,11 @@
 
                     <main class="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#f5fffb]">
                         <header class="flex shrink-0 items-center justify-between border-b border-[#d7eee6] bg-white px-5 py-4 sm:px-8">
-                            <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-2">
                                 <a href="{{ route('dashboard') }}" class="lg:hidden">
                                     <img src="{{ asset('images/cruznegra-logo.png') }}" alt="Cruz Negra" class="h-8 w-24 translate-x-1 object-contain object-left">
                                 </a>
+                                <x-mobile-nav class="lg:hidden" />
                                 <span class="hidden text-xs text-slate-400 sm:inline">{{ now()->translatedFormat('d \d\e F \d\e Y') }}</span>
                             </div>
                             @php($sinLeer = auth()->user()->unreadNotifications()->take(8)->get())
@@ -126,18 +127,18 @@
                             </div>
                         </header>
 
-                        <x-mobile-nav class="shrink-0" />
-
                         @isset($header)
                             <div class="shrink-0 border-b border-[#d7eee6] bg-white px-5 py-5 sm:px-8">
                                 {{ $header }}
                             </div>
                         @endisset
 
-                        <div class="scroll-suave flex-1 overflow-y-auto p-5 sm:p-8">
-                            {{ $slot }}
+                        <div class="scroll-suave w-full flex-1 overflow-y-auto">
+                            <div class="space-y-5 p-5 sm:p-8">
+                                {{ $slot }}
+                            </div>
+                            <x-footer-sitio class="!bg-[#202225] !border-white/10" />
                         </div>
-                        <x-footer-sitio class="!bg-[#202225] !border-white/10" />
                     </main>
                 </div>
             </div>

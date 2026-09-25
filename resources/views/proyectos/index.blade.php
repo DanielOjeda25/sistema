@@ -22,30 +22,54 @@
                     </div>
                 @endif
 
-                <form method="GET" action="{{ route('proyectos.index') }}" class="mb-4 flex flex-wrap gap-3 items-end">
-                    <div class="flex-1 min-w-[200px]">
-                        <label for="q" class="block text-xs font-medium text-gray-500 uppercase mb-1">Buscar</label>
-                        <input type="text" name="q" id="q" value="{{ request('q') }}" placeholder="Nombre o descripción..."
-                               class="w-full rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
+                <form method="GET" action="{{ route('proyectos.index') }}" class="mb-5 rounded-xl border border-gray-100 bg-gray-50/60 p-4">
+                    <div class="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+                        <div class="col-span-2 md:col-span-3 xl:col-span-2">
+                            <label for="q" class="block text-xs font-medium text-gray-500 uppercase mb-1">Buscar</label>
+                            <input type="text" name="q" id="q" value="{{ request('q') }}" placeholder="Nombre o descripción..."
+                                   class="w-full rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
+                        </div>
+                        <div>
+                            <label for="estado" class="block text-xs font-medium text-gray-500 uppercase mb-1">Estado</label>
+                            <select name="estado" id="estado" class="w-full rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
+                                <option value="">Todos</option>
+                                @foreach (['pendiente', 'en_progreso', 'completado', 'cancelado'] as $estado)
+                                    <option value="{{ $estado }}" @selected(request('estado') === $estado)>
+                                        {{ ucfirst(str_replace('_', ' ', $estado)) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <x-buscador-select name="cliente_id" label="Cliente" textoTodos="Todos"
+                                               :opciones="$clientes->mapWithKeys(fn ($c) => [$c->id => trim($c->nombre.' '.$c->apellido)])->all()"
+                                               :seleccionado="request('cliente_id')" placeholder="Buscar cliente..." />
+                        </div>
+                        <div>
+                            <x-buscador-select name="pm_id" label="PM" textoTodos="Todos"
+                                               :opciones="$pms->mapWithKeys(fn ($p) => [$p->id => trim($p->name.' '.$p->apellido)])->all()"
+                                               :seleccionado="request('pm_id')" placeholder="Buscar PM..." />
+                        </div>
+                        <div>
+                            <label for="fecha_desde" class="block text-xs font-medium text-gray-500 uppercase mb-1">Inicio desde</label>
+                            <input type="date" name="fecha_desde" id="fecha_desde" value="{{ request('fecha_desde') }}"
+                                   class="w-full rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
+                        </div>
+                        <div>
+                            <label for="fecha_hasta" class="block text-xs font-medium text-gray-500 uppercase mb-1">Inicio hasta</label>
+                            <input type="date" name="fecha_hasta" id="fecha_hasta" value="{{ request('fecha_hasta') }}"
+                                   class="w-full rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
+                        </div>
                     </div>
-                    <div>
-                        <label for="estado" class="block text-xs font-medium text-gray-500 uppercase mb-1">Estado</label>
-                        <select name="estado" id="estado" class="rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
-                            <option value="">Todos</option>
-                            @foreach (['pendiente', 'en_progreso', 'completado', 'cancelado'] as $estado)
-                                <option value="{{ $estado }}" @selected(request('estado') === $estado)>
-                                    {{ ucfirst(str_replace('_', ' ', $estado)) }}
-                                </option>
-                            @endforeach
-                        </select>
+                    <div class="mt-3 flex items-center justify-end gap-3 border-t border-gray-200/70 pt-3">
+                        @if (request()->hasAny(['q', 'estado', 'cliente_id', 'pm_id', 'fecha_desde', 'fecha_hasta']))
+                            <a href="{{ route('proyectos.index') }}" class="text-xs text-gray-500 hover:text-gray-700 underline">Limpiar filtros</a>
+                        @endif
+                        <button type="submit" class="px-4 py-2 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63] inline-flex items-center gap-1.5">
+                            <x-heroicon-o-magnifying-glass class="w-4 h-4" />
+                            Filtrar
+                        </button>
                     </div>
-                    <button type="submit" class="px-4 py-2 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63] inline-flex items-center gap-1.5">
-                        <x-heroicon-o-magnifying-glass class="w-4 h-4" />
-                        Filtrar
-                    </button>
-                    @if (request()->hasAny(['q', 'estado']))
-                        <a href="{{ route('proyectos.index') }}" class="text-xs text-gray-500 hover:text-gray-700 underline">Limpiar</a>
-                    @endif
                 </form>
 
                 <div class="overflow-x-auto">

@@ -44,22 +44,18 @@
 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     <div>
         <x-input-label for="cliente_id" value="Cliente" />
-        <select id="cliente_id" name="cliente_id" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
-            <option value="">— Seleccioná un cliente —</option>
-            @foreach ($clientes as $c)
-                <option value="{{ $c->id }}" @selected(old('cliente_id', $proyectoItem->cliente_id ?? '') == $c->id)>{{ $c->nombre }} {{ $c->apellido }}</option>
-            @endforeach
-        </select>
+        <x-buscador-select name="cliente_id"
+                           :opciones="$clientes->mapWithKeys(fn ($c) => [$c->id => trim($c->nombre.' '.$c->apellido)])->all()"
+                           :seleccionado="old('cliente_id', $proyectoItem->cliente_id ?? '')"
+                           placeholder="Buscar cliente..." textoTodos="Todos" />
         <x-input-error class="mt-2" :messages="$errors->get('cliente_id')" />
     </div>
     <div>
         <x-input-label for="pm_id" value="Project Manager" />
-        <select id="pm_id" name="pm_id" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
-            <option value="">— Seleccioná un PM —</option>
-            @foreach ($usuarios as $u)
-                <option value="{{ $u->id }}" @selected(old('pm_id', $proyectoItem->pm_id ?? '') == $u->id)>{{ $u->name }}</option>
-            @endforeach
-        </select>
+        <x-buscador-select name="pm_id"
+                           :opciones="$usuarios->mapWithKeys(fn ($u) => [$u->id => trim($u->name.' '.($u->apellido ?? ''))])->all()"
+                           :seleccionado="old('pm_id', $proyectoItem->pm_id ?? '')"
+                           placeholder="Buscar PM..." textoTodos="Todos" />
         <x-input-error class="mt-2" :messages="$errors->get('pm_id')" />
     </div>
 </div>
