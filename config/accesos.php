@@ -21,8 +21,11 @@ return [
     'menu' => [
         ['ruta' => 'dashboard',           'label' => 'Dashboard',           'icono' => 'heroicon-o-home',           'roles' => ['Jefe', 'PM', 'PO', 'Programador', 'Cliente'], 'label_cliente' => 'Dashboard'],
         ['ruta' => 'proyectos.index',     'label' => 'Proyectos',           'icono' => 'heroicon-o-squares-2x2',    'roles' => ['Jefe', 'PM', 'PO', 'Programador', 'Cliente'], 'label_cliente' => 'Mis proyectos'],
-        ['ruta' => 'tareas.tablero',      'label' => 'Mi trabajo',          'icono' => 'heroicon-o-check-circle',   'roles' => ['Jefe', 'PM', 'PO', 'Programador']],
-        ['ruta' => 'tareas.index',        'label' => 'Tareas',              'icono' => 'heroicon-o-queue-list',     'roles' => ['Jefe', 'PM', 'PO', 'Programador']],
+        // 'activo_en': rutas (patrones routeIs) que marcan el item como actual.
+        // Si falta, se usa el patron generico (X.index -> X.*). Hace falta para
+        // "Mi trabajo" y "Tareas", que comparten la familia tareas.*.
+        ['ruta' => 'tareas.tablero',      'label' => 'Mi trabajo',          'icono' => 'heroicon-o-check-circle',   'roles' => ['Jefe', 'PM', 'PO', 'Programador'], 'activo_en' => ['tareas.tablero']],
+        ['ruta' => 'tareas.index',        'label' => 'Tareas',              'icono' => 'heroicon-o-queue-list',     'roles' => ['Jefe', 'PM', 'PO', 'Programador'], 'activo_en' => ['tareas.index', 'tareas.show']],
         ['ruta' => 'facturas.index',      'label' => 'Facturas',            'icono' => 'heroicon-o-banknotes',      'roles' => ['Jefe', 'PM', 'PO', 'Programador', 'Cliente']],
         ['ruta' => 'clientes.index',      'label' => 'Clientes y empresas', 'icono' => 'heroicon-o-building-office-2', 'roles' => ['Jefe', 'PM', 'PO', 'Programador']],
         ['ruta' => 'sprints.index',       'label' => 'Sprints',             'icono' => 'heroicon-o-rocket-launch',                        'roles' => ['Jefe', 'PM', 'PO', 'Programador'], 'seccion' => 'Modulos'],

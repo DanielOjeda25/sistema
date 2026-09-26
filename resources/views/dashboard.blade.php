@@ -26,7 +26,7 @@
                         @continue(isset($enlace['seccion']))
                         @php($etiqueta = $usuario->esCliente() ? ($enlace['label_cliente'] ?? $enlace['label']) : $enlace['label'])
                         <a href="{{ route($enlace['ruta']) }}" title="{{ $etiqueta }}"
-                           class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs(str_replace('.index', '.*', $enlace['ruta']) === $enlace['ruta'] ? $enlace['ruta'] : str_replace('.index', '.*', $enlace['ruta'])) ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }} {{ request()->routeIs('dashboard') ? '!border-[#00e5a0] !bg-white/10 !text-white' : '' }}"
+                           class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs(...($enlace['activo_en'] ?? [str_replace('.index', '.*', $enlace['ruta'])])) ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"
                            :class="colapsado ? '!justify-center !border-l-0 !px-2 !py-2.5' : ''">
                             @if ($enlace['icono'])
                                 <x-dynamic-component :component="$enlace['icono']" class="h-5 w-5 shrink-0" />
@@ -44,7 +44,7 @@
                     @foreach ($menuAccesos as $enlace)
                         @continue(($enlace['seccion'] ?? null) !== 'Modulos')
                         <a href="{{ route($enlace['ruta']) }}" title="{{ $enlace['label'] }}"
-                           class="flex items-center gap-2 rounded-lg border-l-4 px-2.5 py-2 text-xs transition hover:bg-white/10 hover:text-white {{ request()->routeIs(str_replace('.index', '.*', $enlace['ruta'])) ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"
+                           class="flex items-center gap-2 rounded-lg border-l-4 px-2.5 py-2 text-xs transition hover:bg-white/10 hover:text-white {{ request()->routeIs(...($enlace['activo_en'] ?? [str_replace('.index', '.*', $enlace['ruta'])])) ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"
                            :class="colapsado ? '!justify-center !border-l-0 !px-2 !py-2.5' : ''">
                             @if ($enlace['icono'])
                                 <x-dynamic-component :component="$enlace['icono']" class="h-5 w-5 shrink-0" />
