@@ -57,7 +57,8 @@ class HitoController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        $proyectos = Proyecto::orderBy('nombre')->get();
+        // Para el filtro: un Cliente solo puede elegir proyectos de su empresa
+        $proyectos = Proyecto::visiblePara($request->user())->orderBy('nombre')->get();
 
         return view('hitos.index', compact('hitos', 'proyectos'));
     }

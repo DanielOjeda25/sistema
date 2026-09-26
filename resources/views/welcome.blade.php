@@ -12,8 +12,8 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="min-h-screen bg-[#101416] font-sans text-white antialiased">
-        <main class="min-h-screen bg-[radial-gradient(circle_at_75%_45%,#202a2d_0%,#101416_42%,#0b0d0e_100%)]">
-            <header class="border-b border-white/15 px-6 py-5 sm:px-10 lg:px-16">
+        <main class="min-h-screen overflow-x-clip bg-[radial-gradient(circle_at_75%_45%,#202a2d_0%,#101416_42%,#0b0d0e_100%)]">
+            <header class="border-b border-white/15 px-5 py-5 sm:px-10 lg:px-16">
                 <div class="mx-auto flex max-w-[1280px] items-center justify-between">
                     <a href="/" class="flex items-center gap-3">
                         <img src="{{ asset('images/cruznegra-logo-light.png') }}" alt="Cruz Negra" class="h-8 w-auto sm:h-10">
@@ -24,10 +24,10 @@
                 </div>
             </header>
 
-            <section class="mx-auto grid min-h-[calc(100vh-81px)] max-w-[1280px] items-center gap-10 px-4 py-10 sm:px-10 sm:py-14 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16 lg:px-16 lg:py-20">
+            <section class="mx-auto grid max-w-[1280px] items-center gap-10 overflow-x-clip px-4 py-10 sm:px-10 sm:py-14 md:grid-cols-[0.95fr_1.05fr] md:gap-12 lg:gap-16 lg:px-16 lg:py-20 lg:min-h-[calc(100vh-81px)]">
                 <div>
                     <p class="text-sm font-medium uppercase tracking-[0.08em] text-slate-300">Sistema de gestión interna</p>
-                    <h1 class="mt-4 max-w-xl text-4xl font-extrabold leading-[1.02] tracking-[-0.045em] sm:mt-6 sm:text-6xl lg:text-7xl">
+                    <h1 class="mt-4 max-w-xl text-4xl font-extrabold leading-[1.02] tracking-[-0.045em] sm:mt-6 sm:text-5xl md:text-[3.4rem] lg:text-7xl">
                         Gestioná mejor.<br>Trabajá más rápido.
                     </h1>
                     <p class="mt-8 max-w-lg text-base leading-7 text-slate-300">
@@ -42,8 +42,8 @@
                     </div>
                 </div>
 
-                <div id="vista-general" class="relative mx-auto w-full max-w-[620px] px-2 sm:px-0 lg:justify-self-end">
-                    <div class="absolute -inset-12 rounded-full bg-[#39545a]/30 blur-3xl"></div>
+                <div id="vista-general" class="relative mx-auto w-full max-w-[620px] px-2 sm:px-0 md:justify-self-end">
+                    <div class="absolute -inset-8 rounded-full bg-[#39545a]/30 blur-3xl md:-inset-12"></div>
                     <div class="relative rounded-[1.5rem] border-2 border-[#70797b] bg-[#171b1d] p-2 shadow-[0_30px_80px_rgba(0,0,0,0.65)]">
                         <div class="overflow-hidden rounded-[1rem] bg-[#f5f7f8] text-slate-900">
                             <div class="flex min-h-[240px] sm:min-h-[390px]">
@@ -67,7 +67,7 @@
                                         <span class="h-3 w-3 rounded-full bg-emerald-400"></span>
                                     </div>
                                     <p class="mt-3 max-w-xs text-[10px] leading-4 text-slate-500">Colaborá con el equipo y mantené toda la información organizada.</p>
-                                    <div class="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                                    <div class="mt-7 grid grid-cols-2 gap-3 lg:grid-cols-4">
                                         @foreach ([['Proyecto', 'bg-emerald-100 text-emerald-700', 'arrow-trending-up'], ['Conversaciones', 'bg-pink-100 text-pink-700', 'chat-bubble-left-right'], ['Equipo', 'bg-amber-100 text-amber-700', 'users'], ['Búsquedas', 'bg-sky-100 text-sky-700', 'magnifying-glass'], ['Trámites', 'bg-blue-100 text-blue-700', 'clipboard-document-list'], ['Configuración', 'bg-orange-100 text-orange-700', 'cog-6-tooth'], ['Archivos', 'bg-yellow-100 text-yellow-700', 'folder'], ['Seguimientos', 'bg-teal-100 text-teal-700', 'check-circle']] as [$titulo, $color, $icono])
                                             <div class="rounded-lg border border-slate-200 bg-white p-2.5 shadow-sm sm:p-3">
                                                 <span class="flex h-7 w-7 items-center justify-center rounded-md {{ $color }}"><x-dynamic-component :component="'heroicon-o-'.$icono" class="h-4 w-4" /></span>

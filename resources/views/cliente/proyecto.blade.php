@@ -243,7 +243,7 @@
                             <p class="text-xs text-gray-400 mt-0.5">{{ ucfirst($entregable->tipo) }} · {{ $entregable->generado_en?->format('d/m/Y') }}</p>
                         </div>
                         <button type="button" class="text-sm text-[#008c63] hover:underline shrink-0"
-                                @click="ver = @js([
+                                data-dispatch="ver-entregable" data-valores='@json([''
                                     'titulo' => $entregable->titulo,
                                     'contenido' => $entregable->contenido,
                                     'tipo' => $entregable->tipo,

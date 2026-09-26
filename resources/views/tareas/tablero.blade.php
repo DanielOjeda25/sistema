@@ -31,22 +31,16 @@
             </h2>
             <div class="flex items-center gap-3">
                 <form method="GET" action="{{ route('tareas.tablero') }}" class="flex items-center gap-2">
-                    <select name="proyecto" onchange="this.form.submit()"
-                            class="border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm text-sm">
-                        <option value="">— Todos los proyectos —</option>
-                        @foreach ($proyectos as $p)
-                            <option value="{{ $p->id }}" @selected($proyectoId == $p->id)>{{ $p->nombre }}</option>
-                        @endforeach
-                    </select>
+                    <x-buscador-select name="proyecto" autoEnviar
+                                       :opciones="$proyectos->mapWithKeys(fn ($p) => [$p->id => $p->nombre])->all()"
+                                       :seleccionado="$proyectoId"
+                                       placeholder="Buscar proyecto..." textoTodos="— Todos los proyectos —" />
                     @if ($proyectoId)
                         {{-- Los sprints son por proyecto: el selector aparece solo con un proyecto elegido. --}}
-                        <select name="sprint" onchange="this.form.submit()"
-                                class="border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm text-sm">
-                            <option value="">— Todos los sprints —</option>
-                            @foreach ($sprints as $s)
-                                <option value="{{ $s->id }}" @selected($sprintId == $s->id)>{{ $s->nombre }}</option>
-                            @endforeach
-                        </select>
+                        <x-buscador-select name="sprint" autoEnviar
+                                           :opciones="$sprints->mapWithKeys(fn ($s) => [$s->id => $s->nombre])->all()"
+                                           :seleccionado="$sprintId"
+                                           placeholder="Buscar sprint..." textoTodos="— Todos los sprints —" />
                     @endif
                 </form>
                 <a href="{{ route('tareas.index') }}"

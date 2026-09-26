@@ -18,39 +18,65 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased" x-data="{ ver: null, verFactura: null, verCliente: null, verProyecto: null }">
+        <body class="font-sans antialiased">
         @if (request()->routeIs('dashboard'))
             {{ $slot }}
         @else
             <div class="min-h-screen bg-[#d9fff1] text-[#17191b]">
                 <div class="flex h-screen w-full overflow-hidden bg-white shadow-sm">
-                    <aside class="scroll-oscuro hidden w-60 shrink-0 overflow-y-auto bg-[#202225] px-4 py-5 text-slate-300 lg:block">
-                        <a href="{{ route('dashboard') }}" class="block border-b border-white/10 px-3 pb-6">
-                            <img src="{{ asset('images/cruznegra-logo-light.png') }}" alt="Cruz Negra" class="h-14 w-full object-contain object-center">
-                        </a>
+                    <aside x-data="{ colapsado: localStorage.getItem('sidebar-colapsado') === '1' }"
+                           class="scroll-oscuro hidden shrink-0 overflow-y-auto bg-[#202225] text-slate-300 transition-all duration-200 lg:block"
+                           :class="colapsado ? 'w-[68px] px-2' : 'w-60 px-4'">
+                        <div class="py-5" :class="colapsado ? 'px-0' : 'px-3'">
+                            <a href="{{ route('dashboard') }}" class="block border-b border-white/10 pb-6" :class="colapsado ? 'flex justify-center' : ''">
+                                <img src="{{ asset('images/cruznegra-logo-light.png') }}" alt="Cruz Negra" class="object-contain object-center" :class="colapsado ? 'h-9 w-9' : 'h-14 w-full'">
+                            </a>
+                        </div>
 
 @php($menuAccesos = \App\Support\Acceso::menu(auth()->user()))
-                        <nav class="mt-6 space-y-1">
+                        <nav class="space-y-1" :class="colapsado ? '' : 'mt-2'">
                             @foreach ($menuAccesos as $enlace)
                                 @continue(isset($enlace['seccion']))
-                                <a href="{{ route($enlace['ruta']) }}" class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs(str_replace('.index', '.*', $enlace['ruta']) === $enlace['ruta'] ? $enlace['ruta'] : str_replace('.index', '.*', $enlace['ruta'])) ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}">
+                                @php($etiqueta = auth()->user()->esCliente() ? ($enlace['label_cliente'] ?? $enlace['label']) : $enlace['label'])
+                                <a href="{{ route($enlace['ruta']) }}" title="{{ $etiqueta }}"
+                                   class="flex items-center rounded-lg border-l-4 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs(str_replace('.index', '.*', $enlace['ruta']) === $enlace['ruta'] ? $enlace['ruta'] : str_replace('.index', '.*', $enlace['ruta'])) ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"
+                                   :class="colapsado ? 'justify-center border-l-0 px-2 py-2.5' : 'gap-3 px-3 py-2.5'">
                                     @if ($enlace['icono'])
                                         <x-dynamic-component :component="$enlace['icono']" class="h-5 w-5 shrink-0" />
                                     @endif
-                                    {{ auth()->user()->esCliente() ? ($enlace['label_cliente'] ?? $enlace['label']) : $enlace['label'] }}
+                                    <span x-show="!colapsado">{{ $etiqueta }}</span>
                                 </a>
                             @endforeach
                         </nav>
 
                         @if (collect($menuAccesos)->contains(fn ($e) => ($e['seccion'] ?? null) === 'Modulos'))
-                        <p class="mt-8 px-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">Módulos</p>
-                        <nav class="mt-2 space-y-1">
+                        <p class="mt-8 px-3 text-[10px] font-bold uppercase tracking-widest text-slate-500" x-show="!colapsado">Módulos</p>
+                        <div class="mt-8 border-t border-white/10" x-show="colapsado" x-cloak></div>
+                        {{-- Modulos en grilla 2x2 cuando el menu esta expandido --}}
+                        <nav class="mt-2 grid gap-1" x-bind:class="colapsado ? 'grid-cols-1' : 'grid-cols-2'">
                             @foreach ($menuAccesos as $enlace)
                                 @continue(($enlace['seccion'] ?? null) !== 'Modulos')
-                                <a href="{{ route($enlace['ruta']) }}" class="block rounded-lg border-l-4 px-3 py-2 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs(str_replace('.index', '.*', $enlace['ruta'])) ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}">{{ $enlace['label'] }}</a>
+                                <a href="{{ route($enlace['ruta']) }}" title="{{ $enlace['label'] }}"
+                                   class="flex items-center gap-2 rounded-lg border-l-4 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs(str_replace('.index', '.*', $enlace['ruta'])) ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"
+                                   :class="colapsado ? 'justify-center border-l-0 px-2 py-2.5' : 'px-2.5 py-2 text-xs'">
+                                    @if ($enlace['icono'])
+                                        <x-dynamic-component :component="$enlace['icono']" class="h-5 w-5 shrink-0" />
+                                    @endif
+                                    <span x-show="!colapsado">{{ $enlace['label'] }}</span>
+                                </a>
                             @endforeach
                         </nav>
                         @endif
+
+                        {{-- Boton para colapsar / expandir el menu --}}
+                        <div class="mt-6 border-t border-white/10 pt-4" :class="colapsado ? 'flex justify-center' : ''">
+                            <button @click="colapsado = !colapsado; localStorage.setItem('sidebar-colapsado', colapsado ? '1' : '0')"
+                                    class="rounded-lg p-2 text-slate-400 transition hover:bg-white/10 hover:text-white"
+                                    :title="colapsado ? 'Expandir menú' : 'Colapsar menú'"
+                                    aria-label="Colapsar menú">
+                                <x-heroicon-o-chevron-double-left class="h-5 w-5 transition-transform" x-bind:class="colapsado ? 'rotate-180' : ''" />
+                            </button>
+                        </div>
 
                     </aside>
 
@@ -133,8 +159,8 @@
                             </div>
                         @endisset
 
-                        <div class="scroll-suave w-full flex-1 overflow-y-auto">
-                            <div class="space-y-5 p-5 sm:p-8">
+                        <div class="scroll-suave flex w-full flex-1 flex-col overflow-y-auto">
+                            <div class="animar-entrada flex-1 space-y-5 p-5 sm:p-8">
                                 {{ $slot }}
                             </div>
                             <x-footer-sitio class="!bg-[#202225] !border-white/10" />

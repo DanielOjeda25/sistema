@@ -120,7 +120,13 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="5" class="px-4 py-6 text-center text-gray-500">Sin registros.</td></tr>
+                        <tr><td colspan="5" class="px-4 py-6 text-center text-gray-500">
+                            @if (request('modelo'))
+                                Este elemento todavía no tuvo cambios registrados: solo aparece en el historial después de crearse o editarse.
+                            @else
+                                Sin registros.
+                            @endif
+                        </td></tr>
                     @endforelse
                 </tbody>
             </table>

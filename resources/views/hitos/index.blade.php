@@ -30,15 +30,10 @@
                                class="w-full rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
                     </div>
                     <div>
-                        <label for="proyecto_id" class="block text-xs font-medium text-gray-500 uppercase mb-1">Proyecto</label>
-                        <select name="proyecto_id" id="proyecto_id" class="rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] min-w-[180px]">
-                            <option value="">Todos</option>
-                            @foreach ($proyectos as $proyecto)
-                                <option value="{{ $proyecto->id }}" @selected(request('proyecto_id') == $proyecto->id)>
-                                    {{ $proyecto->nombre }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <x-buscador-select name="proyecto_id" label="Proyecto" textoTodos="Todos"
+                                           :opciones="$proyectos->mapWithKeys(fn ($p) => [$p->id => $p->nombre])->all()"
+                                           :seleccionado="request('proyecto_id')"
+                                           placeholder="Buscar proyecto..." />
                     </div>
                     <div>
                         <label for="estado" class="block text-xs font-medium text-gray-500 uppercase mb-1">Estado</label>
@@ -93,6 +88,13 @@
                         <tbody class="bg-white divide-y divide-gray-200 text-gray-700">
                             @forelse ($hitos as $hito)
                                 @php($valoresHito = ['nombre' => $hito->nombre, 'descripcion' => $hito->descripcion, 'completado' => (string) $hito->completado, 'proyecto_id' => $hito->proyecto_id, 'fecha_objetivo' => $hito->fecha_objetivo?->format('Y-m-d')])
+                                @php($verHitoFila = [
+                                    'nombre' => $hito->nombre,
+                                    'descripcion' => $hito->descripcion,
+                                    'completado' => (bool) $hito->completado,
+                                    'proyecto' => $hito->proyecto?->nombre ?? '—',
+                                    'fecha' => $hito->fecha_objetivo?->format('d/m/Y'),
+                                ])
                                 <tr>
                                     <td class="px-6 py-4">{{ $hito->nombre }}</td>
                                     <td class="px-6 py-4">{{ $hito->proyecto?->nombre ?? 'N/A' }}</td>
@@ -106,9 +108,9 @@
                                                     <x-heroicon-o-clock class="w-5 h-5" />
                                                 </a>
                                             @endhasanyrole
-                                            <a href="{{ route('hitos.show', $hito) }}" class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
+                                            <button type="button" data-dispatch="ver-hito" data-valores='@json($verHitoFila)' class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
                                                 <x-heroicon-o-eye class="w-5 h-5" />
-                                            </a>
+                                            </button>
                                             <button type="button" data-abrir-modal="modal-hito-editar"
                                                     data-url="{{ route('hitos.update', $hito) }}"
                                                     data-valores='@json($valoresHito)'
@@ -164,5 +166,6 @@
     @hasanyrole('Jefe|PM|PO')
     @include('hitos._modal_editar')
     @endhasanyrole
+    <x-hito-view-modal />
     <x-confirmar-eliminar />
 </x-app-layout>

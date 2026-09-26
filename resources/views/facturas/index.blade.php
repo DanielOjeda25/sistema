@@ -89,7 +89,7 @@
                                                     <x-heroicon-o-clock class="w-5 h-5" />
                                                 </a>
                                             @endhasanyrole
-                                            <button type="button" @click="verFactura = @js($verFacturaFila)" class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
+                                            <button type="button" data-dispatch="ver-factura" data-valores='@json($verFacturaFila)' class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
                                                 <x-heroicon-o-eye class="w-5 h-5" />
                                             </button>
                                             @hasanyrole('Jefe|PM')

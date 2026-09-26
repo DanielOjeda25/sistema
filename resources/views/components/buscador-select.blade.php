@@ -5,6 +5,7 @@
     'seleccionado' => null,    // id elegido actualmente
     'placeholder' => 'Buscar...',
     'textoTodos' => 'Todos',
+    'autoEnviar' => false,     // si es true, envía el formulario al elegir una opción
 ])
 
 {{-- Buscador con lista desplegable filtrable: útil cuando el select tiene muchas opciones --}}
@@ -17,7 +18,7 @@
          x-data="buscadorSelect({{ \Illuminate\Support\Js::from($seleccionado) }}, {{ \Illuminate\Support\Js::from($opciones) }})"
          @click.outside="abierto = false">
         {{-- Valor real que se envía en el formulario --}}
-        <input type="hidden" name="{{ $name }}" :value="valor">
+        <input type="hidden" name="{{ $name }}" :value="valor" x-ref="oculto">
 
         {{-- Campo visible: muestra la etiqueta elegida o el texto de búsqueda --}}
         <input type="text" x-model="texto" @focus="abrir()" @input="abierto = true; filtrar()"
@@ -104,6 +105,13 @@
                 this.texto = id === '' ? '' : etiqueta;
                 this.abierto = false;
                 this.filtrar();
+                // Para filtros que recargan la pagina al cambiar, como los selects nativos con onchange.
+                // Se escribe el valor en el input oculto a mano: el binding de Alpine se aplica
+                // despues y el formulario saldria con el valor viejo.
+                if ({{ $autoEnviar ? 'true' : 'false' }}) {
+                    this.$refs.oculto.value = id;
+                    this.$el.closest('form')?.submit();
+                }
             },
 
             limpiar() {

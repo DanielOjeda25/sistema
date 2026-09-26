@@ -141,3 +141,41 @@ input[type="text"].campo, select.campo, textarea.campo {
 [data-crud-modal] input[type="date"]:invalid::-webkit-datetime-edit {
     color: #9ca3af;
 }
+
+/* -----------------------------------------------------------------------------
+   Transicion suave entre paginas:
+   - Navegadores con View Transitions (Chrome/Edge) hacen cross-fade entre
+     la pantalla anterior y la nueva.
+   - El resto ve la animacion de entrada del contenido como respaldo.
+----------------------------------------------------------------------------- */
+@view-transition {
+    navigation: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    @view-transition {
+        navigation: none;
+    }
+}
+
+/* Entrada del contenido al cargar cada pantalla: sube levemente y aparece */
+@keyframes entrada-pagina {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animar-entrada {
+    animation: entrada-pagina 0.35s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animar-entrada {
+        animation: none;
+    }
+}

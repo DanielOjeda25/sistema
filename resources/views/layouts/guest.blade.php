@@ -51,7 +51,7 @@
 
             {{-- Panel del formulario --}}
             <div class="lg:w-7/12 bg-gray-50 flex items-center justify-center px-6 py-12 lg:px-12">
-                <div class="w-full max-w-md">
+                <div class="animar-entrada w-full max-w-md">
                     {{ $slot }}
                 </div>
             </div>

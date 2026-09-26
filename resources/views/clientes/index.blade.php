@@ -78,7 +78,7 @@
                                                     <x-heroicon-o-clock class="w-5 h-5" />
                                                 </a>
                                             @endhasanyrole
-                                            <button type="button" @click="verCliente = @js([
+                                            <button type="button" data-dispatch="ver-cliente" data-valores='@json([''
                                                     'nombre' => $cliente->nombre.' '.$cliente->apellido,
                                                     'email' => $cliente->email,
                                                     'telefono' => $cliente->telefono ?? '—',

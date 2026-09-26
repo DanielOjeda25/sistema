@@ -86,7 +86,7 @@
                                                     <x-heroicon-o-clock class="w-5 h-5" />
                                                 </a>
                                             @endhasanyrole
-                                            <button type="button" @click="ver = @js($verEntregable)" class="text-blue-600 hover:text-blue-800" title="Ver detalle" aria-label="Ver detalle">
+                                            <button type="button" data-dispatch="ver-entregable" data-valores='@json($verEntregable)' class="text-blue-600 hover:text-blue-800" title="Ver detalle" aria-label="Ver detalle">
                                                 <x-heroicon-o-eye class="w-5 h-5" />
                                             </button>
                                             @hasanyrole('Jefe|PM|PO|Programador')

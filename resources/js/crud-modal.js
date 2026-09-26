@@ -6,6 +6,24 @@
  * del modal y data-url para sobreescribir su action (edición).
  */
 document.addEventListener('DOMContentLoaded', () => {
+    /*
+     * Modales de solo lectura (x-buscador... no; los <x-*-view-modal>):
+     * el boton lleva data-dispatch="<evento>" y data-valores (JSON). Al hacer
+     * click se emite el evento a nivel window, que el modal escucha con
+     * @<evento>.window para abrirse con esos datos. Va por delegacion para
+     * no depender de que Alpine haya inicializado cada boton.
+     */
+    document.addEventListener('click', evento => {
+        const boton = evento.target.closest('[data-dispatch]');
+        if (!boton) return;
+
+        let datos = null;
+        if (boton.dataset.valores) {
+            try { datos = JSON.parse(boton.dataset.valores); } catch { datos = null; }
+        }
+        window.dispatchEvent(new CustomEvent(boton.dataset.dispatch, { detail: datos }));
+    });
+
     function modal(id) {
         return document.querySelector(`[data-crud-modal]#${id}`);
     }
