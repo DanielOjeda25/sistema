@@ -73,7 +73,15 @@ class AuditoriaController extends Controller
         $nombresRoles = Role::orderBy('name')->pluck('name');
         $opcionesRol = $nombresRoles->combine($nombresRoles)->all();
 
-        return view('auditoria.index', compact('auditoria', 'opcionesRol', 'opcionesUsuario', 'usuarioElegido'));
+        // Modo historial: el usuario vino desde el boton "Historial" de un
+        // listado. El aviso muestra el nombre del registro ("Cliente: Mariana").
+        $contexto = null;
+        if ($request->filled('modelo')) {
+            $contexto = $this->nombreRegistro($request->string('modelo')->toString(), $request->string('registro')->toString())
+                ?? $this->etiquetaRegistro($request->string('modelo')->toString()).' #'.$request->string('registro')->toString();
+        }
+
+        return view('auditoria.index', compact('auditoria', 'opcionesRol', 'opcionesUsuario', 'usuarioElegido', 'contexto'));
     }
 
     /**
@@ -82,7 +90,17 @@ class AuditoriaController extends Controller
      */
     private function tituloRegistro(Audit $registro): string
     {
-        $etiqueta = match ($registro->auditable_type) {
+        return $this->nombreRegistro($registro->auditable_type, $registro->auditable_id)
+            ?? $this->etiquetaRegistro($registro->auditable_type).' #'.$registro->auditable_id
+            .($registro->event === 'deleted' ? ' (eliminado)' : '');
+    }
+
+    /**
+     * Etiqueta legible del tipo auditado ("Cliente", "Solicitud de cambio").
+     */
+    private function etiquetaRegistro(string $tipo): string
+    {
+        return match ($tipo) {
             'App\Models\Tarea' => 'Tarea',
             'App\Models\Proyecto' => 'Proyecto',
             'App\Models\Hito' => 'Hito',
@@ -92,25 +110,33 @@ class AuditoriaController extends Controller
             'App\Models\EntregableIA' => 'Entregable',
             'App\Models\SolicitudCambio' => 'Solicitud de cambio',
             'App\Models\User' => 'Usuario',
-            default => class_basename($registro->auditable_type),
+            default => class_basename($tipo),
         };
+    }
 
-        $camposNombre = ['titulo', 'nombre', 'numero'];
-        $candidato = $registro->auditable_type;
+    /**
+     * Nombre humano del registro auditado ("Cliente: Mariana"), buscando el
+     * registro vivito. Null si el tipo no existe o el registro ya fue borrado.
+     */
+    private function nombreRegistro(string $tipo, string $id): ?string
+    {
+        if (! class_exists($tipo) || ! $modelo = $tipo::find($id)) {
+            return null;
+        }
 
-        if (class_exists($candidato) && $modelo = $candidato::find($registro->auditable_id)) {
-            foreach ($camposNombre as $campo) {
-                if (isset($modelo->{$campo}) && $modelo->{$campo} !== null) {
-                    return "{$etiqueta}: {$modelo->{$campo}}";
-                }
-            }
+        $etiqueta = $this->etiquetaRegistro($tipo);
 
-            if ($modelo instanceof User) {
-                return "{$etiqueta}: {$modelo->name} {$modelo->apellido}";
+        foreach (['titulo', 'nombre', 'numero'] as $campo) {
+            if (isset($modelo->{$campo}) && $modelo->{$campo} !== null) {
+                return "{$etiqueta}: {$modelo->{$campo}}";
             }
         }
 
-        return "{$etiqueta} #{$registro->auditable_id}".($registro->event === 'deleted' ? ' (eliminado)' : '');
+        if ($modelo instanceof User) {
+            return "{$etiqueta}: {$modelo->name} {$modelo->apellido}";
+        }
+
+        return null;
     }
 
     /**
