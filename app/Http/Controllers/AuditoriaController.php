@@ -11,6 +11,9 @@ class AuditoriaController extends Controller
 {
     public function index(Request $request)
     {
+        $rolElegido = $request->string('rol')->toString();
+        $usuarioElegido = $request->string('usuario')->toString();
+
         $auditoria = Audit::with('user.roles')
             ->latest()
             // Busqueda libre: evento o modelo auditado.
@@ -21,15 +24,14 @@ class AuditoriaController extends Controller
                         ->orWhere('auditable_type', 'like', "%{$q}%");
                 });
             })
-            // Filtro por usuario responsable del cambio.
-            ->when($request->filled('usuario'), function ($query) use ($request) {
-                $query->where('user_id', $request->string('usuario')->toString());
-            })
+            // Filtro por usuario responsable del cambio. Si el usuario elegido
+            // no cumple el rol elegido, ya quedo reseteado mas abajo.
+            ->when($usuarioElegido !== '', fn ($query) => $query->where('user_id', $usuarioElegido))
             // Filtro por rol: queda solo la actividad de los usuarios que
             // cumplen ese rol (Jefe, PM, etc.).
-            ->when($request->filled('rol'), function ($query) use ($request) {
+            ->when($rolElegido !== '', function ($query) use ($rolElegido) {
                 $ids = User::query()
-                    ->whereHas('roles', fn ($rol) => $rol->where('name', $request->string('rol')->toString()))
+                    ->whereHas('roles', fn ($rol) => $rol->where('name', $rolElegido))
                     ->pluck('id');
                 $query->whereIn('user_id', $ids);
             })
@@ -55,11 +57,23 @@ class AuditoriaController extends Controller
             return $registro;
         });
 
-        // Con roles cargados para que el filtro muestre "Sofia (Programador)".
-        $usuarios = User::with('roles')->orderBy('name')->get();
-        $roles = Role::orderBy('name')->pluck('name');
+        // Opciones del buscador de usuarios: "Nombre (Rol)". Si hay rol elegido,
+        // quedan solo los que cumplen ese rol (antes se filtraba con JS).
+        $opcionesUsuario = User::with('roles')->orderBy('name')
+            ->when($rolElegido !== '', fn ($query) => $query->whereHas('roles', fn ($rol) => $rol->where('name', $rolElegido)))
+            ->get()
+            ->mapWithKeys(fn ($u) => [$u->id => $u->name.' ('.($u->roles->pluck('name')->implode(', ') ?: 'sin rol').')'])
+            ->all();
 
-        return view('auditoria.index', compact('auditoria', 'usuarios', 'roles'));
+        // Si el usuario elegido no cumple el rol elegido, el filtro vuelve a "Todos".
+        if ($usuarioElegido !== '' && ! isset($opcionesUsuario[$usuarioElegido])) {
+            $usuarioElegido = '';
+        }
+
+        $nombresRoles = Role::orderBy('name')->pluck('name');
+        $opcionesRol = $nombresRoles->combine($nombresRoles)->all();
+
+        return view('auditoria.index', compact('auditoria', 'opcionesRol', 'opcionesUsuario', 'usuarioElegido'));
     }
 
     /**

@@ -64,6 +64,7 @@
                         <tbody class="bg-white divide-y divide-gray-200 text-gray-700">
                             @forelse ($clientes as $cliente)
                                 @php($valoresCliente = $cliente->only(['nombre', 'apellido', 'email', 'telefono', 'empresa', 'estado']))
+                                @php($datosVerCliente = ['nombre' => $cliente->nombre.' '.$cliente->apellido, 'email' => $cliente->email, 'telefono' => $cliente->telefono ?? '—', 'empresa' => $cliente->empresa ?? 'Sin empresa', 'estado' => $cliente->estado])
                                 <tr>
                                     <td class="px-6 py-4">{{ $cliente->nombre }} {{ $cliente->apellido }}</td>
                                     <td class="px-6 py-4">{{ $cliente->email }}</td>
@@ -78,13 +79,7 @@
                                                     <x-heroicon-o-clock class="w-5 h-5" />
                                                 </a>
                                             @endhasanyrole
-                                            <button type="button" data-dispatch="ver-cliente" data-valores='@json([''
-                                                    'nombre' => $cliente->nombre.' '.$cliente->apellido,
-                                                    'email' => $cliente->email,
-                                                    'telefono' => $cliente->telefono ?? '—',
-                                                    'empresa' => $cliente->empresa ?? 'Sin empresa',
-                                                    'estado' => $cliente->estado,
-                                                ])" class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
+                                            <button type="button" data-dispatch="ver-cliente" data-valores='@json($datosVerCliente)' class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
                                                 <x-heroicon-o-eye class="w-5 h-5" />
                                             </button>
                                             @hasanyrole('Jefe|PM')

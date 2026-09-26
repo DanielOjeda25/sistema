@@ -4,70 +4,42 @@
     </x-slot>
 
     <div class="py-12 max-w-7xl mx-auto sm:px-6 lg:px-8">
-        <form method="GET" class="mb-4 flex flex-wrap items-end gap-2">
-            <div>
-                <label for="q" class="block text-xs font-medium text-gray-500 uppercase mb-1">Buscar</label>
-                <input type="text" id="q" name="q" value="{{ request('q') }}" placeholder="Evento o modelo..."
-                       class="border-gray-300 rounded-lg w-56 focus:border-[#00b87d] focus:ring-[#00b87d]">
+        <form method="GET" class="mb-4 rounded-xl border border-gray-100 bg-gray-50/60 p-4">
+            <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
+                <div>
+                    <label for="q" class="block text-xs font-medium text-gray-500 uppercase mb-1">Buscar</label>
+                    <input type="text" id="q" name="q" value="{{ request('q') }}" placeholder="Evento o modelo..."
+                           class="w-full border-gray-300 rounded-lg text-sm focus:border-[#00b87d] focus:ring-[#00b87d]">
+                </div>
+                {{-- Al elegir rol se recarga la pagina: el buscador de usuario queda solo con los que cumplen ese rol --}}
+                <x-buscador-select name="rol" label="Rol" textoTodos="Todos"
+                                   :opciones="$opcionesRol"
+                                   :seleccionado="request('rol')"
+                                   placeholder="Buscar rol..."
+                                   autoEnviar />
+                <x-buscador-select name="usuario" label="Usuario" textoTodos="Todos"
+                                   :opciones="$opcionesUsuario"
+                                   :seleccionado="$usuarioElegido"
+                                   placeholder="Buscar usuario..." />
+                <x-buscador-select name="accion" label="Acción" textoTodos="Todas"
+                                   :opciones="['created' => 'Creación', 'updated' => 'Modificación', 'deleted' => 'Eliminación']"
+                                   :seleccionado="request('accion')"
+                                   placeholder="Buscar acción..." />
             </div>
-            <div>
-                <label for="rol" class="block text-xs font-medium text-gray-500 uppercase mb-1">Rol</label>
-                <select id="rol" name="rol" onchange="filtrarUsuariosPorRol()" class="border-gray-300 rounded-lg focus:border-[#00b87d] focus:ring-[#00b87d]">
-                    <option value="">Todos</option>
-                    @foreach ($roles as $nombreRol)
-                        <option value="{{ $nombreRol }}" @selected(request('rol') === $nombreRol)>{{ $nombreRol }}</option>
-                    @endforeach
-                </select>
+            <div class="mt-3 flex flex-wrap items-center gap-3">
+                @if (request('modelo'))
+                    <input type="hidden" name="modelo" value="{{ request('modelo') }}">
+                    <input type="hidden" name="registro" value="{{ request('registro') }}">
+                    <span class="text-xs text-gray-500">Historial de {{ class_basename(request('modelo')) }} #{{ request('registro') }}</span>
+                @endif
+                <button class="px-4 py-2.5 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63] inline-flex items-center gap-1.5">
+                    <x-heroicon-o-magnifying-glass class="w-4 h-4" />
+                    Filtrar
+                </button>
+                @if (request()->filled('q') || request()->filled('usuario') || request()->filled('accion') || request()->filled('rol'))
+                    <a href="{{ route('auditoria.index') }}" class="text-xs text-gray-500 hover:underline">Limpiar</a>
+                @endif
             </div>
-            <div>
-                <label for="usuario" class="block text-xs font-medium text-gray-500 uppercase mb-1">Usuario</label>
-                <select id="usuario" name="usuario" class="border-gray-300 rounded-lg focus:border-[#00b87d] focus:ring-[#00b87d]">
-                    <option value="">Todos</option>
-                    @foreach ($usuarios as $u)
-                        <option value="{{ $u->id }}" data-roles="{{ $u->roles->pluck('name')->implode(',') }}" @selected(request('usuario') == $u->id)>
-                            {{ $u->name }} ({{ $u->roles->pluck('name')->implode(', ') ?: 'sin rol' }})
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <script>
-                // Al elegir un rol, el desplegable de usuario queda solo con
-                // los que cumplen ese rol; si el usuario elegido no cumple,
-                // se resetea a Todos.
-                function filtrarUsuariosPorRol() {
-                    const rol = document.getElementById('rol').value;
-                    const select = document.getElementById('usuario');
-                    let hayElegidoVisible = false;
-                    select.querySelectorAll('option').forEach(opcion => {
-                        if (opcion.value === '') { opcion.hidden = false; return; }
-                        opcion.hidden = rol !== '' && !opcion.dataset.roles.split(',').includes(rol);
-                        if (!opcion.hidden && opcion.selected) hayElegidoVisible = true;
-                    });
-                    if (!hayElegidoVisible) select.value = '';
-                }
-                document.addEventListener('DOMContentLoaded', filtrarUsuariosPorRol);
-            </script>
-            <div>
-                <label for="accion" class="block text-xs font-medium text-gray-500 uppercase mb-1">Acción</label>
-                <select id="accion" name="accion" class="border-gray-300 rounded-lg focus:border-[#00b87d] focus:ring-[#00b87d]">
-                    <option value="">Todas</option>
-                    @foreach (['created' => 'Creación', 'updated' => 'Modificación', 'deleted' => 'Eliminación'] as $valor => $etiqueta)
-                        <option value="{{ $valor }}" @selected(request('accion') == $valor)>{{ $etiqueta }}</option>
-                    @endforeach
-                </select>
-            </div>
-            @if (request('modelo'))
-                <input type="hidden" name="modelo" value="{{ request('modelo') }}">
-                <input type="hidden" name="registro" value="{{ request('registro') }}">
-                <span class="text-xs text-gray-500 pb-2">Historial de {{ class_basename(request('modelo')) }} #{{ request('registro') }}</span>
-            @endif
-            <button class="px-4 py-2.5 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63] inline-flex items-center gap-1.5">
-                <x-heroicon-o-magnifying-glass class="w-4 h-4" />
-                Filtrar
-            </button>
-            @if (request()->filled('q') || request()->filled('usuario') || request()->filled('accion') || request()->filled('rol'))
-                <a href="{{ route('auditoria.index') }}" class="text-xs text-gray-500 hover:underline pb-2">Limpiar</a>
-            @endif
         </form>
 
         <div class="bg-white rounded-lg shadow overflow-x-auto">
