@@ -25,22 +25,24 @@
             <div class="min-h-screen bg-[#d9fff1] text-[#17191b]">
                 <div class="flex h-screen w-full overflow-hidden bg-white shadow-sm">
                     <aside x-data="{ colapsado: localStorage.getItem('sidebar-colapsado') === '1' }"
-                           class="scroll-oscuro hidden shrink-0 overflow-y-auto bg-[#202225] text-slate-300 transition-all duration-200 lg:block"
-                           :class="colapsado ? 'w-[68px] px-2' : 'w-60 px-4'">
-                        <div class="py-5" :class="colapsado ? 'px-0' : 'px-3'">
-                            <a href="{{ route('dashboard') }}" class="block border-b border-white/10 pb-6" :class="colapsado ? 'flex justify-center' : ''">
-                                <img src="{{ asset('images/cruznegra-logo-light.png') }}" alt="Cruz Negra" class="object-contain object-center" :class="colapsado ? 'h-9 w-9' : 'h-14 w-full'">
+                           class="scroll-oscuro hidden w-60 shrink-0 overflow-y-auto bg-[#202225] px-4 text-slate-300 transition-all duration-200 lg:block"
+                           :class="colapsado ? '!w-[68px] !px-2' : ''">
+                        {{-- Clases estaticas = estado expandido: asi no hay "salto" antes de que Alpine arranque.
+                             El estado colapsado pisa con !important. --}}
+                        <div class="py-5 px-3" :class="colapsado ? '!px-0' : ''">
+                            <a href="{{ route('dashboard') }}" class="block border-b border-white/10 pb-6" :class="colapsado ? '!flex !justify-center' : ''">
+                                <img src="{{ asset('images/cruznegra-logo-light.png') }}" alt="Cruz Negra" class="h-14 w-full object-contain object-center" :class="colapsado ? '!h-9 !w-9' : ''">
                             </a>
                         </div>
 
 @php($menuAccesos = \App\Support\Acceso::menu(auth()->user()))
-                        <nav class="space-y-1" :class="colapsado ? '' : 'mt-2'">
+                        <nav class="mt-2 space-y-1" :class="colapsado ? '!mt-0' : ''">
                             @foreach ($menuAccesos as $enlace)
                                 @continue(isset($enlace['seccion']))
                                 @php($etiqueta = auth()->user()->esCliente() ? ($enlace['label_cliente'] ?? $enlace['label']) : $enlace['label'])
                                 <a href="{{ route($enlace['ruta']) }}" title="{{ $etiqueta }}"
-                                   class="flex items-center rounded-lg border-l-4 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs(str_replace('.index', '.*', $enlace['ruta']) === $enlace['ruta'] ? $enlace['ruta'] : str_replace('.index', '.*', $enlace['ruta'])) ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"
-                                   :class="colapsado ? 'justify-center border-l-0 px-2 py-2.5' : 'gap-3 px-3 py-2.5'">
+                                   class="flex items-center gap-3 rounded-lg border-l-4 px-3 py-2.5 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs(str_replace('.index', '.*', $enlace['ruta']) === $enlace['ruta'] ? $enlace['ruta'] : str_replace('.index', '.*', $enlace['ruta'])) ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"
+                                   :class="colapsado ? '!justify-center !border-l-0 !px-2 !py-2.5' : ''">
                                     @if ($enlace['icono'])
                                         <x-dynamic-component :component="$enlace['icono']" class="h-5 w-5 shrink-0" />
                                     @endif
@@ -53,12 +55,12 @@
                         <p class="mt-8 px-3 text-[10px] font-bold uppercase tracking-widest text-slate-500" x-show="!colapsado">Módulos</p>
                         <div class="mt-8 border-t border-white/10" x-show="colapsado" x-cloak></div>
                         {{-- Modulos en grilla 2x2 cuando el menu esta expandido --}}
-                        <nav class="mt-2 grid gap-1" x-bind:class="colapsado ? 'grid-cols-1' : 'grid-cols-2'">
+                        <nav class="mt-2 grid grid-cols-2 gap-1" x-bind:class="colapsado ? '!grid-cols-1' : ''">
                             @foreach ($menuAccesos as $enlace)
                                 @continue(($enlace['seccion'] ?? null) !== 'Modulos')
                                 <a href="{{ route($enlace['ruta']) }}" title="{{ $enlace['label'] }}"
-                                   class="flex items-center gap-2 rounded-lg border-l-4 text-sm transition hover:bg-white/10 hover:text-white {{ request()->routeIs(str_replace('.index', '.*', $enlace['ruta'])) ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"
-                                   :class="colapsado ? 'justify-center border-l-0 px-2 py-2.5' : 'px-2.5 py-2 text-xs'">
+                                   class="flex items-center gap-2 rounded-lg border-l-4 px-2.5 py-2 text-xs transition hover:bg-white/10 hover:text-white {{ request()->routeIs(str_replace('.index', '.*', $enlace['ruta'])) ? 'border-[#00e5a0] bg-white/10 text-white' : 'border-transparent' }}"
+                                   :class="colapsado ? '!justify-center !border-l-0 !px-2 !py-2.5' : ''">
                                     @if ($enlace['icono'])
                                         <x-dynamic-component :component="$enlace['icono']" class="h-5 w-5 shrink-0" />
                                     @endif
@@ -81,17 +83,24 @@
                     </aside>
 
                     <main class="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#f5fffb]">
-                        <header class="flex shrink-0 items-center justify-between border-b border-[#d7eee6] bg-white px-5 py-4 sm:px-8">
-                            <div class="flex items-center gap-2">
-                                <a href="{{ route('dashboard') }}" class="lg:hidden">
+                        {{-- Barra unica: titulo de la pagina a la izquierda (con su descripcion en chico),
+                             fecha + notificaciones + usuario a la derecha. --}}
+                        <header class="flex shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-[#d7eee6] bg-white px-5 py-3 sm:px-8">
+                            <div class="flex min-w-0 items-center gap-2">
+                                <a href="{{ route('dashboard') }}" class="shrink-0 lg:hidden">
                                     <img src="{{ asset('images/cruznegra-logo.png') }}" alt="Cruz Negra" class="h-8 w-24 translate-x-1 object-contain object-left">
                                 </a>
                                 <x-mobile-nav class="lg:hidden" />
-                                <span class="hidden text-xs text-slate-400 sm:inline">{{ now()->translatedFormat('d \d\e F \d\e Y') }}</span>
+                                @isset($header)
+                                    <div class="min-w-0 font-semibold leading-tight text-gray-800 [&_a]:shrink-0 [&_a]:text-xs [&_a]:font-normal [&_a]:text-gray-400 [&_a:hover]:underline [&_h2]:truncate [&_h2]:text-base [&_h2]:font-semibold [&_h2]:leading-tight [&_h2]:text-gray-800 [&_p]:mt-0.5 [&_p]:text-xs [&_p]:font-normal [&_p]:leading-tight [&_p]:text-gray-400 sm:[&_h2]:text-lg">
+                                        {{ $header }}
+                                    </div>
+                                @endisset
                             </div>
                             @php($sinLeer = auth()->user()->unreadNotifications()->take(8)->get())
                             @php($totalSinLeer = auth()->user()->unreadNotifications()->count())
-                            <div class="flex items-center gap-1">
+                            <div class="flex shrink-0 items-center gap-1">
+                                <span class="mr-1 hidden text-xs text-slate-400 md:inline">{{ now()->translatedFormat('d \d\e F \d\e Y') }}</span>
                             <div class="relative" x-data="{ abierto: false }">
                                 <button @click="abierto = !abierto" class="relative rounded-lg p-2 text-slate-500 transition hover:bg-[#f0fff9] hover:text-slate-700" aria-label="Notificaciones">
                                     <x-heroicon-o-bell class="h-5 w-5" />
@@ -152,12 +161,6 @@
                             </x-dropdown>
                             </div>
                         </header>
-
-                        @isset($header)
-                            <div class="shrink-0 border-b border-[#d7eee6] bg-white px-5 py-5 sm:px-8">
-                                {{ $header }}
-                            </div>
-                        @endisset
 
                         <div class="scroll-suave flex w-full flex-1 flex-col overflow-y-auto">
                             <div class="animar-entrada flex-1 space-y-5 p-5 sm:p-8">
