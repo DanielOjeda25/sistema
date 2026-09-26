@@ -87,6 +87,29 @@
                         <tbody class="bg-white divide-y divide-gray-200 text-gray-700">
                             @forelse ($tareas as $tarea)
                                 @php($valoresTarea = $tarea->only(['titulo', 'descripcion', 'estado', 'prioridad', 'proyecto_id', 'sprint_id', 'asignado_a', 'solicitud_cambio_id']) + ['fecha_limite' => $tarea->fecha_limite?->format('Y-m-d')])
+                                @php($valoresVerTarea = [
+                                    'titulo' => $tarea->titulo,
+                                    'descripcion' => $tarea->descripcion,
+                                    'estado' => ucfirst(str_replace('_', ' ', $tarea->estado)),
+                                    'estado_color' => match ($tarea->estado) {
+                                        'pendiente' => 'bg-amber-100 text-amber-800',
+                                        'en_progreso' => 'bg-blue-100 text-blue-800',
+                                        'completada' => 'bg-emerald-100 text-emerald-800',
+                                        'cancelada' => 'bg-red-100 text-red-800',
+                                        default => 'bg-gray-100 text-gray-700',
+                                    },
+                                    'prioridad' => ucfirst($tarea->prioridad),
+                                    'prioridad_color' => match ($tarea->prioridad) {
+                                        'alta' => 'bg-red-100 text-red-800',
+                                        'media' => 'bg-yellow-100 text-yellow-800',
+                                        default => 'bg-gray-100 text-gray-700',
+                                    },
+                                    'proyecto' => $tarea->proyecto?->nombre ?? 'Sin proyecto',
+                                    'sprint' => $tarea->sprint?->nombre,
+                                    'responsable' => $tarea->asignado?->name ?? 'Sin asignar',
+                                    'fecha' => $tarea->fecha_limite?->format('d/m/Y'),
+                                    'solicitud' => $tarea->solicitudCambio?->titulo,
+                                ])
                                 <tr>
                                     <td class="px-6 py-4">{{ $tarea->titulo }}</td>
                                     <td class="px-6 py-4">{{ $tarea->proyecto?->nombre ?? 'N/A' }}</td>
@@ -102,9 +125,9 @@
                                                     <x-heroicon-o-clock class="w-5 h-5" />
                                                 </a>
                                             @endhasanyrole
-                                            <a href="{{ route('tareas.show', $tarea) }}" class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
+                                            <button type="button" data-dispatch="ver-tarea" data-valores='@json($valoresVerTarea)' class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
                                                 <x-heroicon-o-eye class="w-5 h-5" />
-                                            </a>
+                                            </button>
                                             @hasanyrole('Jefe|PM|PO')
                                                 <button type="button" data-abrir-modal="modal-tarea-editar" data-url="{{ route('tareas.update', $tarea) }}" data-valores='@json($valoresTarea)' class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
                                                     <x-heroicon-o-pencil-square class="w-5 h-5" />
@@ -156,5 +179,6 @@
     @hasanyrole('Jefe|PM|PO')
     @include('tareas._modal_editar')
     @endhasanyrole
+    <x-tarea-view-modal />
     <x-confirmar-eliminar />
 </x-app-layout>

@@ -3,7 +3,7 @@
     Se engancha al alcance Alpine del padre: la pagina define `detalle`
     (objeto del entregable o null) y los botones le asignan el objeto.
 --}}
-<div x-data="{ detalle: null }" @detalle-entregable.window="detalle = $event.detail" x-show="detalle" x-cloak class="fixed inset-0 odetalleflow-y-auto" style="z-index: 9999" role="dialog" aria-modal="true" @keydown.escape.window="detalle = null">
+<div data-teleportar x-data="{ detalle: null }" @detalle-entregable.window="detalle = $event.detail" x-show="detalle" x-cloak class="fixed inset-0 odetalleflow-y-auto" style="z-index: 9999" role="dialog" aria-modal="true" @keydown.escape.window="detalle = null">
     <div class="fixed inset-0 bg-gray-900/60" @click="detalle = null"></div>
 
     <div class="min-h-full flex items-center justify-center p-4">

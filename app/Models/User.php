@@ -95,6 +95,15 @@ class User extends Authenticatable implements Auditable
     }
 
     /**
+     * Usuarios que pueden recibir una tarea asignada: los roles de trabajo
+     * (PM, PO, Programador). Quedan fuera Jefe y los Clientes.
+     */
+    public function scopeAsignables($query)
+    {
+        return $query->whereHas('roles', fn ($rol) => $rol->whereIn('name', ['PM', 'PO', 'Programador']));
+    }
+
+    /**
      * Puede este usuario ver el registro dado? Los roles internos ven todo;
      * un Cliente solo ve los registros cuyo proyecto pertenece a su empresa.
      */

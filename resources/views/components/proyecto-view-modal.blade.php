@@ -4,7 +4,7 @@
     le asigna el objeto de la fila. El detalle completo (linea de tiempo,
     tareas, informes) sigue en proyectos.show, enlazado desde el pie.
 --}}
-<div x-data="{ detalle: null }" @ver-proyecto.window="detalle = $event.detail" x-show="detalle" x-cloak class="fixed inset-0 overflow-y-auto" style="z-index: 9999" role="dialog" aria-modal="true" @keydown.escape.window="detalle = null">
+<div data-teleportar x-data="{ detalle: null }" @ver-proyecto.window="detalle = $event.detail" x-show="detalle" x-cloak class="fixed inset-0 overflow-y-auto" style="z-index: 9999" role="dialog" aria-modal="true" @keydown.escape.window="detalle = null">
     <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm" @click="detalle = null"></div>
 
     <div class="min-h-full flex items-center justify-center p-4">

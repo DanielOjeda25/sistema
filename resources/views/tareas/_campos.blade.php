@@ -74,7 +74,7 @@
         <select id="asignado_a" name="asignado_a" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
             <option value="">— Seleccioná un responsable —</option>
             @foreach ($usuarios as $u)
-                <option value="{{ $u->id }}" @selected(old('asignado_a', $tarea?->asignado_a) == $u->id)>{{ $u->name }}</option>
+                <option value="{{ $u->id }}" @selected(old('asignado_a', $tarea?->asignado_a) == $u->id)>{{ $u->name }} ({{ $u->roles->pluck('name')->implode(', ') }})</option>
             @endforeach
         </select>
         <x-input-error class="mt-2" :messages="$errors->get('asignado_a')" />

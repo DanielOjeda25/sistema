@@ -7,6 +7,14 @@
  */
 document.addEventListener('DOMContentLoaded', () => {
     /*
+     * Los modales de lectura (<x-*-view-modal>) viven dentro del contenedor
+     * del contenido, cuya animacion de entrada deja un transform activo: eso
+     * hace que su position:fixed se calcule respecto de ese contenedor y no
+     * del viewport (quedan descentrados). Los pasamos al <body> apenas carga.
+     */
+    document.querySelectorAll('[data-teleportar]').forEach(el => document.body.appendChild(el));
+
+    /*
      * Modales de solo lectura (x-buscador... no; los <x-*-view-modal>):
      * el boton lleva data-dispatch="<evento>" y data-valores (JSON). Al hacer
      * click se emite el evento a nivel window, que el modal escucha con

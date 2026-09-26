@@ -35,7 +35,7 @@ class TareaController extends Controller
     public function index(Request $request)
     {
         $tareas = Tarea::visiblePara($request->user())
-            ->with(['proyecto', 'asignado'])
+            ->with(['proyecto', 'asignado', 'sprint', 'solicitudCambio'])
             ->when($request->filled('q'), function ($query) use ($request) {
                 $texto = $request->string('q')->trim()->toString();
 
@@ -54,7 +54,8 @@ class TareaController extends Controller
             ->withQueryString();
 
         $proyectos = Proyecto::orderBy('nombre')->get();
-        $usuarios = User::orderBy('name')->get();
+        // Solo roles de trabajo: Jefe y Clientes no reciben tareas.
+        $usuarios = User::asignables()->with('roles')->orderBy('name')->get();
         $solicitudes = SolicitudCambio::orderBy('titulo')->get();
         $sprints = Sprint::with('proyecto')->orderBy('proyecto_id')->orderBy('fecha_inicio')->get();
 
@@ -65,7 +66,8 @@ class TareaController extends Controller
     {
         $usuario = $request->user();
         $proyectos = Proyecto::visiblePara($usuario)->orderBy('nombre')->get();
-        $usuarios = User::orderBy('name')->get();
+        // Solo roles de trabajo: Jefe y Clientes no reciben tareas.
+        $usuarios = User::asignables()->with('roles')->orderBy('name')->get();
         $proyectoId = $request->query('proyecto');
         $sprintId = $request->query('sprint');
 
@@ -199,7 +201,8 @@ class TareaController extends Controller
         $tarea->load(['proyecto', 'asignado', 'solicitudCambio']);
 
         $proyectos = Proyecto::orderBy('nombre')->get();
-        $usuarios = User::orderBy('name')->get();
+        // Solo roles de trabajo: Jefe y Clientes no reciben tareas.
+        $usuarios = User::asignables()->with('roles')->orderBy('name')->get();
         $solicitudes = SolicitudCambio::orderBy('titulo')->get();
         $sprints = Sprint::with('proyecto')->orderBy('proyecto_id')->orderBy('fecha_inicio')->get();
 
