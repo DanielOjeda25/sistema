@@ -1,6 +1,6 @@
 /*
  * Tablero de tareas estilo Trello: drag & drop con SortableJS, creación de
- * tarjetas inline por columna y edición rápida en un modal, todo vía AJAX.
+ * tarjetas desde un modal y edición rápida en otro modal, todo vía AJAX.
  *
  * El HTML lo renderiza el servidor (resources/views/tareas/tablero.blade.php);
  * este módulo solo mueve, crea y actualiza tarjetas sin recargar la página.
@@ -85,10 +85,15 @@ document.addEventListener('DOMContentLoaded', () => {
             : '';
         const proyecto = cfg.proyectoFiltrado ? '' : `
             <span class="truncate max-w-[120px]" title="${esc(tarea.proyecto?.nombre)}">${esc(tarea.proyecto?.nombre)}</span>`;
+        const eliminar = cfg.puedeEditar ? `
+            <button type="button" class="eliminar-tarjeta absolute top-1.5 right-1.5 rounded-md p-1 text-gray-300 transition hover:bg-red-50 hover:text-red-600" title="Eliminar tarea" aria-label="Eliminar tarea">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/></svg>
+            </button>` : '';
 
         return `
-            <article class="tarjeta bg-white rounded-lg shadow-sm p-3 cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow" data-id="${tarea.id}" data-tarea='${tareaAttr(tarea)}'>
-                <a href="${cfg.urls.show.replace(':id:', tarea.id)}" class="font-medium text-gray-800 hover:text-indigo-600">${esc(tarea.titulo)}</a>
+            <article class="tarjeta group relative bg-white rounded-lg shadow-sm p-3 cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow" data-id="${tarea.id}" data-tarea='${tareaAttr(tarea)}'>
+                <a href="${cfg.urls.show.replace(':id:', tarea.id)}" class="block pr-6 font-medium text-gray-800 hover:text-indigo-600">${esc(tarea.titulo)}</a>
+                ${eliminar}
                 <div class="mt-2 flex flex-wrap items-center gap-1.5 text-xs">
                     <span class="px-2 py-0.5 rounded-full font-medium ${prioridad}">${esc(tarea.prioridad.charAt(0).toUpperCase() + tarea.prioridad.slice(1))}</span>
                     ${fecha ? `<span class="px-2 py-0.5 rounded-full font-medium ${fecha.vencida ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-600'}">${fecha.texto}</span>` : ''}
@@ -112,7 +117,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function mostrarError(elemento, mensaje) {
+    // Error puntual dentro del formulario de un modal (mostrarError() es el
+    // modal global de errores del tablero).
+    function mostrarErrorEn(elemento, mensaje) {
         elemento.textContent = mensaje;
         elemento.classList.remove('hidden');
     }
@@ -207,45 +214,56 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ------------------------------------------------- creación inline (AJAX)
+    // ------------------------------------------------- creación (modal AJAX)
 
-    tablero.querySelectorAll('form[data-agregar]').forEach(form => {
-        form.addEventListener('submit', async evento => {
+    if (cfg.puedeEditar) {
+        const modalCrear = document.getElementById('modal-tarea-crear');
+        const formCrear = document.getElementById('form-crear-tarea');
+        const errorCrear = formCrear.querySelector('.error');
+
+        function cerrarModalCrear() {
+            modalCrear.classList.add('hidden');
+        }
+
+        function abrirModalCrear(estado) {
+            // Igual que el modal de edición: al final del <body> para que
+            // ningún elemento del tablero o del layout quede por encima.
+            document.body.appendChild(modalCrear);
+            formCrear.reset();
+            // La columna desde la que se abrió define el estado inicial; el
+            // resto (proyecto, sprint, responsable) viene prefijado del HTML.
+            formCrear.estado.value = estado;
+            ocultarError(errorCrear);
+            modalCrear.classList.remove('hidden');
+            formCrear.titulo.focus();
+        }
+
+        tablero.querySelectorAll('[data-agregar-estado]').forEach(boton =>
+            boton.addEventListener('click', () => abrirModalCrear(boton.dataset.agregarEstado)));
+
+        modalCrear.querySelectorAll('[data-cerrar-modal]').forEach(el =>
+            el.addEventListener('click', cerrarModalCrear));
+
+        document.addEventListener('keydown', evento => {
+            if (evento.key === 'Escape' && !modalCrear.classList.contains('hidden')) cerrarModalCrear();
+        });
+
+        formCrear.addEventListener('submit', async evento => {
             evento.preventDefault();
 
-            const datos = Object.fromEntries(new FormData(form));
-            const error = form.querySelector('.error');
-
-            ocultarError(error);
+            ocultarError(errorCrear);
             try {
-                const tarea = await enviar(cfg.urls.store, 'POST', datos);
-                const lista = form.closest('.columna').querySelector('.tarjetas');
+                const tarea = await enviar(cfg.urls.store, 'POST', Object.fromEntries(new FormData(formCrear)));
+                const lista = columna(tarea.estado);
                 lista.querySelector('.sin-tareas')?.remove();
                 lista.insertAdjacentHTML('beforeend', tarjetaHTML(tarea));
                 actualizarContadores();
-                form.reset();
-                form.querySelector('textarea')?.focus();
+                cerrarModalCrear();
             } catch (e) {
-                mostrarError(error, primerError(e.datos));
+                mostrarErrorEn(errorCrear, primerError(e.datos));
             }
         });
-
-        // Enter envía, Shift+Enter salta de línea (como en Trello).
-        form.querySelector('textarea').addEventListener('keydown', evento => {
-            if (evento.key === 'Enter' && !evento.shiftKey) {
-                evento.preventDefault();
-                form.requestSubmit();
-            }
-        });
-    });
-
-    tablero.querySelectorAll('[data-alternar-agregar]').forEach(boton => {
-        boton.addEventListener('click', () => {
-            const form = boton.closest('.agregar-tarjeta').querySelector('form');
-            form.classList.toggle('hidden');
-            if (!form.classList.contains('hidden')) form.querySelector('textarea').focus();
-        });
-    });
+    }
 
     // ------------------------------------------------------- modal de edición
 
@@ -271,7 +289,6 @@ document.addEventListener('DOMContentLoaded', () => {
         formEditar.proyecto_id.value = tarea.proyecto_id;
         formEditar.sprint_id.value = tarea.sprint_id ?? '';
         formEditar.asignado_a.value = tarea.asignado_a ?? '';
-        formEditar.querySelector('.ver-detalle').href = cfg.urls.show.replace(':id:', tarea.id);
 
         ocultarError(errorEditar);
         modal.classList.remove('hidden');
@@ -283,11 +300,30 @@ document.addEventListener('DOMContentLoaded', () => {
         tarjetaAbierta = null;
     }
 
+    // Elimina una tarjeta (desde el tacho de la tarjeta o desde el modal de
+    // edicion): pide confirmacion, borra por AJAX y reordena la columna.
+    // Devuelve true si se elimino de verdad.
+    async function eliminarTarjeta(tarjeta) {
+        if (!await confirmarAccion('¿Eliminar esta tarea? Esta acción no se puede deshacer.')) return false;
+
+        try {
+            await enviar(cfg.urls.update.replace(':id:', tarjeta.dataset.id), 'DELETE');
+            const estado = tarjeta.closest('.columna').dataset.estado;
+            tarjeta.remove();
+            guardarMovimiento(estado, estado);
+            actualizarContadores();
+            return true;
+        } catch (e) {
+            mostrarError(primerError(e.datos));
+            return false;
+        }
+    }
+
     if (cfg.puedeEditar) {
         // Clic en una tarjeta: si ya está dentro de una columna (los botones
         // de agregar no cuentan) se abre el modal en vez de navegar.
         tablero.addEventListener('click', evento => {
-            if (evento.target.closest('form[data-agregar]') || evento.target.closest('button')) return;
+            if (evento.target.closest('button')) return;
 
             const tarjeta = evento.target.closest('.tarjeta');
             if (tarjeta) {
@@ -296,11 +332,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // Tacho en la tarjeta: elimina directo (con confirmacion), sin abrir
+        // el modal de edicion. Los botones se excluyen solos del click de arriba.
+        tablero.addEventListener('click', evento => {
+            const botonEliminar = evento.target.closest('.eliminar-tarjeta');
+            if (botonEliminar) eliminarTarjeta(botonEliminar.closest('.tarjeta'));
+        });
+
         modal.querySelectorAll('[data-cerrar-modal]').forEach(el =>
             el.addEventListener('click', cerrarModal));
         document.addEventListener('keydown', evento => {
             if (evento.key !== 'Escape') return;
             if (!modal.classList.contains('hidden')) cerrarModal();
+            if (modalDetalle && !modalDetalle.classList.contains('hidden')) cerrarDetalle();
             if (modalError && !modalError.classList.contains('hidden')) cerrarError();
             if (modalConfirmar && !modalConfirmar.classList.contains('hidden')) responderConfirmacion(false);
         });
@@ -327,24 +371,69 @@ document.addEventListener('DOMContentLoaded', () => {
                 actualizarContadores();
                 cerrarModal();
             } catch (e) {
-                mostrarError(errorEditar, primerError(e.datos));
+                mostrarErrorEn(errorEditar, primerError(e.datos));
             }
         });
 
         formEditar.querySelector('.eliminar-tarea').addEventListener('click', async () => {
-            if (!await confirmarAccion('¿Eliminar esta tarea? Esta acción no se puede deshacer.')) return;
-
             ocultarError(errorEditar);
-            try {
-                await enviar(formEditar.action, 'DELETE');
-                const estadoAnterior = tarjetaAbierta.closest('.columna').dataset.estado;
-                tarjetaAbierta.remove();
-                guardarMovimiento(estadoAnterior, estadoAnterior);
-                actualizarContadores();
-                cerrarModal();
-            } catch (e) {
-                mostrarError(errorEditar, primerError(e.datos));
-            }
+            if (await eliminarTarjeta(tarjetaAbierta)) cerrarModal();
+        });
+
+        // ------------------------------------------------ detalle (solo lectura)
+
+        const modalDetalle = document.getElementById('modal-detalle-tarea');
+        let tarjetaEnDetalle = null;
+
+        function cerrarDetalle() {
+            modalDetalle.classList.add('hidden');
+            tarjetaEnDetalle = null;
+        }
+
+        function abrirDetalle(tarjeta) {
+            const tarea = JSON.parse(tarjeta.dataset.tarea);
+            tarjetaEnDetalle = tarjeta;
+            document.body.appendChild(modalDetalle);
+
+            document.getElementById('detalle-titulo').textContent = tarea.titulo;
+
+            const badgeEstado = document.getElementById('detalle-estado');
+            badgeEstado.textContent = (cfg.columnas[tarea.estado] ?? [tarea.estado])[0];
+            badgeEstado.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider '
+                + ((cfg.columnas[tarea.estado] ?? [])[1] ?? 'bg-gray-100 text-gray-600');
+
+            const badgePrioridad = document.getElementById('detalle-prioridad');
+            badgePrioridad.textContent = tarea.prioridad.charAt(0).toUpperCase() + tarea.prioridad.slice(1);
+            badgePrioridad.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider '
+                + (cfg.prioridades[tarea.prioridad] ?? 'bg-gray-100 text-gray-600');
+
+            document.getElementById('detalle-proyecto').textContent = tarea.proyecto?.nombre ?? 'Sin proyecto';
+            document.getElementById('detalle-sprint-wrapper').classList.toggle('hidden', !tarea.sprint?.nombre);
+            document.getElementById('detalle-sprint').textContent = tarea.sprint?.nombre ?? '';
+            document.getElementById('detalle-descripcion').textContent = tarea.descripcion || 'Sin descripción.';
+            document.getElementById('detalle-responsable').textContent = tarea.asignado?.name ?? 'Sin asignar';
+
+            const fecha = soloFecha(tarea.fecha_limite);
+            document.getElementById('detalle-fecha').textContent = fecha ? fecha.split('-').reverse().join('/') : 'Sin fecha';
+
+            modalDetalle.classList.remove('hidden');
+        }
+
+        // "Ver detalle" en el modal de edicion: muestra la informacion aca,
+        // sin ir a otra pantalla.
+        formEditar.querySelector('.ver-detalle').addEventListener('click', () => {
+            const tarjeta = tarjetaAbierta;
+            cerrarModal();
+            if (tarjeta) abrirDetalle(tarjeta);
+        });
+
+        modalDetalle.querySelectorAll('[data-cerrar-detalle]').forEach(el =>
+            el.addEventListener('click', cerrarDetalle));
+
+        document.getElementById('btn-detalle-editar').addEventListener('click', () => {
+            const tarjeta = tarjetaEnDetalle;
+            cerrarDetalle();
+            if (tarjeta) abrirModal(tarjeta);
         });
     }
 });

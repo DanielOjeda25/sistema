@@ -83,12 +83,18 @@
                                     $payload['sprint'] = ['nombre' => $tarea->sprint?->nombre];
                                     $payload['asignado'] = ['name' => $tarea->asignado?->name];
                                 @endphp
-                                <article class="tarjeta bg-white rounded-lg shadow-sm p-3 {{ $puedeMover ? 'cursor-grab active:cursor-grabbing' : '' }} hover:shadow-md transition-shadow"
+                                <article class="tarjeta group relative bg-white rounded-lg shadow-sm p-3 {{ $puedeMover ? 'cursor-grab active:cursor-grabbing' : '' }} hover:shadow-md transition-shadow"
                                          data-id="{{ $tarea->id }}"
                                          data-tarea='@json($payload, $flags)'>
-                                    <a href="{{ route('tareas.show', $tarea) }}" class="font-medium text-gray-800 hover:text-indigo-600">
+                                    <a href="{{ route('tareas.show', $tarea) }}" class="block pr-6 font-medium text-gray-800 hover:text-indigo-600">
                                         {{ $tarea->titulo }}
                                     </a>
+                                    @if ($puedeMover)
+                                        <button type="button" class="eliminar-tarjeta absolute top-1.5 right-1.5 rounded-md p-1 text-gray-300 transition hover:bg-red-50 hover:text-red-600"
+                                                title="Eliminar tarea" aria-label="Eliminar tarea">
+                                            <x-heroicon-o-trash class="w-4 h-4" />
+                                        </button>
+                                    @endif
                                     <div class="mt-2 flex flex-wrap items-center gap-1.5 text-xs">
                                         <span class="px-2 py-0.5 rounded-full font-medium {{ $prioridades[$tarea->prioridad] }}">
                                             {{ ucfirst($tarea->prioridad) }}
@@ -116,52 +122,11 @@
                         </div>
 
                         @if ($puedeMover)
-                            <div class="agregar-tarjeta mt-3">
-                                <form data-agregar class="hidden space-y-2">
-                                    <input type="hidden" name="estado" value="{{ $estado }}">
-                                    <textarea name="titulo" rows="2" placeholder="Título de la tarea…"
-                                              class="block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm text-sm"></textarea>
-                                    <div class="grid grid-cols-2 gap-2">
-                                        <select name="prioridad" class="border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm text-xs">
-                                            <option value="baja">Baja</option>
-                                            <option value="media" selected>Media</option>
-                                            <option value="alta">Alta</option>
-                                        </select>
-                                        <select name="asignado_a" class="border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm text-xs">
-                                            @foreach ($usuarios as $u)
-                                                <option value="{{ $u->id }}" @selected($u->is(auth()->user()))>{{ $u->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <select name="proyecto_id" class="block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm text-xs">
-                                        @foreach ($proyectos as $p)
-                                            <option value="{{ $p->id }}" @selected($proyectoId == $p->id)>{{ $p->nombre }}</option>
-                                        @endforeach
-                                    </select>
-                                    @if ($proyectoId && $sprints->isNotEmpty())
-                                        {{-- Con un proyecto filtrado, la tarjeta nueva puede asignarse directo a un sprint suyo. --}}
-                                        <select name="sprint_id" class="block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm text-xs">
-                                            <option value="">Sin sprint</option>
-                                            @foreach ($sprints as $s)
-                                                <option value="{{ $s->id }}">{{ $s->nombre }}</option>
-                                            @endforeach
-                                        </select>
-                                    @endif
-                                    <div class="flex items-center justify-between gap-2">
-                                        <button type="submit"
-                                                class="px-3 py-1.5 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63]">
-                                            Añadir
-                                        </button>
-                                        <button type="button" data-alternar-agregar
-                                                class="text-xs text-gray-500 hover:underline">Cancelar</button>
-                                    </div>
-                                    <p class="error hidden text-xs text-red-600"></p>
-                                </form>
-                                <button type="button" data-alternar-agregar
-                                        class="w-full text-left px-2 py-1.5 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-md transition-colors">
-                                    + Añadir tarjeta
-                                </button>
-                            </div>
+                            {{-- Abre el modal de creación con esta columna preseleccionada --}}
+                            <button type="button" data-agregar-estado="{{ $estado }}"
+                                    class="mt-3 w-full text-left px-2 py-1.5 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-200 rounded-md transition-colors">
+                                + Añadir tarjeta
+                            </button>
                         @endif
                     </div>
                 @endforeach
@@ -175,7 +140,11 @@
         window.TABLERO = {
             puedeEditar: {{ $puedeMover ? 'true' : 'false' }},
             proyectoFiltrado: {{ $proyectoId ? 'true' : 'false' }},
+            proyectoId: {{ $proyectoId ?? 'null' }},
+            sprintId: {{ $sprintId ?? 'null' }},
+            usuarioId: {{ auth()->id() }},
             prioridades: @json($prioridades),
+            columnas: @json($columnas),
             urls: {
                 store: '{{ route('tareas.store') }}',
                 update: '{{ route('tareas.update', ':id:') }}',
@@ -193,12 +162,155 @@
     @endif
 
     @if ($puedeMover)
+        {{-- Modal de creación: lo abre el botón "+ Añadir tarjeta" de cada columna --}}
+        <div id="modal-tarea-crear" class="hidden fixed inset-0 overflow-y-auto" style="z-index: 9999" role="dialog" aria-modal="true">
+            <div class="fixed inset-0 bg-gray-900/50" style="z-index: -1" data-cerrar-modal></div>
+
+            <div class="min-h-full flex items-center justify-center p-4">
+                <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl p-6">
+                    <form id="form-crear-tarea" method="POST" class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-semibold text-lg text-gray-800">Nueva tarea</h3>
+                            <button type="button" data-cerrar-modal class="text-gray-400 hover:text-gray-600">✕</button>
+                        </div>
+
+                        <div>
+                            <x-input-label for="crear-titulo" value="Título" />
+                            <textarea id="crear-titulo" name="titulo" rows="2" required placeholder="Título de la tarea…"
+                                      class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm"></textarea>
+                        </div>
+
+                        <div>
+                            <x-input-label for="crear-descripcion" value="Descripción (opcional)" />
+                            <textarea id="crear-descripcion" name="descripcion" rows="3"
+                                      class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm"></textarea>
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                            <div>
+                                <x-input-label for="crear-estado" value="Estado" />
+                                <select id="crear-estado" name="estado" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
+                                    @foreach ($columnas as $estado => [$etiqueta, $color])
+                                        <option value="{{ $estado }}">{{ $etiqueta }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <x-input-label for="crear-prioridad" value="Prioridad" />
+                                <select id="crear-prioridad" name="prioridad" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
+                                    <option value="baja">Baja</option>
+                                    <option value="media" selected>Media</option>
+                                    <option value="alta">Alta</option>
+                                </select>
+                            </div>
+                            <div>
+                                <x-input-label for="crear-fecha" value="Fecha límite (opcional)" />
+                                <x-text-input id="crear-fecha" name="fecha_limite" type="date" class="mt-1 block w-full" />
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                            <div>
+                                <x-input-label for="crear-proyecto" value="Proyecto" />
+                                <select id="crear-proyecto" name="proyecto_id" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
+                                    @foreach ($proyectos as $p)
+                                        <option value="{{ $p->id }}" @selected($proyectoId == $p->id)>{{ $p->nombre }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <x-input-label for="crear-sprint" value="Sprint (opcional)" />
+                                <select id="crear-sprint" name="sprint_id" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
+                                    <option value="">Sin sprint</option>
+                                    @foreach ($sprintsPorProyecto as $nombreProyecto => $sprintsProyecto)
+                                        <optgroup label="{{ $nombreProyecto }}">
+                                            @foreach ($sprintsProyecto as $s)
+                                                <option value="{{ $s->id }}" @selected($sprintId == $s->id)>{{ $s->nombre }}</option>
+                                            @endforeach
+                                        </optgroup>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <x-input-label for="crear-asignado" value="Asignar a" />
+                                <select id="crear-asignado" name="asignado_a" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
+                                    @foreach ($usuarios as $u)
+                                        <option value="{{ $u->id }}" @selected($u->is(auth()->user()))>{{ $u->name }} ({{ $u->roles->pluck('name')->implode(', ') }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        <p class="error hidden text-sm text-red-600"></p>
+
+                        <div class="flex items-center justify-end gap-2 pt-2 border-t border-gray-200">
+                            <button type="button" data-cerrar-modal
+                                    class="px-4 py-2 bg-white border border-gray-300 rounded-lg font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50">
+                                Cancelar
+                            </button>
+                            <x-primary-button>Crear tarea</x-primary-button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {{-- Modal de detalle (solo lectura): lo abre "Ver detalle" en el modal de edicion --}}
+        <div id="modal-detalle-tarea" class="hidden fixed inset-0 overflow-y-auto" style="z-index: 9999" role="dialog" aria-modal="true">
+            <div class="fixed inset-0 bg-gray-900/50" style="z-index: -1" data-cerrar-detalle></div>
+
+            <div class="min-h-full flex items-center justify-center p-4">
+                <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-6">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="min-w-0">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span id="detalle-estado" class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"></span>
+                                <span id="detalle-prioridad" class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"></span>
+                            </div>
+                            <h3 id="detalle-titulo" class="mt-2 text-xl font-bold text-gray-800 leading-tight"></h3>
+                            <p class="text-xs text-gray-400 mt-1">
+                                <span id="detalle-proyecto"></span><span id="detalle-sprint-wrapper" class="hidden"> &middot; Sprint: <span id="detalle-sprint"></span></span>
+                            </p>
+                        </div>
+                        <button type="button" data-cerrar-detalle class="shrink-0 text-gray-400 hover:text-gray-600 text-xl leading-none" aria-label="Cerrar">×</button>
+                    </div>
+
+                    <div class="mt-4 bg-gray-50 border border-gray-100 rounded-xl p-4">
+                        <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Descripción</p>
+                        <p id="detalle-descripcion" class="mt-1 text-sm text-gray-700 whitespace-pre-wrap leading-relaxed"></p>
+                    </div>
+
+                    <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
+                        <div class="rounded-lg border border-gray-100 p-3">
+                            <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Responsable</p>
+                            <p id="detalle-responsable" class="mt-1 font-medium text-gray-800"></p>
+                        </div>
+                        <div class="rounded-lg border border-gray-100 p-3">
+                            <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400">Fecha límite</p>
+                            <p id="detalle-fecha" class="mt-1 font-medium text-gray-800"></p>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 flex items-center justify-between gap-2 border-t border-gray-200 pt-4">
+                        <button type="button" data-cerrar-detalle
+                                class="px-4 py-2 bg-white border border-gray-300 rounded-lg font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50">
+                            Cerrar
+                        </button>
+                        <button type="button" id="btn-detalle-editar"
+                                class="px-4 py-2 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63]">
+                            Editar tarea
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         {{-- Modal de edición rápida (clic en una tarjeta) --}}
         <div id="modal-tarea" class="hidden fixed inset-0 overflow-y-auto" style="z-index: 9999" role="dialog" aria-modal="true">
             <div class="fixed inset-0 bg-gray-900/50" style="z-index: -1" data-cerrar-modal></div>
 
             <div class="min-h-full flex items-center justify-center p-4">
-                <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-6">
+                <div class="bg-white rounded-xl shadow-xl w-full max-w-2xl p-6">
                     <form id="form-editar-tarea" method="POST" class="space-y-4">
                         <div class="flex items-center justify-between">
                             <h3 class="font-semibold text-lg text-gray-800">Editar tarea</h3>
@@ -216,7 +328,7 @@
                                       class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm"></textarea>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <div>
                                 <x-input-label for="editar-estado" value="Estado" />
                                 <select id="editar-estado" name="estado" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
@@ -233,13 +345,13 @@
                                     <option value="alta">Alta</option>
                                 </select>
                             </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <x-input-label for="editar-fecha" value="Fecha límite (opcional)" />
                                 <x-text-input id="editar-fecha" name="fecha_limite" type="date" class="mt-1 block w-full" />
                             </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <div>
                                 <x-input-label for="editar-proyecto" value="Proyecto" />
                                 <select id="editar-proyecto" name="proyecto_id" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
@@ -248,37 +360,41 @@
                                     @endforeach
                                 </select>
                             </div>
-                        </div>
-
-                        <div>
-                            <x-input-label for="editar-asignado" value="Asignar a" />
-                            <select id="editar-asignado" name="asignado_a" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
-                                @foreach ($usuarios as $u)
-                                    <option value="{{ $u->id }}">{{ $u->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div>
-                            <x-input-label for="editar-sprint" value="Sprint (opcional)" />
-                            <select id="editar-sprint" name="sprint_id" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
-                                <option value="">Sin sprint</option>
-                                @foreach ($sprintsPorProyecto as $nombreProyecto => $sprintsProyecto)
-                                    <optgroup label="{{ $nombreProyecto }}">
-                                        @foreach ($sprintsProyecto as $s)
-                                            <option value="{{ $s->id }}">{{ $s->nombre }}</option>
-                                        @endforeach
-                                    </optgroup>
-                                @endforeach
-                            </select>
+                            <div>
+                                <x-input-label for="editar-sprint" value="Sprint (opcional)" />
+                                <select id="editar-sprint" name="sprint_id" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
+                                    <option value="">Sin sprint</option>
+                                    @foreach ($sprintsPorProyecto as $nombreProyecto => $sprintsProyecto)
+                                        <optgroup label="{{ $nombreProyecto }}">
+                                            @foreach ($sprintsProyecto as $s)
+                                                <option value="{{ $s->id }}">{{ $s->nombre }}</option>
+                                            @endforeach
+                                        </optgroup>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <x-input-label for="editar-asignado" value="Asignar a" />
+                                <select id="editar-asignado" name="asignado_a" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
+                                    @foreach ($usuarios as $u)
+                                        <option value="{{ $u->id }}">{{ $u->name }} ({{ $u->roles->pluck('name')->implode(', ') }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
 
                         <p class="error hidden text-sm text-red-600"></p>
 
                         <div class="flex items-center justify-between pt-2 border-t border-gray-200">
-                            <div class="flex items-center gap-4">
-                                <button type="button" class="eliminar-tarea text-sm text-red-600 hover:underline">Eliminar</button>
-                                <a href="#" class="ver-detalle text-sm text-gray-600 hover:underline">Ver detalle</a>
+                            <div class="flex items-center gap-3">
+                                <button type="button" class="eliminar-tarea inline-flex items-center gap-1.5 rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-600 uppercase tracking-widest transition hover:bg-red-50">
+                                    <x-heroicon-o-trash class="w-4 h-4" />
+                                    Eliminar
+                                </button>
+                                <button type="button" class="ver-detalle inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-semibold text-gray-700 uppercase tracking-widest hover:bg-gray-50">
+                                    <x-heroicon-o-eye class="w-4 h-4" />
+                                    Ver detalle
+                                </button>
                             </div>
                             <x-primary-button>Guardar</x-primary-button>
                         </div>
