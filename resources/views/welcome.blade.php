@@ -19,7 +19,7 @@
                         <img src="{{ asset('images/cruznegra-logo-light.png') }}" alt="Cruz Negra" class="h-8 w-auto sm:h-10">
                     </a>
                     <a href="{{ route('login') }}" class="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-semibold text-[#101416] transition hover:bg-slate-200 sm:px-6 sm:py-2.5 sm:text-sm">
-                        Ingresar <span class="text-base leading-none">→</span>
+                        Ingresar <x-heroicon-o-arrow-right class="h-4 w-4" />
                     </a>
                 </div>
             </header>
@@ -37,7 +37,7 @@
 
                     <div class="mt-9 flex flex-wrap gap-3">
                         <a href="{{ route('login') }}" class="inline-flex items-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#101416] transition hover:bg-slate-200">
-                            Ingresar <span class="ml-2 text-lg leading-none">→</span>
+                            Ingresar <x-heroicon-o-arrow-right class="ml-1 h-4 w-4" />
                         </a>
                     </div>
                 </div>

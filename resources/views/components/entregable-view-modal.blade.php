@@ -3,7 +3,7 @@
     Se engancha al alcance Alpine del padre: la pagina define `detalle`
     (objeto del entregable o null) y los botones le asignan el objeto.
 --}}
-<div data-teleportar x-data="{ detalle: null }" @detalle-entregable.window="detalle = $event.detail" x-show="detalle" x-cloak class="fixed inset-0 odetalleflow-y-auto" style="z-index: 9999" role="dialog" aria-modal="true" @keydown.escape.window="detalle = null">
+<div data-teleportar x-data="{ detalle: null }" @ver-entregable.window="detalle = $event.detail" x-show="detalle" x-cloak class="fixed inset-0 overflow-y-auto" style="z-index: 9999" role="dialog" aria-modal="true" @keydown.escape.window="detalle = null">
     <div class="fixed inset-0 bg-gray-900/60" @click="detalle = null"></div>
 
     <div class="min-h-full flex items-center justify-center p-4">
@@ -24,12 +24,12 @@
                                 <span x-show="detalle.fecha"> · <span x-text="detalle.fecha"></span></span>
                             </p>
                         </div>
-                        <button @click="detalle = null" class="text-gray-400 hodetalle:text-gray-600 text-xl leading-none" aria-label="Cerrar">×</button>
+                        <button @click="detalle = null" class="text-gray-400 hover:text-gray-600 text-xl leading-none" aria-label="Cerrar">×</button>
                     </div>
 
                     <div class="p-6">
                         <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">Contenido</p>
-                        <div class="bg-[#f8fafc] border border-gray-100 rounded-xl p-4 text-sm text-gray-700 whitespace-pre-wrap leading-relaxed max-h-72 odetalleflow-y-auto" x-text="detalle.contenido"></div>
+                        <div class="bg-[#f8fafc] border border-gray-100 rounded-xl p-4 text-sm text-gray-700 whitespace-pre-wrap leading-relaxed max-h-72 overflow-y-auto" x-text="detalle.contenido"></div>
                     </div>
                 </div>
             </template>

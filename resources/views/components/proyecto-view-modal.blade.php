@@ -14,13 +14,8 @@
              x-transition:enter-end="opacity-100 scale-100">
             <template x-if="detalle">
                 <div>
-                    {{-- Cabecera: nombre, cliente y estado --}}
+                    {{-- Cabecera: nombre, cliente y estado (el cierre esta en el boton "Cerrar" del pie) --}}
                     <div class="relative bg-gradient-to-br from-[#202225] to-[#2d3134] px-6 py-5 text-white">
-                        <button @click="detalle = null"
-                                class="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition hover:bg-white/10 hover:text-white"
-                                aria-label="Cerrar">
-                            <x-heroicon-o-x-mark class="h-5 w-5" />
-                        </button>
                         <div class="flex items-center gap-4">
                             <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white/10">
                                 <x-heroicon-o-squares-2x2 class="h-7 w-7 text-[#00e5a0]" />
@@ -86,7 +81,7 @@
                     </div>
 
                     <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-                        <a :href="detalle.detalle" class="text-sm font-semibold text-[#008c63] hover:underline">Ver detalle completo &rarr;</a>
+                        <a :href="detalle.detalle" class="text-sm font-semibold text-[#008c63] hover:underline">Ver detalle completo <x-heroicon-o-arrow-right class="inline h-4 w-4" /></a>
                         <button type="button" @click="detalle = null"
                                 class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-xs font-semibold text-gray-700 uppercase tracking-widest hover:bg-gray-50">
                             Cerrar

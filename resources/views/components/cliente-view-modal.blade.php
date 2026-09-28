@@ -13,13 +13,8 @@
              x-transition:enter-end="opacity-100 scale-100">
             <template x-if="detalle">
                 <div>
-                    {{-- Cabecera con avatar de iniciales, nombre y badge --}}
+                    {{-- Cabecera con avatar de iniciales, nombre y badge (el cierre esta en el boton "Cerrar" del pie) --}}
                     <div class="relative bg-gradient-to-br from-[#202225] to-[#2d3134] px-6 py-5 text-white">
-                        <button @click="detalle = null"
-                                class="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full text-slate-400 transition hover:bg-white/10 hover:text-white"
-                                aria-label="Cerrar">
-                            <x-heroicon-o-x-mark class="h-5 w-5" />
-                        </button>
                         <div class="flex items-center gap-4">
                             <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#00b87d] text-lg font-bold text-white"
                                   x-text="(detalle.nombre || '?').split(' ').map(p => p[0]).slice(0, 2).join('')"></span>

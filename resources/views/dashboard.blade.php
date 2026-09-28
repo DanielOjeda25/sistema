@@ -96,8 +96,11 @@
                     </div>
                 </header>
 
-                <div class="scroll-suave flex w-full flex-1 flex-col space-y-5 overflow-y-auto p-5 sm:p-8 animar-entrada">
-                    <div>
+                {{-- El scroller es flex-col: el contenido lleva el padding y el
+                     footer va directo, asi el mt-auto lo pega al fondo sin que
+                     el space-y del contenido se lo impida. --}}
+                <div class="scroll-suave flex w-full flex-1 flex-col overflow-y-auto animar-entrada">
+                    <div class="space-y-5 p-5 sm:p-8">
                         <section class="rounded-xl border border-[#d7eee6] bg-white p-5 shadow-sm">
                             <div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
                                 <div>

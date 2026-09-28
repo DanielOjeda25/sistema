@@ -14,7 +14,7 @@
                 </p>
                 <a href="{{ route('auditoria.index') }}"
                    class="ml-auto text-xs font-semibold uppercase tracking-widest text-[#008c63] hover:underline">
-                    &larr; Ver toda la actividad
+                    <x-heroicon-o-arrow-left class="h-3.5 w-3.5" /> Ver toda la actividad
                 </a>
             </div>
         @endif
@@ -120,7 +120,7 @@
                                                 <div class="flex flex-wrap items-baseline gap-1.5 text-xs">
                                                     <span class="font-semibold text-gray-500">{{ $cambio['campo'] }}:</span>
                                                     <span class="line-through decoration-red-400 text-gray-400">{{ $cambio['viejo'] }}</span>
-                                                    <span class="text-gray-400">&rarr;</span>
+                                                    <x-heroicon-o-arrow-right class="inline h-3.5 w-3.5 text-gray-400" />
                                                     <span class="font-medium text-[#008c63]">{{ $cambio['nuevo'] }}</span>
                                                 </div>
                                             @endforeach
