@@ -53,11 +53,13 @@
                         <div>
                             <label for="fecha_desde" class="block text-xs font-medium text-gray-500 uppercase mb-1">Inicio desde</label>
                             <input type="date" name="fecha_desde" id="fecha_desde" value="{{ request('fecha_desde') }}"
+                                   min="{{ $limitesFecha->desde }}" max="{{ $limitesFecha->hasta }}"
                                    class="w-full rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
                         </div>
                         <div>
                             <label for="fecha_hasta" class="block text-xs font-medium text-gray-500 uppercase mb-1">Inicio hasta</label>
                             <input type="date" name="fecha_hasta" id="fecha_hasta" value="{{ request('fecha_hasta') }}"
+                                   min="{{ $limitesFecha->desde }}" max="{{ $limitesFecha->hasta }}"
                                    class="w-full rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
                         </div>
                     </div>

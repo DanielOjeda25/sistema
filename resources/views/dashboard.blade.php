@@ -144,10 +144,17 @@
                                 <span class="text-sm font-semibold text-slate-700">{{ $facturasPendientes }}</span>
                             </a>
                             @endif
+                            @unless ($usuario->esCliente())
                             <a href="{{ route('hitos.index') }}" class="flex items-center justify-between px-4 py-3 hover:bg-[#f0fff9]">
                                 <div class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span><span><span class="block text-sm font-medium text-slate-700">Hitos</span><span class="block text-xs text-slate-400">Puntos de control</span></span></div>
                                 <span class="text-sm font-semibold text-slate-700">{{ $totalHitos }}</span>
                             </a>
+                            @else
+                            <div class="flex items-center justify-between px-4 py-3">
+                                <div class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span><span><span class="block text-sm font-medium text-slate-700">Hitos</span><span class="block text-xs text-slate-400">Puntos de control</span></span></div>
+                                <span class="text-sm font-semibold text-slate-700">{{ $totalHitos }}</span>
+                            </div>
+                            @endunless
                             <a href="{{ route('entregables.index') }}" class="flex items-center justify-between px-4 py-3 hover:bg-[#f0fff9]">
                                 <div class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-sky-500"></span><span><span class="block text-sm font-medium text-slate-700">Entregables</span><span class="block text-xs text-slate-400">{{ $usuario->esCliente() ? 'Material aprobado para vos' : 'Material del proyecto' }}</span></span></div>
                                 <span class="text-sm font-semibold text-slate-700">{{ $totalEntregables }}</span>

@@ -285,18 +285,27 @@ Route::middleware(['auth', 'role:Jefe|PM|PO|Programador'])->group(function () {
  */
 Route::middleware('auth')->group(function () {
     Route::resource('proyectos', ProyectoController::class)->only(['index', 'show']);
-    // Va antes del resource para que "tablero" no se tome como un id de tarea.
-    Route::get('tareas/tablero', [TareaController::class, 'tablero'])->name('tareas.tablero');
-    Route::resource('tareas', TareaController::class)->only(['index', 'show']);
-    Route::resource('hitos', HitoController::class)->only(['index', 'show']);
-    Route::resource('solicitudes-cambio', SolicitudCambioController::class)->only(['index', 'show']);
-    Route::resource('sprints', SprintController::class)->only(['index']);
     Route::resource('entregables', EntregableIAController::class)->only(['index', 'show']);
     Route::resource('facturas', FacturaController::class)->only(['index', 'show']);
     // Descargar factura en PDF: es lectura, cualquier usuario autorizado
     // puede bajar las facturas de los proyectos que puede ver.
     Route::get('/facturas/{factura}/pdf', [FacturaController::class, 'descargarPdf'])
         ->name('facturas.pdf');
+});
+
+/*
+ * LECTURA INTERNA — tareas, hitos, sprints y solicitudes de cambio son el
+ * día a día del equipo: el Cliente los sigue desde Mis proyectos y las
+ * notificaciones, no desde estos listados, asi que quedan limitados a los
+ * roles internos (para el Cliente son 403 aunque teclee la URL).
+ */
+Route::middleware(['auth', 'role:Jefe|PM|PO|Programador'])->group(function () {
+    // Va antes del resource para que "tablero" no se tome como un id de tarea.
+    Route::get('tareas/tablero', [TareaController::class, 'tablero'])->name('tareas.tablero');
+    Route::resource('tareas', TareaController::class)->only(['index', 'show']);
+    Route::resource('hitos', HitoController::class)->only(['index', 'show']);
+    Route::resource('solicitudes-cambio', SolicitudCambioController::class)->only(['index', 'show']);
+    Route::resource('sprints', SprintController::class)->only(['index']);
 });
 
 // -----------------------------------------------------------------------------

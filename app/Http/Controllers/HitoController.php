@@ -60,7 +60,16 @@ class HitoController extends Controller
         // Para el filtro: un Cliente solo puede elegir proyectos de su empresa
         $proyectos = Proyecto::visiblePara($request->user())->orderBy('nombre')->get();
 
-        return view('hitos.index', compact('hitos', 'proyectos'));
+        // Rango real de fechas objetivo registradas: acota los selectores
+        // "Desde"/"Hasta" del filtro (buscar desde 1999 no tiene sentido si
+        // no hay hitos de ese año).
+        $limitesFecha = Hito::visiblePara($request->user())
+            ->selectRaw('MIN(fecha_objetivo) as desde, MAX(fecha_objetivo) as hasta')
+            ->first();
+        $limitesFecha->desde = $limitesFecha->desde ? substr($limitesFecha->desde, 0, 10) : null;
+        $limitesFecha->hasta = $limitesFecha->hasta ? substr($limitesFecha->hasta, 0, 10) : null;
+
+        return view('hitos.index', compact('hitos', 'proyectos', 'limitesFecha'));
     }
 
     public function store(Request $request)

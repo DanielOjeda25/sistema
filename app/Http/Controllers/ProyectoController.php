@@ -54,7 +54,16 @@ class ProyectoController extends Controller
         // PMs disponibles para el filtro del listado.
         $pms = User::whereHas('roles', fn ($q) => $q->where('name', 'PM'))->orderBy('name')->get();
 
-        return view('proyectos.index', compact('proyectos', 'clientes', 'usuarios', 'pms'));
+        // Rango real de fechas registradas: acota los selectores "inicio desde"
+        // e "inicio hasta" del filtro (no tiene sentido buscar desde 1999 si
+        // no hay proyectos de ese año).
+        $limitesFecha = Proyecto::visiblePara($request->user())
+            ->selectRaw('MIN(fecha_inicio) as desde, MAX(fecha_inicio) as hasta')
+            ->first();
+        $limitesFecha->desde = $limitesFecha->desde ? substr($limitesFecha->desde, 0, 10) : null;
+        $limitesFecha->hasta = $limitesFecha->hasta ? substr($limitesFecha->hasta, 0, 10) : null;
+
+        return view('proyectos.index', compact('proyectos', 'clientes', 'usuarios', 'pms', 'limitesFecha'));
 
     }
 
