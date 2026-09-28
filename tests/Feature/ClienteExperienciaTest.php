@@ -35,19 +35,28 @@ class ClienteExperienciaTest extends TestCase
     {
         $cliente = $this->cliente();
 
+        // Listados que el Cliente si ve: nunca muestran botones de creacion.
         foreach ([
             '/proyectos' => 'Nuevo Proyecto',
-            '/tareas' => 'Nueva Tarea',
-            '/hitos' => 'Nuevo Hito',
-            '/solicitudes-cambio' => 'Nueva Solicitud de Cambio',
             '/entregables' => 'Nuevo Entregable',
             '/facturas' => 'Nueva Factura',
-            '/sprints' => 'Nuevo Sprint',
         ] as $ruta => $boton) {
             $this->actingAs($cliente)
                 ->get($ruta)
                 ->assertOk()
                 ->assertDontSee($boton, false);
+        }
+    }
+
+        #[Test]
+    public function las_pantallas_internas_le_quedan_bloqueadas_por_url(): void
+    {
+        // Decision de alcance: /tareas, /hitos, /solicitudes-cambio y /sprints son
+        // solo del equipo (middleware role); el Cliente las ve desde su portal.
+        $cliente = $this->cliente();
+
+        foreach (['/tareas', '/tareas/tablero', '/hitos', '/solicitudes-cambio', '/sprints'] as $ruta) {
+            $this->actingAs($cliente)->get($ruta)->assertForbidden();
         }
     }
 

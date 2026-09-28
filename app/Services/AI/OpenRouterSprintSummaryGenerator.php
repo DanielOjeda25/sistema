@@ -2,6 +2,7 @@
 
 namespace App\Services\AI;
 
+use App\Support\LimpiaMarkdown;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
@@ -81,7 +82,7 @@ PROMPT;
 
                 if (is_string($contenido) && trim($contenido) !== '') {
                     return [
-                        'contenido' => $this->limpiarMarkdown(trim($contenido)),
+                        'contenido' => LimpiaMarkdown::limpiar(trim($contenido)),
                         'modelo' => $modelo,
                     ];
                 }
@@ -104,20 +105,4 @@ PROMPT;
         );
     }
 
-    /**
-     * El prompt pide texto plano, pero los modelos igual devuelven markdown
-     * (**negritas**, # títulos, `código`); se limpia antes de guardar/mostrar.
-     */
-    private function limpiarMarkdown(string $texto): string
-    {
-        $patrones = [
-            '/^\s*#{1,6}\s+/m',      // títulos # ## ...
-            '/\*\*([^*]+)\*\*/',     // **negrita**
-            '/__([^_]+)__/',         // __negrita__
-            '/\*([^*\n]+)\*/',       // *itálica*
-            '/`([^`]+)`/',           // `código`
-        ];
-
-        return trim(preg_replace($patrones, '$1', $texto));
-    }
 }

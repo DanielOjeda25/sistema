@@ -124,15 +124,12 @@ class CorreccionesSeguridadTest extends TestCase
     }
 
         #[Test]
-    public function cliente_solo_ve_sprints_de_sus_proyectos_en_el_tablero(): void
+    public function el_tablero_le_queda_bloqueado_al_cliente(): void
     {
+        // El tablero paso a ser 100% interno (middleware role); el Cliente sigue
+        // los sprints de su proyecto desde el portal (proyectos.show).
         $cliente = User::where('email', 'cliente@example.com')->firstOrFail();
 
-        $respuesta = $this->actingAs($cliente)->get(route('tareas.tablero'));
-        $respuesta->assertOk();
-
-        // Sprint 1 y 2 son del proyecto 1 (cliente del usuario), sprint 3 del proyecto 2 (otro cliente).
-        $html = $respuesta->getContent();
-        $this->assertStringNotContainsString('Sprint 3', $html);
+        $this->actingAs($cliente)->get(route('tareas.tablero'))->assertForbidden();
     }
 }

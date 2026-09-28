@@ -3,6 +3,7 @@
 namespace App\Services\AI;
 
 use App\Contracts\ProjectReportGenerator;
+use App\Support\LimpiaMarkdown;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use RuntimeException;
@@ -84,7 +85,7 @@ PROMPT;
                 $contenido = $response->json('choices.0.message.content');
 
                 if (is_string($contenido) && trim($contenido) !== '') {
-                    return $this->limpiarMarkdown(trim($contenido))
+                    return LimpiaMarkdown::limpiar(trim($contenido))
                         ."\n\n(Borrador automatico: el equipo lo revisa y ajusta antes de publicarlo al cliente.)";
                 }
 
@@ -106,20 +107,4 @@ PROMPT;
         );
     }
 
-    /**
-     * El prompt pide texto plano, pero los modelos igual devuelven markdown
-     * (**negritas**, # títulos, `código`); se limpia antes de guardar/mostrar.
-     */
-    private function limpiarMarkdown(string $texto): string
-    {
-        $patrones = [
-            '/^\s*#{1,6}\s+/m',      // títulos # ## ...
-            '/\*\*([^*]+)\*\*/',     // **negrita**
-            '/__([^_]+)__/',         // __negrita__
-            '/\*([^*\n]+)\*/',       // *itálica*
-            '/`([^`]+)`/',           // `código`
-        ];
-
-        return trim(preg_replace($patrones, '$1', $texto));
-    }
 }

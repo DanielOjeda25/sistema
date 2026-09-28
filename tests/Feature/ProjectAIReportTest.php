@@ -17,6 +17,15 @@ class ProjectAIReportTest extends TestCase
     {
         parent::setUp();
         $this->seed();
+
+        // Los tests no pueden depender del .env ni llamar a la IA real:
+        // se fija el generador demo para que sean deterministicos y offline.
+        config([
+            'ai.enabled' => true,
+            'ai.provider' => 'fake',
+            'ai.model' => 'fake-local',
+            'ai.generator' => \App\Services\AI\FakeProjectReportGenerator::class,
+        ]);
     }
 
     public function test_internal_user_can_record_safe_context_and_generate_a_draft(): void

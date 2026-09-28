@@ -31,33 +31,21 @@ class TableroTareasTest extends TestCase
             ->assertSee('form-editar-tarea');
     }
 
-    public function test_cliente_ve_el_tablero_en_modo_lectura(): void
+    public function test_cliente_tiene_el_tablero_bloqueado_por_url(): void
     {
+        // Decision de alcance: el tablero es 100% del equipo interno (middleware
+        // role); el Cliente sigue su proyecto desde el portal.
         $cliente = User::role('Cliente')->firstOrFail();
 
         $this->actingAs($cliente)
             ->get(route('tareas.tablero'))
-            ->assertOk()
-            ->assertDontSee('data-agregar')
-            ->assertDontSee('modal-tarea');
-    }
-
-    public function test_cliente_solo_ve_los_proyectos_de_su_empresa_en_el_tablero(): void
-    {
-        $cliente = User::role('Cliente')->firstOrFail();
-        $proyectoVisible = Proyecto::where('cliente_id', $cliente->cliente_id)->firstOrFail();
-        $proyectoOculto = Proyecto::where('cliente_id', '!=', $cliente->cliente_id)->firstOrFail();
-
-        $this->actingAs($cliente)
-            ->get(route('tareas.tablero'))
-            ->assertOk()
-            ->assertSee($proyectoVisible->nombre)
-            ->assertDontSee($proyectoOculto->nombre);
+            ->assertForbidden();
     }
 
     public function test_crear_tarjeta_ajax_la_agrega_al_final_de_su_columna(): void
     {
         $jefe = User::where('email', 'jefe@example.com')->firstOrFail();
+        $dev = User::where('email', 'dev@example.com')->firstOrFail();
         $proyecto = Proyecto::firstOrFail();
         $ordenPrevio = (int) Tarea::where('estado', 'en_progreso')->max('orden');
 
@@ -67,7 +55,7 @@ class TableroTareasTest extends TestCase
                 'estado' => 'en_progreso',
                 'prioridad' => 'media',
                 'proyecto_id' => $proyecto->id,
-                'asignado_a' => $jefe->id,
+                'asignado_a' => $dev->id,
             ])
             ->assertCreated()
             ->assertJsonPath('titulo', 'Tarjeta creada desde el tablero')

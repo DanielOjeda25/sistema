@@ -29,6 +29,7 @@ use App\Models\Sprint;
 use App\Models\Tarea;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class TareaController extends Controller
 {
@@ -176,7 +177,11 @@ class TareaController extends Controller
             'fecha_limite' => 'nullable|date',
             'proyecto_id' => 'required|exists:proyectos,id',
             'sprint_id' => 'nullable|exists:sprints,id',
-            'asignado_a' => 'required|exists:users,id',
+            'asignado_a' => [
+                'required',
+                // Solo roles de trabajo: Jefe y Clientes no reciben tareas.
+                Rule::in(User::asignables()->pluck('id')),
+            ],
             'solicitud_cambio_id' => 'nullable|exists:solicitudes_cambio,id',
             'orden' => 'nullable|integer',
         ]);
@@ -219,7 +224,11 @@ class TareaController extends Controller
             'fecha_limite' => 'nullable|date',
             'proyecto_id' => 'required|exists:proyectos,id',
             'sprint_id' => 'nullable|exists:sprints,id',
-            'asignado_a' => 'required|exists:users,id',
+            'asignado_a' => [
+                'required',
+                // Solo roles de trabajo: Jefe y Clientes no reciben tareas.
+                Rule::in(User::asignables()->pluck('id')),
+            ],
             'solicitud_cambio_id' => 'nullable|exists:solicitudes_cambio,id',
         ]);
 
