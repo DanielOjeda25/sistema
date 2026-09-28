@@ -19,21 +19,19 @@
 
     <div>
         <x-input-label for="estado" value="Estado" />
-        <select id="estado" name="estado" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
-            @foreach (['pendiente' => 'Pendiente', 'en_progreso' => 'En progreso', 'completada' => 'Completada', 'cancelada' => 'Cancelada'] as $valor => $label)
-                <option value="{{ $valor }}" @selected(old('estado', $tarea?->estado ?? 'pendiente') === $valor)>{{ $label }}</option>
-            @endforeach
-        </select>
+        <x-buscador-select name="estado" :conBuscador="false" textoTodos=""
+                           :opciones="['pendiente' => 'Pendiente', 'en_progreso' => 'En progreso', 'completada' => 'Completada', 'cancelada' => 'Cancelada']"
+                           :seleccionado="old('estado', $tarea?->estado ?? 'pendiente')"
+                           placeholder="Estado..." />
         <x-input-error class="mt-2" :messages="$errors->get('estado')" />
     </div>
 
     <div>
         <x-input-label for="prioridad" value="Prioridad" />
-        <select id="prioridad" name="prioridad" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
-            @foreach (['baja' => 'Baja', 'media' => 'Media', 'alta' => 'Alta'] as $valor => $label)
-                <option value="{{ $valor }}" @selected(old('prioridad', $tarea?->prioridad ?? 'media') === $valor)>{{ $label }}</option>
-            @endforeach
-        </select>
+        <x-buscador-select name="prioridad" :conBuscador="false" textoTodos=""
+                           :opciones="['baja' => 'Baja', 'media' => 'Media', 'alta' => 'Alta']"
+                           :seleccionado="old('prioridad', $tarea?->prioridad ?? 'media')"
+                           placeholder="Prioridad..." />
         <x-input-error class="mt-2" :messages="$errors->get('prioridad')" />
     </div>
 
@@ -45,49 +43,37 @@
 
     <div>
         <x-input-label for="proyecto_id" value="Proyecto" />
-        <select id="proyecto_id" name="proyecto_id" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
-            <option value="">— Seleccioná un proyecto —</option>
-            @foreach ($proyectos as $p)
-                <option value="{{ $p->id }}" @selected(old('proyecto_id', $tarea?->proyecto_id) == $p->id)>{{ $p->nombre }}</option>
-            @endforeach
-        </select>
+        <x-buscador-select name="proyecto_id"
+                           :opciones="$proyectos->mapWithKeys(fn ($p) => [$p->id => $p->nombre])->all()"
+                           :seleccionado="old('proyecto_id', $tarea?->proyecto_id)"
+                           placeholder="Buscar proyecto..." textoTodos="Ninguno" />
         <x-input-error class="mt-2" :messages="$errors->get('proyecto_id')" />
     </div>
 
     <div>
         <x-input-label for="sprint_id" value="Sprint (opcional)" />
-        <select id="sprint_id" name="sprint_id" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
-            <option value="">Sin sprint</option>
-            @foreach ($sprints->groupBy(fn ($s) => $s->proyecto?->nombre ?? 'Sin proyecto') as $nombreProyecto => $sprintsProyecto)
-                <optgroup label="{{ $nombreProyecto }}">
-                    @foreach ($sprintsProyecto as $s)
-                        <option value="{{ $s->id }}" @selected(old('sprint_id', $tarea?->sprint_id) == $s->id)>{{ $s->nombre }}</option>
-                    @endforeach
-                </optgroup>
-            @endforeach
-        </select>
+        <x-buscador-select name="sprint_id"
+                           :opciones="$sprints->mapWithKeys(fn ($s) => [$s->id => trim($s->nombre . (($s->proyecto?->nombre ?? '') !== '' ? ' — ' . $s->proyecto->nombre : ''))])->all()"
+                           :seleccionado="old('sprint_id', $tarea?->sprint_id)"
+                           placeholder="Buscar sprint..." textoTodos="Sin sprint" />
         <x-input-error class="mt-2" :messages="$errors->get('sprint_id')" />
     </div>
 
     <div>
         <x-input-label for="asignado_a" value="Asignar a" />
-        <select id="asignado_a" name="asignado_a" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
-            <option value="">— Seleccioná un responsable —</option>
-            @foreach ($usuarios as $u)
-                <option value="{{ $u->id }}" @selected(old('asignado_a', $tarea?->asignado_a) == $u->id)>{{ $u->name }} ({{ $u->roles->pluck('name')->implode(', ') }})</option>
-            @endforeach
-        </select>
+        <x-buscador-select name="asignado_a"
+                           :opciones="$usuarios->mapWithKeys(fn ($u) => [$u->id => trim($u->name . ' (' . $u->roles->pluck('name')->implode(', ') . ')')])->all()"
+                           :seleccionado="old('asignado_a', $tarea?->asignado_a)"
+                           placeholder="Buscar responsable..." textoTodos="Nadie" />
         <x-input-error class="mt-2" :messages="$errors->get('asignado_a')" />
     </div>
 
     <div>
         <x-input-label for="solicitud_cambio_id" value="Solicitud de cambio (opcional)" />
-        <select id="solicitud_cambio_id" name="solicitud_cambio_id" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
-            <option value="">— Ninguna —</option>
-            @foreach ($solicitudes as $s)
-                <option value="{{ $s->id }}" @selected(old('solicitud_cambio_id', $tarea?->solicitud_cambio_id) == $s->id)>{{ $s->titulo }}</option>
-            @endforeach
-        </select>
+        <x-buscador-select name="solicitud_cambio_id"
+                           :opciones="$solicitudes->mapWithKeys(fn ($s) => [$s->id => $s->titulo])->all()"
+                           :seleccionado="old('solicitud_cambio_id', $tarea?->solicitud_cambio_id)"
+                           placeholder="Buscar solicitud..." textoTodos="— Ninguna —" />
         <x-input-error class="mt-2" :messages="$errors->get('solicitud_cambio_id')" />
     </div>
 </div>

@@ -5,7 +5,8 @@
     que define que proyectos y facturas va a ver. La contrasena usa el
     componente x-password-input (mostrar/ocultar + aviso en vivo).
 --}}
-<div class="grid gap-4 sm:grid-cols-2" x-data="{ rol: '{{ old('rol', '') }}' }">
+<div class="grid gap-4 sm:grid-cols-2" x-data="{ rol: '{{ old('rol', '') }}' }"
+     @change="if ($event.target.name === 'rol') rol = $event.target.value">
     <div>
         <x-input-label for="name" value="Nombre" />
         <x-text-input id="name" name="name" type="text" class="mt-1 block w-full" :value="old('name')" required autofocus  maxlength="255" />
@@ -26,32 +27,28 @@
 
     <div>
         <x-input-label for="rol" value="Rol" />
-        <select id="rol" name="rol" x-model="rol" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
-            <option value="">— Seleccioná un rol —</option>
-            @foreach ($roles as $rol)
-                <option value="{{ $rol->name }}" @selected(old('rol') === $rol->name)>{{ $rol->name }}</option>
-            @endforeach
-        </select>
+        <x-buscador-select name="rol" :conBuscador="false" textoTodos=""
+                           :opciones="$roles->pluck('name', 'name')->all()"
+                           :seleccionado="old('rol')"
+                           placeholder="Selecciona un rol..." />
         <x-input-error class="mt-2" :messages="$errors->get('rol')" />
     </div>
 
     <div>
         <x-input-label for="estado" value="Estado" />
-        <select id="estado" name="estado" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
-            <option value="activo" @selected(old('estado', 'activo') === 'activo')>Activo</option>
-            <option value="inactivo" @selected(old('estado') === 'inactivo')>Inactivo</option>
-        </select>
+        <x-buscador-select name="estado" :conBuscador="false" textoTodos=""
+                           :opciones="['activo' => 'Activo', 'inactivo' => 'Inactivo']"
+                           :seleccionado="old('estado', 'activo')"
+                           placeholder="Estado..." />
         <x-input-error class="mt-2" :messages="$errors->get('estado')" />
     </div>
 
     <div x-show="rol === 'Cliente'" x-cloak class="sm:col-span-2 rounded-lg border border-emerald-100 bg-emerald-50 p-4">
         <x-input-label for="cliente_id" value="Cuenta para la ficha de cliente" />
-        <select id="cliente_id" name="cliente_id" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
-            <option value="">— Seleccioná la ficha de cliente —</option>
-            @foreach ($clientes as $c)
-                <option value="{{ $c->id }}" @selected(old('cliente_id') == $c->id)>{{ $c->nombre }} {{ $c->apellido }}@if($c->empresa) · {{ $c->empresa }}@endif</option>
-            @endforeach
-        </select>
+        <x-buscador-select name="cliente_id"
+                           :opciones="$clientes->mapWithKeys(fn ($c) => [$c->id => trim($c->nombre.' '.$c->apellido).(($c->empresa ?? '') !== '' ? ' · '.$c->empresa : '')])->all()"
+                           :seleccionado="old('cliente_id')"
+                           placeholder="Buscar cliente..." textoTodos="Ninguna" />
         <x-input-error class="mt-2" :messages="$errors->get('cliente_id')" />
     </div>
 

@@ -16,17 +16,19 @@
 
 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     <div>
-        <x-input-label for="tipo" value="Tipo (ej: documento, informe, resumen)" />
-        <x-text-input maxlength="255" id="tipo" name="tipo" type="text" class="mt-1 block w-full" :value="old('tipo', $entregable->tipo ?? 'documento')" required />
+        <x-input-label for="tipo" value="Tipo" />
+        <x-buscador-select name="tipo" :conBuscador="false" textoTodos=""
+                           :opciones="\App\Models\EntregableIA::TIPOS"
+                           :seleccionado="old('tipo', $entregable->tipo ?? 'documento')"
+                           placeholder="Tipo..." />
         <x-input-error class="mt-2" :messages="$errors->get('tipo')" />
     </div>
     <div>
         <x-input-label for="estado" value="Estado" />
-        <select id="estado" name="estado" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
-            @foreach (['borrador' => 'Borrador', 'revisado' => 'Revisado', 'aprobado' => 'Aprobado'] as $valor => $etiqueta)
-                <option value="{{ $valor }}" @selected(old('estado', $entregable->estado ?? 'borrador') == $valor)>{{ $etiqueta }}</option>
-            @endforeach
-        </select>
+        <x-buscador-select name="estado" :conBuscador="false" textoTodos=""
+                           :opciones="['borrador' => 'Borrador', 'revisado' => 'Revisado', 'aprobado' => 'Aprobado']"
+                           :seleccionado="old('estado', $entregable->estado ?? 'borrador')"
+                           placeholder="Estado..." />
         <x-input-error class="mt-2" :messages="$errors->get('estado')" />
     </div>
 </div>
@@ -34,22 +36,18 @@
 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     <div>
         <x-input-label for="proyecto_id" value="Proyecto" />
-        <select id="proyecto_id" name="proyecto_id" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
-            <option value="">— Seleccioná un proyecto —</option>
-            @foreach ($proyectos as $p)
-                <option value="{{ $p->id }}" @selected(old('proyecto_id', $entregable->proyecto_id ?? '') == $p->id)>{{ $p->nombre }}</option>
-            @endforeach
-        </select>
+        <x-buscador-select name="proyecto_id"
+                           :opciones="$proyectos->mapWithKeys(fn ($p) => [$p->id => $p->nombre])->all()"
+                           :seleccionado="old('proyecto_id', $entregable->proyecto_id ?? '')"
+                           placeholder="Buscar proyecto..." textoTodos="Ninguno" />
         <x-input-error class="mt-2" :messages="$errors->get('proyecto_id')" />
     </div>
     <div>
         <x-input-label for="generado_por" value="Generado por" />
-        <select id="generado_por" name="generado_por" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
-            <option value="">— Seleccioná un usuario —</option>
-            @foreach ($usuarios as $u)
-                <option value="{{ $u->id }}" @selected(old('generado_por', $entregable->generado_por ?? '') == $u->id)>{{ $u->name }}</option>
-            @endforeach
-        </select>
+        <x-buscador-select name="generado_por"
+                           :opciones="$usuarios->mapWithKeys(fn ($u) => [$u->id => $u->name])->all()"
+                           :seleccionado="old('generado_por', $entregable->generado_por ?? '')"
+                           placeholder="Buscar usuario..." textoTodos="Nadie" />
         <x-input-error class="mt-2" :messages="$errors->get('generado_por')" />
     </div>
 </div>

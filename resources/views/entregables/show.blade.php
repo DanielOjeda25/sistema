@@ -16,7 +16,7 @@
                 <div class="px-6 py-5 border-b border-gray-200 flex items-center justify-between gap-4">
                     <div>
                         <h3 class="text-lg font-semibold text-gray-900">{{ $entregable->titulo }}</h3>
-                        <p class="text-sm text-gray-500 mt-0.5">{{ $entregable->proyecto?->nombre ?? 'Sin proyecto' }} · {{ ucfirst($entregable->tipo) }}</p>
+                        <p class="text-sm text-gray-500 mt-0.5">{{ $entregable->proyecto?->nombre ?? 'Sin proyecto' }} · {{ \App\Models\EntregableIA::TIPOS[$entregable->tipo] ?? ucfirst($entregable->tipo) }}</p>
                     </div>
                     <x-estado-badge :estado="$entregable->estado" />
                 </div>

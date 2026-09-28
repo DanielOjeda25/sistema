@@ -33,11 +33,10 @@
 
 <div>
     <x-input-label for="estado" value="Estado" />
-    <select id="estado" name="estado" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
-        @foreach (['pendiente' => 'Pendiente', 'en_progreso' => 'En progreso', 'completado' => 'Completado', 'cancelado' => 'Cancelado'] as $valor => $etiqueta)
-            <option value="{{ $valor }}" @selected(old('estado', $proyectoItem->estado ?? 'pendiente') == $valor)>{{ $etiqueta }}</option>
-        @endforeach
-    </select>
+    <x-buscador-select name="estado" :conBuscador="false" textoTodos=""
+                       :opciones="['pendiente' => 'Pendiente', 'en_progreso' => 'En progreso', 'completado' => 'Completado', 'cancelado' => 'Cancelado']"
+                       :seleccionado="old('estado', $proyectoItem->estado ?? 'pendiente')"
+                       placeholder="Estado..." />
     <x-input-error class="mt-2" :messages="$errors->get('estado')" />
 </div>
 

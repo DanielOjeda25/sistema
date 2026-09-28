@@ -31,14 +31,10 @@
                     </div>
                     <div>
                         <label for="estado" class="block text-xs font-medium text-gray-500 uppercase mb-1">Estado</label>
-                        <select name="estado" id="estado" class="rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
-                            <option value="">Todos</option>
-                            @foreach (['activo', 'inactivo'] as $estado)
-                                <option value="{{ $estado }}" @selected(request('estado') === $estado)>
-                                    {{ ucfirst($estado) }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <x-buscador-select name="estado" textoTodos="Todos"
+                                           :opciones="['activo' => 'Activo', 'inactivo' => 'Inactivo']"
+                                           :seleccionado="request('estado')"
+                                           placeholder="Estado..." />
                     </div>
                     <button type="submit" class="px-4 py-2 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63] inline-flex items-center gap-1.5">
                         <x-heroicon-o-magnifying-glass class="w-4 h-4" />

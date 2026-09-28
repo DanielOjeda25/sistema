@@ -189,7 +189,7 @@
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <div>
                                 <x-input-label for="crear-estado" value="Estado" />
-                                <select id="crear-estado" name="estado" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
+                                <select id="crear-estado" name="estado" class="mt-1 block w-full h-11 border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
                                     @foreach ($columnas as $estado => [$etiqueta, $color])
                                         <option value="{{ $estado }}">{{ $etiqueta }}</option>
                                     @endforeach
@@ -197,7 +197,7 @@
                             </div>
                             <div>
                                 <x-input-label for="crear-prioridad" value="Prioridad" />
-                                <select id="crear-prioridad" name="prioridad" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
+                                <select id="crear-prioridad" name="prioridad" class="mt-1 block w-full h-11 border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
                                     <option value="baja">Baja</option>
                                     <option value="media" selected>Media</option>
                                     <option value="alta">Alta</option>
@@ -212,7 +212,7 @@
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <div>
                                 <x-input-label for="crear-proyecto" value="Proyecto" />
-                                <select id="crear-proyecto" name="proyecto_id" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
+                                <select id="crear-proyecto" name="proyecto_id" class="mt-1 block w-full h-11 border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
                                     @foreach ($proyectos as $p)
                                         <option value="{{ $p->id }}" @selected($proyectoId == $p->id)>{{ $p->nombre }}</option>
                                     @endforeach
@@ -220,7 +220,7 @@
                             </div>
                             <div>
                                 <x-input-label for="crear-sprint" value="Sprint (opcional)" />
-                                <select id="crear-sprint" name="sprint_id" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
+                                <select id="crear-sprint" name="sprint_id" class="mt-1 block w-full h-11 border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
                                     <option value="">Sin sprint</option>
                                     @foreach ($sprintsPorProyecto as $nombreProyecto => $sprintsProyecto)
                                         <optgroup label="{{ $nombreProyecto }}">
@@ -233,7 +233,7 @@
                             </div>
                             <div>
                                 <x-input-label for="crear-asignado" value="Asignar a" />
-                                <select id="crear-asignado" name="asignado_a" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
+                                <select id="crear-asignado" name="asignado_a" class="mt-1 block w-full h-11 border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
                                     @foreach ($usuarios as $u)
                                         <option value="{{ $u->id }}" @selected($u->is(auth()->user()))>{{ $u->name }} ({{ $u->roles->pluck('name')->implode(', ') }})</option>
                                     @endforeach
@@ -331,7 +331,7 @@
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <div>
                                 <x-input-label for="editar-estado" value="Estado" />
-                                <select id="editar-estado" name="estado" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
+                                <select id="editar-estado" name="estado" class="mt-1 block w-full h-11 border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
                                     @foreach ($columnas as $estado => [$etiqueta, $color])
                                         <option value="{{ $estado }}">{{ $etiqueta }}</option>
                                     @endforeach
@@ -339,7 +339,7 @@
                             </div>
                             <div>
                                 <x-input-label for="editar-prioridad" value="Prioridad" />
-                                <select id="editar-prioridad" name="prioridad" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
+                                <select id="editar-prioridad" name="prioridad" class="mt-1 block w-full h-11 border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
                                     <option value="baja">Baja</option>
                                     <option value="media">Media</option>
                                     <option value="alta">Alta</option>
@@ -354,7 +354,7 @@
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <div>
                                 <x-input-label for="editar-proyecto" value="Proyecto" />
-                                <select id="editar-proyecto" name="proyecto_id" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
+                                <select id="editar-proyecto" name="proyecto_id" class="mt-1 block w-full h-11 border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
                                     @foreach ($proyectos as $p)
                                         <option value="{{ $p->id }}">{{ $p->nombre }}</option>
                                     @endforeach
@@ -362,7 +362,7 @@
                             </div>
                             <div>
                                 <x-input-label for="editar-sprint" value="Sprint (opcional)" />
-                                <select id="editar-sprint" name="sprint_id" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
+                                <select id="editar-sprint" name="sprint_id" class="mt-1 block w-full h-11 border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
                                     <option value="">Sin sprint</option>
                                     @foreach ($sprintsPorProyecto as $nombreProyecto => $sprintsProyecto)
                                         <optgroup label="{{ $nombreProyecto }}">
@@ -375,7 +375,7 @@
                             </div>
                             <div>
                                 <x-input-label for="editar-asignado" value="Asignar a" />
-                                <select id="editar-asignado" name="asignado_a" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
+                                <select id="editar-asignado" name="asignado_a" class="mt-1 block w-full h-11 border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
                                     @foreach ($usuarios as $u)
                                         <option value="{{ $u->id }}">{{ $u->name }} ({{ $u->roles->pluck('name')->implode(', ') }})</option>
                                     @endforeach

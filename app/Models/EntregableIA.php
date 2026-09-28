@@ -15,6 +15,20 @@ class EntregableIA extends Model implements Auditable
 
     protected $table = 'entregables_ia';
 
+    /**
+     * Tipos cerrados de entregable: la clave es lo que se guarda en la base,
+     * el valor lo que ve la gente. El flujo automatico de IA siempre crea
+     * informe_avance.
+     */
+    public const TIPOS = [
+        'documento' => 'Documento',
+        'informe' => 'Informe',
+        'informe_avance' => 'Informe de avance',
+        'resumen' => 'Resumen',
+        'transcripcion' => 'Transcripción',
+        'diagrama' => 'Diagrama',
+    ];
+
     protected $fillable = [
         'titulo',
         'contenido',

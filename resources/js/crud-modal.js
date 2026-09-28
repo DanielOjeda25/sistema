@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         campo.value = valor ?? '';
                         // Los buscadores-select escuchan el change del oculto
                         // para reflejar el valor en su cuadro visible.
-                        campo.dispatchEvent(new Event('change'));
+                        campo.dispatchEvent(new Event('change', { bubbles: true }));
                     }
                 });
             }

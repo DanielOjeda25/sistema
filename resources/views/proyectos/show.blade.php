@@ -172,13 +172,10 @@
                         </div>
                         <div>
                             <x-input-label for="tipo" value="Tipo" />
-                            <select id="tipo" name="tipo"
-                                    class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
-                                <option value="avance">Avance</option>
-                                <option value="problema">Problema</option>
-                                <option value="decision">Decisión</option>
-                                <option value="proximo_paso">Próximo paso</option>
-                            </select>
+                            <x-buscador-select name="tipo" :conBuscador="false" textoTodos=""
+                                               :opciones="['avance' => 'Avance', 'problema' => 'Problema', 'decision' => 'Decisión', 'proximo_paso' => 'Próximo paso']"
+                                               :seleccionado="old('tipo', 'avance')"
+                                               placeholder="Tipo..." />
                         </div>
                         <label class="flex items-center gap-2 self-end pb-2">
                             <input type="checkbox" name="visible_cliente" value="1"

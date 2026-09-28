@@ -1,4 +1,4 @@
-@props(['id', 'titulo', 'abrirConErrores' => false])
+@props(['id', 'titulo', 'abrirConErrores' => false, 'ancho' => 'max-w-lg'])
 
 {{--
     Modal genérico para crear/editar sin dejar el listado.
@@ -17,7 +17,7 @@
     <div class="fixed inset-0 bg-gray-900/50" style="z-index: -1" data-crud-cerrar></div>
 
     <div class="min-h-full flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto relative">
+        <div class="bg-white rounded-2xl shadow-2xl w-full {{ $ancho }} max-h-[90vh] overflow-y-auto relative">
             <div class="sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-white/95 backdrop-blur border-b border-gray-100">
                 <h3 class="font-semibold text-lg text-gray-800">{{ $titulo }}</h3>
                 <button type="button" data-crud-cerrar

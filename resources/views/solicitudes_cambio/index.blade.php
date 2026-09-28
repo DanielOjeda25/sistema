@@ -23,30 +23,49 @@
                     </div>
                 @endif
 
-                <form method="GET" action="{{ route('solicitudes-cambio.index') }}" class="mb-4 flex flex-wrap gap-3 items-end">
-                    <div class="flex-1 min-w-[200px]">
-                        <label for="q" class="block text-xs font-medium text-gray-500 uppercase mb-1">Buscar</label>
-                        <input type="text" name="q" id="q" value="{{ request('q') }}" placeholder="Título o descripción..."
-                               class="w-full rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
+                <form method="GET" action="{{ route('solicitudes-cambio.index') }}" class="mb-4 rounded-xl border border-gray-100 bg-gray-50/60 p-4">
+                    <div class="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+                        <div class="col-span-2 md:col-span-3 xl:col-span-2">
+                            <label for="q" class="block text-xs font-medium text-gray-500 uppercase mb-1">Buscar</label>
+                            <input type="text" name="q" id="q" value="{{ request('q') }}" placeholder="Título o descripción..."
+                                   class="w-full rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
+                        </div>
+                        <div>
+                            <label for="estado" class="block text-xs font-medium text-gray-500 uppercase mb-1">Estado</label>
+                            <x-buscador-select name="estado" textoTodos="Todos"
+                                               :opciones="['pendiente' => 'Pendiente', 'aprobada' => 'Aprobada', 'rechazada' => 'Rechazada']"
+                                               :seleccionado="request('estado')"
+                                               placeholder="Estado..." />
+                        </div>
+                        <div>
+                            <label for="prioridad" class="block text-xs font-medium text-gray-500 uppercase mb-1">Prioridad</label>
+                            <x-buscador-select name="prioridad" textoTodos="Todas"
+                                               :opciones="['alta' => 'Alta', 'media' => 'Media', 'baja' => 'Baja']"
+                                               :seleccionado="request('prioridad')"
+                                               placeholder="Prioridad..." />
+                        </div>
+                        <div>
+                            <x-buscador-select name="proyecto_id" label="Proyecto" textoTodos="Todos"
+                                               :opciones="$proyectos->mapWithKeys(fn ($p) => [$p->id => $p->nombre])->all()"
+                                               :seleccionado="request('proyecto_id')"
+                                               placeholder="Buscar proyecto..." />
+                        </div>
+                        <div>
+                            <x-buscador-select name="solicitado_por" label="Solicitante" textoTodos="Todos"
+                                               :opciones="$usuarios->mapWithKeys(fn ($u) => [$u->id => $u->name])->all()"
+                                               :seleccionado="request('solicitado_por')"
+                                               placeholder="Buscar solicitante..." />
+                        </div>
                     </div>
-                    <div>
-                        <label for="estado" class="block text-xs font-medium text-gray-500 uppercase mb-1">Estado</label>
-                        <select name="estado" id="estado" class="rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
-                            <option value="">Todos</option>
-                            @foreach (['pendiente', 'aprobada', 'rechazada'] as $estado)
-                                <option value="{{ $estado }}" @selected(request('estado') === $estado)>
-                                    {{ ucfirst($estado) }}
-                                </option>
-                            @endforeach
-                        </select>
+                    <div class="mt-3 flex items-center justify-end gap-3 border-t border-gray-200/70 pt-3">
+                        @if (request()->hasAny(['q', 'estado', 'prioridad', 'proyecto_id', 'solicitado_por']))
+                            <a href="{{ route('solicitudes-cambio.index') }}" class="text-xs text-gray-500 hover:text-gray-700 underline">Limpiar</a>
+                        @endif
+                        <button type="submit" class="px-4 py-2 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63] inline-flex items-center gap-1.5">
+                            <x-heroicon-o-magnifying-glass class="w-4 h-4" />
+                            Filtrar
+                        </button>
                     </div>
-                    <button type="submit" class="px-4 py-2 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63] inline-flex items-center gap-1.5">
-                        <x-heroicon-o-magnifying-glass class="w-4 h-4" />
-                        Filtrar
-                    </button>
-                    @if (request()->hasAny(['q', 'estado']))
-                        <a href="{{ route('solicitudes-cambio.index') }}" class="text-xs text-gray-500 hover:text-gray-700 underline">Limpiar</a>
-                    @endif
                 </form>
 
                 <div class="overflow-x-auto">
@@ -146,7 +165,7 @@
     </div>
 
     @hasanyrole('Jefe|PM|PO')
-    <x-crud-modal id="modal-solicitud-crear" abrir-con-errores titulo="Nueva Solicitud de Cambio">
+    <x-crud-modal id="modal-solicitud-crear" abrir-con-errores titulo="Nueva Solicitud de Cambio" ancho="max-w-3xl">
         <form method="POST" action="{{ route('solicitudes-cambio.store') }}" class="space-y-4">
             @csrf
             <input type="hidden" name="desde_modal" value="1">

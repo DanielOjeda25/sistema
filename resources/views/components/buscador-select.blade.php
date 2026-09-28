@@ -4,44 +4,53 @@
     'opciones' => [],          // array: [id => etiqueta]
     'seleccionado' => null,    // id elegido actualmente
     'placeholder' => 'Buscar...',
-    'textoTodos' => 'Todos',
+    'textoTodos' => 'Todos',   // fila para quitar la eleccion; en "" se oculta (enums obligatorios)
     'autoEnviar' => false,     // si es true, envía el formulario al elegir una opción
+    'conBuscador' => true,     // en false es un selector lindo sin cuadro de busqueda
 ])
 
-{{-- Buscador con lista desplegable filtrable: útil cuando el select tiene muchas opciones --}}
+{{-- Buscador con lista desplegable filtrable: útil cuando el select tiene muchas opciones.
+     Con conBuscador en false se comporta como un select comun, pero con la misma
+     lista estilizada (la nativa no se puede pintar). --}}
 <div {{ $attributes }}>
     @if ($label)
         <label class="block text-xs font-medium text-gray-500 uppercase mb-1">{{ $label }}</label>
     @endif
 
     <div class="relative"
-         x-data="buscadorSelect({{ \Illuminate\Support\Js::from($seleccionado) }}, {{ \Illuminate\Support\Js::from($opciones) }})"
+         x-data="buscadorSelect({{ \Illuminate\Support\Js::from($seleccionado) }}, {{ \Illuminate\Support\Js::from($opciones) }}, {{ \Illuminate\Support\Js::from($conBuscador) }})"
          @click.outside="abierto = false">
         {{-- Valor real que se envía en el formulario --}}
         <input type="hidden" name="{{ $name }}" :value="valor" x-ref="oculto">
 
         {{-- Campo visible: muestra la etiqueta elegida o el texto de búsqueda --}}
         <input type="text" x-model="texto" @focus="abrir()" @input="abierto = true; filtrar()"
+               @readonly(!$conBuscador)
                :placeholder="valor ? '' : '{{ $placeholder }}'"
-               class="w-full rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] text-sm"
+               class="block w-full h-11 rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] text-sm shadow-sm"
+               @class(['cursor-pointer' => ! $conBuscador])
                autocomplete="off">
 
         {{-- Botón para limpiar la selección --}}
-        <button type="button" x-show="valor" @click="limpiar()" x-cloak
-                class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                title="Limpiar selección">
-            <x-heroicon-o-x-mark class="w-4 h-4" />
-        </button>
+        @if ($textoTodos !== '')
+            <button type="button" x-show="valor" @click="limpiar()" x-cloak
+                    class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    title="Limpiar selección">
+                <x-heroicon-o-x-mark class="w-4 h-4" />
+            </button>
+        @endif
 
         {{-- Lista de opciones filtradas por lo escrito; se abre hacia arriba si no hay espacio abajo --}}
         <div x-show="abierto" x-cloak
              class="absolute z-20 w-full max-h-60 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg"
              :class="arriba ? 'bottom-full mb-1' : 'mt-1'">
-            <button type="button" @click="elegir('', '{{ $textoTodos }}')"
-                    class="w-full text-left px-3 py-2 text-sm text-gray-500 hover:bg-gray-50"
-                    x-show="texto === '' || '{{ $textoTodos }}'.toLowerCase().includes(texto.toLowerCase())">
-                {{ $textoTodos }}
-            </button>
+            @if ($textoTodos !== '')
+                <button type="button" @click="elegir('', '{{ $textoTodos }}')"
+                        class="w-full text-left px-3 py-2 text-sm text-gray-500 hover:bg-gray-50"
+                        x-show="texto === '' || '{{ $textoTodos }}'.toLowerCase().includes(texto.toLowerCase())">
+                    {{ $textoTodos }}
+                </button>
+            @endif
             <template x-for="(etiqueta, id) in filtradas" :key="id">
                 <button type="button" @click="elegir(id.toString(), etiqueta)"
                         class="w-full text-left px-3 py-2 text-sm hover:bg-emerald-50"
@@ -61,23 +70,25 @@
     if (!window.buscadorSelectRegistrado) {
         window.buscadorSelectRegistrado = true;
         document.addEventListener('alpine:init', () => {
-            Alpine.data('buscadorSelect', (seleccionado = '', opciones = {}) => ({
+            Alpine.data('buscadorSelect', (seleccionado = '', opciones = {}, conBuscador = true) => ({
             opciones: {},
             filtradas: {},
             valor: '',
             texto: '',
             abierto: false,
             arriba: false,
+            conBuscador: true,
 
             init() {
                 this.opciones = opciones ?? {};
+                this.conBuscador = conBuscador;
                 this.valor = seleccionado && this.opciones[seleccionado] ? String(seleccionado) : '';
                 if (this.valor) {
                     this.texto = this.opciones[this.valor];
                 }
                 this.filtrar();
                 // crud-modal.js setea el input oculto a mano al abrir un modal de
-                // edicion: reflejamos ese valor en el campo visible.
+                // edicion: reflejamos ese valor en el cuadro visible.
                 this.$refs.oculto.addEventListener('change', () => {
                     this.valor = this.$refs.oculto.value;
                     this.texto = this.opciones[this.valor] ?? '';
@@ -94,6 +105,11 @@
             },
 
             filtrar() {
+                // En modo selector (sin busqueda) la lista queda completa siempre.
+                if (!this.conBuscador) {
+                    this.filtradas = { ...this.opciones };
+                    return;
+                }
                 const q = this.texto.toLowerCase();
                 // Si el texto coincide exactamente con lo seleccionado, no filtrar
                 if (this.valor && this.texto === this.opciones[this.valor]) {
@@ -112,6 +128,13 @@
                 this.texto = id === '' ? '' : etiqueta;
                 this.abierto = false;
                 this.filtrar();
+                // Avisamos al resto de la pagina con un change que burbujee: asi un
+                // x-model o x-show externo puede reaccionar a la eleccion (ej: el rol
+                // que muestra la ficha de cliente). Va en nextTick para que el input
+                // oculto ya tenga el valor nuevo cuando alguien lo lea.
+                this.$nextTick(() => {
+                    this.$refs.oculto.dispatchEvent(new Event('change', { bubbles: true }));
+                });
                 // Para filtros que recargan la pagina al cambiar, como los selects nativos con onchange.
                 // Se escribe el valor en el input oculto a mano: el binding de Alpine se aplica
                 // despues y el formulario saldria con el valor viejo.

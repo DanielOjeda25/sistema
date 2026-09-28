@@ -25,6 +25,12 @@ class SolicitudCambioController extends Controller
             })
             ->when($request->filled('estado'), fn ($query) => $query->where('estado', $request->string('estado')->toString())
             )
+            ->when($request->filled('prioridad'), fn ($query) => $query->where('prioridad', $request->string('prioridad')->toString())
+            )
+            ->when($request->filled('proyecto_id'), fn ($query) => $query->where('proyecto_id', $request->integer('proyecto_id'))
+            )
+            ->when($request->filled('solicitado_por'), fn ($query) => $query->where('solicitado_por', $request->integer('solicitado_por'))
+            )
             ->latest()
             ->paginate(15)
             ->withQueryString();

@@ -35,32 +35,24 @@
                     </div>
                     <div>
                         <label for="estado" class="block text-xs font-medium text-gray-500 uppercase mb-1">Estado</label>
-                        <select name="estado" id="estado" class="rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
-                            <option value="">Todos</option>
-                            @foreach (['pendiente', 'en_progreso', 'completada', 'cancelada'] as $estado)
-                                <option value="{{ $estado }}" @selected(request('estado') === $estado)>
-                                    {{ ucfirst(str_replace('_', ' ', $estado)) }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <x-buscador-select name="estado" textoTodos="Todos"
+                                           :opciones="['pendiente' => 'Pendiente', 'en_progreso' => 'En progreso', 'completada' => 'Completada', 'cancelada' => 'Cancelada']"
+                                           :seleccionado="request('estado')"
+                                           placeholder="Estado..." />
                     </div>
                     <div>
                         <label for="prioridad" class="block text-xs font-medium text-gray-500 uppercase mb-1">Prioridad</label>
-                        <select name="prioridad" id="prioridad" class="rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
-                            <option value="">Todas</option>
-                            @foreach (['alta' => 'Alta', 'media' => 'Media', 'baja' => 'Baja'] as $valor => $etiqueta)
-                                <option value="{{ $valor }}" @selected(request('prioridad') === $valor)>{{ $etiqueta }}</option>
-                            @endforeach
-                        </select>
+                        <x-buscador-select name="prioridad" textoTodos="Todas"
+                                           :opciones="['alta' => 'Alta', 'media' => 'Media', 'baja' => 'Baja']"
+                                           :seleccionado="request('prioridad')"
+                                           placeholder="Prioridad..." />
                     </div>
                     <div>
                         <label for="asignado_a" class="block text-xs font-medium text-gray-500 uppercase mb-1">Asignado a</label>
-                        <select name="asignado_a" id="asignado_a" class="rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
-                            <option value="">Todos</option>
-                            @foreach ($usuarios as $u)
-                                <option value="{{ $u->id }}" @selected(request('asignado_a') == $u->id)>{{ $u->name }}</option>
-                            @endforeach
-                        </select>
+                        <x-buscador-select name="asignado_a" textoTodos="Todos"
+                                           :opciones="$usuarios->mapWithKeys(fn ($u) => [$u->id => $u->name])->all()"
+                                           :seleccionado="request('asignado_a')"
+                                           placeholder="Buscar responsable..." />
                     </div>
                     <button type="submit" class="px-4 py-2 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63] inline-flex items-center gap-1.5">
                         <x-heroicon-o-magnifying-glass class="w-4 h-4" />

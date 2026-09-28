@@ -23,10 +23,10 @@
     </div>
     <div>
         <x-input-label for="completado" value="Estado" />
-        <select id="completado" name="completado" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
-            <option value="0" @selected(old('completado', $hito->completado ?? '0') == '0')>Pendiente</option>
-            <option value="1" @selected(old('completado', $hito->completado ?? '0') == '1')>Completado</option>
-        </select>
+        <x-buscador-select name="completado" :conBuscador="false" textoTodos=""
+                           :opciones="['0' => 'Pendiente', '1' => 'Completado']"
+                           :seleccionado="old('completado', ($hito->completado ?? false) ? '1' : '0')"
+                           placeholder="Estado..." />
         <x-input-error class="mt-2" :messages="$errors->get('completado')" />
     </div>
 </div>

@@ -1,4 +1,4 @@
-    <x-crud-modal id="modal-solicitud-editar" titulo="Editar Solicitud de Cambio">
+    <x-crud-modal id="modal-solicitud-editar" titulo="Editar Solicitud de Cambio" ancho="max-w-3xl">
         <form method="POST" action="{{ route('solicitudes-cambio.store') }}" class="space-y-4">
             @csrf
             @method('PUT')

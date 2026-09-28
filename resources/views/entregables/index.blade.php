@@ -29,15 +29,10 @@
                                class="w-full rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
                     </div>
                     <div>
-                        <label for="estado" class="block text-xs font-medium text-gray-500 uppercase mb-1">Estado</label>
-                        <select name="estado" id="estado" class="rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
-                            <option value="">Todos</option>
-                            @foreach (['borrador', 'revisado', 'aprobado'] as $estado)
-                                <option value="{{ $estado }}" @selected(request('estado') === $estado)>
-                                    {{ ucfirst($estado) }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <x-buscador-select name="estado" label="Estado" textoTodos="Todos"
+                                           :opciones="['borrador' => 'Borrador', 'revisado' => 'Revisado', 'aprobado' => 'Aprobado']"
+                                           :seleccionado="request('estado')"
+                                           placeholder="Buscar estado..." />
                     </div>
                     <button type="submit" class="px-4 py-2 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63] inline-flex items-center gap-1.5">
                         <x-heroicon-o-magnifying-glass class="w-4 h-4" />
@@ -66,7 +61,7 @@
                                 @php($verEntregable = [
                                     'titulo' => $entregable->titulo,
                                     'contenido' => $entregable->contenido,
-                                    'tipo' => $entregable->tipo,
+                                    'tipo' => \App\Models\EntregableIA::TIPOS[$entregable->tipo] ?? $entregable->tipo,
                                     'estado' => $entregable->estado,
                                     'proyecto' => $entregable->proyecto?->nombre,
                                     'generador' => $entregable->generador?->name,
@@ -75,7 +70,7 @@
                                 <tr>
                                     <td class="px-6 py-4">{{ $entregable->titulo }}</td>
                                     <td class="px-6 py-4">{{ $entregable->proyecto?->nombre ?? 'N/A' }}</td>
-                                    <td class="px-6 py-4">{{ ucfirst($entregable->tipo) }}</td>
+                                    <td class="px-6 py-4">{{ \App\Models\EntregableIA::TIPOS[$entregable->tipo] ?? ucfirst($entregable->tipo) }}</td>
                                     <td class="px-6 py-4"><x-estado-badge :estado="$entregable->estado" /></td>
                                     <td class="px-6 py-4">{{ $entregable->generador?->name ?? 'N/A' }}</td>
                                     <td class="px-6 py-4 text-sm font-medium">
@@ -133,7 +128,7 @@
     <x-entregable-view-modal />
 
     @hasanyrole('Jefe|PM|PO|Programador')
-    <x-crud-modal id="modal-entregable-crear" abrir-con-errores titulo="Nuevo Entregable">
+    <x-crud-modal id="modal-entregable-crear" abrir-con-errores titulo="Nuevo Entregable" ancho="max-w-3xl">
         <form method="POST" action="{{ route('entregables.store') }}" class="space-y-4">
             @csrf
             <input type="hidden" name="desde_modal" value="1">

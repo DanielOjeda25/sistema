@@ -1,4 +1,4 @@
-    <x-crud-modal id="modal-entregable-editar" titulo="Editar Entregable">
+    <x-crud-modal id="modal-entregable-editar" titulo="Editar Entregable" ancho="max-w-3xl">
         <form method="POST" action="{{ route('entregables.store') }}" class="space-y-4">
             @csrf
             @method('PUT')

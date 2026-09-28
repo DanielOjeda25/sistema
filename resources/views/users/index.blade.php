@@ -177,30 +177,26 @@
                     </div>
                     <div>
                         <x-input-label for="edit_rol" value="Rol" />
-                        <select id="edit_rol" name="rol" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
-                            <option value="">— Seleccioná un rol —</option>
-                            @foreach ($roles as $rol)
-                                <option value="{{ $rol->name }}" @selected(old('rol') === $rol->name)>{{ $rol->name }}</option>
-                            @endforeach
-                        </select>
+                        <x-buscador-select name="rol" :conBuscador="false" textoTodos=""
+                                           :opciones="$roles->pluck('name', 'name')->all()"
+                                           :seleccionado="old('rol')"
+                                           placeholder="Rol..." />
                         <x-input-error class="mt-2" :messages="$errors->get('rol')" />
                     </div>
                     <div>
                         <x-input-label for="edit_estado" value="Estado" />
-                        <select id="edit_estado" name="estado" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
-                            <option value="activo" @selected(old('estado', 'activo') === 'activo')>Activo</option>
-                            <option value="inactivo" @selected(old('estado') === 'inactivo')>Inactivo</option>
-                        </select>
+                        <x-buscador-select name="estado" :conBuscador="false" textoTodos=""
+                                           :opciones="['activo' => 'Activo', 'inactivo' => 'Inactivo']"
+                                           :seleccionado="old('estado', 'activo')"
+                                           placeholder="Estado..." />
                         <x-input-error class="mt-2" :messages="$errors->get('estado')" />
                     </div>
                     <div class="sm:col-span-2 rounded-lg border border-emerald-100 bg-emerald-50 p-4">
                         <x-input-label for="edit_cliente_id" value="Ficha de cliente (solo rol Cliente)" />
-                        <select id="edit_cliente_id" name="cliente_id" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
-                            <option value="">— Sin ficha asignada —</option>
-                            @foreach ($clientes as $c)
-                                <option value="{{ $c->id }}" @selected(old('cliente_id') == $c->id)>{{ $c->nombre }} {{ $c->apellido }}@if($c->empresa) · {{ $c->empresa }}@endif</option>
-                            @endforeach
-                        </select>
+                        <x-buscador-select name="cliente_id" textoTodos="Sin ficha asignada"
+                                           :opciones="$clientes->mapWithKeys(fn ($c) => [$c->id => trim($c->nombre.' '.$c->apellido).(isset($c->empresa) && $c->empresa ? ' · '.$c->empresa : '')])->all()"
+                                           :seleccionado="old('cliente_id')"
+                                           placeholder="Buscar cliente..." />
                         <x-input-error class="mt-2" :messages="$errors->get('cliente_id')" />
                     </div>
                     <div class="sm:col-span-2 border-t border-gray-200 pt-4">
@@ -227,12 +223,10 @@
                 <p class="text-sm text-gray-500">Elegí el rol del usuario. Un usuario tiene un solo rol en el sistema.</p>
                 <div>
                     <x-input-label for="rol_usuario" value="Rol" />
-                    <select id="rol_usuario" name="rol" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
-                        <option value="">— Seleccioná un rol —</option>
-                        @foreach ($roles as $rol)
-                            <option value="{{ $rol->name }}" @selected(old('rol') === $rol->name)>{{ $rol->name }}</option>
-                        @endforeach
-                    </select>
+                    <x-buscador-select name="rol" :conBuscador="false" textoTodos=""
+                                       :opciones="$roles->pluck('name', 'name')->all()"
+                                       :seleccionado="old('rol')"
+                                       placeholder="Rol..." />
                     <x-input-error class="mt-2" :messages="$errors->get('rol')" />
                 </div>
                 <div class="flex items-center justify-end gap-4 border-t border-gray-200 pt-3">

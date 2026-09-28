@@ -42,7 +42,7 @@ class EntregableIAController extends Controller
         $data = $request->validate([
             'titulo' => 'required|string|max:255',
             'contenido' => 'required|string',
-            'tipo' => 'required|string|max:255',
+            'tipo' => ['required', 'in:'.implode(',', array_keys(EntregableIA::TIPOS))],
             'estado' => 'required|in:borrador,revisado,aprobado',
             'proyecto_id' => 'required|exists:proyectos,id',
             'generado_por' => 'required|exists:users,id',
@@ -70,7 +70,7 @@ class EntregableIAController extends Controller
         $data = $request->validate([
             'titulo' => 'required|string|max:255',
             'contenido' => 'required|string',
-            'tipo' => 'required|string|max:255',
+            'tipo' => ['required', 'in:'.implode(',', array_keys(EntregableIA::TIPOS))],
             'estado' => 'required|in:borrador,revisado,aprobado',
             'proyecto_id' => 'required|exists:proyectos,id',
             'generado_por' => 'required|exists:users,id',
