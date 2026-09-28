@@ -1,17 +1,17 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-                <a href="{{ route('proyectos.index') }}" class="text-xs text-gray-500 hover:underline">← Mis proyectos</a>
+        <div>
+            <a href="{{ route('proyectos.index') }}" class="inline-flex items-center gap-1 text-xs text-gray-500 hover:underline"><x-heroicon-o-arrow-left class="h-3.5 w-3.5" /> Mis proyectos</a>
+            <div class="flex items-center gap-3">
                 <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ $proyecto->nombre }}</h2>
+                <span class="px-3 py-1 rounded-full text-xs font-semibold
+                    {{ $proyecto->estado === 'completado' ? 'bg-green-100 text-green-700' : '' }}
+                    {{ $proyecto->estado === 'en_progreso' ? 'bg-blue-100 text-blue-700' : '' }}
+                    {{ $proyecto->estado === 'pendiente' ? 'bg-gray-100 text-gray-600' : '' }}
+                    {{ $proyecto->estado === 'cancelado' ? 'bg-red-100 text-red-700' : '' }}">
+                    {{ ucfirst(str_replace('_', ' ', $proyecto->estado)) }}
+                </span>
             </div>
-            <span class="px-3 py-1 rounded-full text-xs font-semibold self-start
-                {{ $proyecto->estado === 'completado' ? 'bg-green-100 text-green-700' : '' }}
-                {{ $proyecto->estado === 'en_progreso' ? 'bg-blue-100 text-blue-700' : '' }}
-                {{ $proyecto->estado === 'pendiente' ? 'bg-gray-100 text-gray-600' : '' }}
-                {{ $proyecto->estado === 'cancelado' ? 'bg-red-100 text-red-700' : '' }}">
-                {{ ucfirst(str_replace('_', ' ', $proyecto->estado)) }}
-            </span>
         </div>
     </x-slot>
 
@@ -44,7 +44,7 @@
                         <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-gray-300"></span> Pendiente</span>
                     </div>
                 </div>
-                <p class="text-sm text-gray-500">Seguí el camino de izquierda a derecha.</p>
+                <p class="text-sm text-gray-500">Cada punto es una etapa del proyecto o una fecha clave. Tocá cualquiera para ver el detalle.</p>
 
                 @php
                     // progreso de la linea: hasta el ultimo hito/etapa completado
@@ -54,39 +54,61 @@
                     $marcadoCurso = false;
                 @endphp
 
-                <div class="hidden md:block overflow-x-auto scroll-oculto mt-6 pb-2">
-                    <div class="relative min-w-max px-6">
+                {{-- Grilla elastica: todos los puntos entran en el ancho disponible,
+                     sin scroll horizontal sin importar cuantos haya --}}
+                <div class="hidden md:block mt-6 pb-2">
+                    <div class="relative px-6">
                         {{-- riel de fondo y riel de avance --}}
-                        <div class="absolute top-6 left-8 right-8 h-1.5 bg-gray-200 rounded-full"></div>
-                        <div class="absolute top-6 left-8 h-1.5 bg-gradient-to-r from-[#00b87d] to-[#00d99a] rounded-full animar-riel"
+                        <div class="absolute top-9 left-8 right-8 h-1.5 bg-gray-200 rounded-full"></div>
+                        <div class="absolute top-9 left-8 h-1.5 bg-gradient-to-r from-[#00b87d] to-[#00d99a] rounded-full animar-riel"
                              style="width: {{ $llenado }}%"></div>
 
-                        <div class="flex items-start">
+                        <div class="grid" style="grid-template-columns: repeat({{ $linea->count() }}, minmax(0, 1fr));">
                             @foreach ($linea as $i => $item)
                                 @php
                                     $esCurso = ! $item['hecho'] && ! $item['vencido'] && ! $marcadoCurso;
                                     if ($esCurso) { $marcadoCurso = true; }
                                     $claseNodo = $item['hecho'] ? 'bg-[#00b87d] text-white' : ($item['vencido'] ? 'bg-red-500 text-white' : ($esCurso ? 'bg-[#00d99a] text-white animar-curso' : 'bg-gray-300 text-gray-500'));
-                                    $icono = $item['hecho'] ? '✓' : ($item['vencido'] ? '!' : ($esCurso ? '▶' : $i + 1));
+                                    $estadoTexto = $item['estado'];
+                                    $estadoClase = $item['estado_clase'];
+                                    // Rango de fechas en palabras: los sprints cubren un periodo,
+                                    // los hitos tienen una fecha clave.
+                                    $rango = $item['tipo'] === 'sprint'
+                                        ? trim($item['fecha_texto'].(! empty($item['fecha_fin_texto']) ? ' → '.$item['fecha_fin_texto'] : ''))
+                                        : ($item['fecha_texto'] ? 'Fecha clave: '.$item['fecha_texto'] : '');
                                 @endphp
-                                <div class="relative w-44 shrink-0 px-2 text-center animar-item cursor-pointer"
+                                <div class="relative min-w-0 px-2 text-center animar-item cursor-pointer"
                                      style="animation-delay: {{ $i * 0.18 }}s"
                                      @click="abrir({{ $i }})" title="Ver detalle">
-                                    <p class="text-xs text-gray-400 h-4">{{ $item['fecha']?->format('d/m/Y') }}</p>
-                                    <div class="relative mx-auto mt-8 mb-5 w-10 h-10 transition-transform duration-200 hover:scale-110 cursor-pointer">
-                                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-md {{ $claseNodo }}">{{ $icono }}</div>
+                                    {{-- Marcador de donde esta el proyecto hoy --}}
+                                    @if ($esCurso)
+                                        <p class="text-[10px] font-bold uppercase tracking-widest text-[#008c63]">▼ Estamos acá</p>
+                                    @else
+                                        <p class="h-[15px]"></p>
+                                    @endif
+                                    <div class="relative mx-auto mt-2 mb-4 w-10 h-10 transition-transform duration-200 hover:scale-110 cursor-pointer">
+                                        <div class="w-10 h-10 rounded-full flex items-center justify-center shadow-md {{ $claseNodo }}">
+                                            @if ($item['hecho'])
+                                                <x-heroicon-o-check class="w-5 h-5" />
+                                            @elseif ($item['vencido'])
+                                                <x-heroicon-o-exclamation-triangle class="w-5 h-5" />
+                                            @elseif ($esCurso)
+                                                <x-heroicon-o-play class="w-4 h-4" />
+                                            @else
+                                                <span class="text-sm font-bold">{{ $i + 1 }}</span>
+                                            @endif
+                                        </div>
                                     </div>
                                     <span class="inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full mb-1
                                         {{ $item['tipo'] === 'hito' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-50 text-emerald-700' }}">
                                         {{ $item['tipo'] === 'hito' ? 'Hito' : 'Etapa' }}
                                     </span>
                                     <p class="text-sm font-semibold text-gray-800 leading-snug">{{ $item['titulo'] }}</p>
-                                    @if ($item['hecho'])
-                                        <p class="text-xs text-[#008c63] font-semibold mt-0.5">✓ Completado</p>
-                                    @elseif ($item['vencido'])
-                                        <p class="text-xs text-red-600 font-semibold mt-0.5">Atrasado</p>
-                                    @elseif ($esCurso)
-                                        <p class="text-xs text-[#008c63] font-semibold mt-0.5">En curso</p>
+                                    <span class="inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-full {{ $estadoClase }}">
+                                        {{ $estadoTexto }}
+                                    </span>
+                                    @if ($rango)
+                                        <p class="text-[11px] text-gray-400 mt-1">{{ $rango }}</p>
                                     @endif
                                     @if ($item['detalle'])
                                         <p class="text-xs text-gray-500 mt-1 leading-relaxed">{{ $item['detalle'] }}</p>
@@ -112,6 +134,11 @@
                             $esCursoMovil = ! $item['hecho'] && ! $item['vencido'] && ! $marcadoMovil;
                             if ($esCursoMovil) { $marcadoMovil = true; }
                             $borde = $item['hecho'] ? 'border-[#00b87d]' : ($item['vencido'] ? 'border-red-400' : ($esCursoMovil ? 'border-[#00d99a]' : 'border-gray-300'));
+                            $estadoTextoMovil = $item['estado'];
+                            $estadoClaseMovil = $item['estado_clase'];
+                            $rangoMovil = $item['tipo'] === 'sprint'
+                                ? trim($item['fecha_texto'].(! empty($item['fecha_fin_texto']) ? ' → '.$item['fecha_fin_texto'] : ''))
+                                : ($item['fecha_texto'] ? 'Fecha clave: '.$item['fecha_texto'] : '');
                         @endphp
                         <div class="mb-3 rounded-xl bg-white border-l-4 {{ $borde }} shadow-sm p-4 animar-item">
                             <div class="flex items-center justify-between">
@@ -119,13 +146,17 @@
                                     {{ $item['tipo'] === 'hito' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-50 text-emerald-700' }}">
                                     {{ $item['tipo'] === 'hito' ? 'Hito' : 'Etapa' }}
                                 </span>
-                                <span class="text-xs text-gray-400">{{ $item['fecha']?->format('d/m/Y') }}</span>
+                                @if ($esCursoMovil)
+                                    <span class="text-[10px] font-bold uppercase tracking-widest text-[#008c63]">▼ Estamos acá</span>
+                                @endif
                             </div>
                             <p class="mt-1 font-semibold text-gray-800">{{ $item['titulo'] }}</p>
-                            <p class="text-xs font-semibold mt-0.5
-                                {{ $item['hecho'] ? 'text-[#008c63]' : ($item['vencido'] ? 'text-red-600' : ($esCursoMovil ? 'text-[#008c63]' : 'text-gray-400')) }}">
-                                {{ $item['hecho'] ? 'Completado' : ($item['vencido'] ? 'Atrasado' : ($esCursoMovil ? 'En curso' : 'Pendiente')) }}
-                            </p>
+                            <div class="mt-1.5 flex flex-wrap items-center gap-2">
+                                <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full {{ $estadoClaseMovil }}">{{ $estadoTextoMovil }}</span>
+                                @if ($rangoMovil)
+                                    <span class="text-[11px] text-gray-400">{{ $rangoMovil }}</span>
+                                @endif
+                            </div>
                             @if ($item['detalle'])
                                 <p class="text-xs text-gray-500 mt-1">{{ $item['detalle'] }}</p>
                             @endif
@@ -149,8 +180,12 @@
                 {{-- Pop-up con el detalle del hito o etapa --}}
                 <div x-show="abierta" x-cloak class="fixed inset-0 overflow-y-auto" style="z-index: 9999" role="dialog" aria-modal="true" @keydown.escape.window="abierta = null">
                     <div class="fixed inset-0 bg-gray-900/60" @click="abierta = null"></div>
-                    <div class="min-h-full flex items-center justify-center p-4">
-                        <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-md p-6" x-show="abierta">
+                    {{-- m-auto en la tarjeta: la centra cuando entra en pantalla y
+                         permite scrollear hasta el borde cuando es mas alta --}}
+                    <div class="min-h-full flex justify-center p-4">
+                        {{-- h-fit: la tarjeta abraza su contenido; sin esto el flex la
+                             estira hasta el alto del contenedor y sobra espacio abajo --}}
+                        <div class="relative m-auto h-fit bg-white rounded-2xl shadow-xl w-full max-w-2xl p-5" x-show="abierta">
                             <button @click="abierta = null" class="absolute top-3 right-4 text-gray-400 hover:text-gray-600 text-xl leading-none" aria-label="Cerrar">×</button>
                             <template x-if="abierta">
                                 <div>
@@ -161,23 +196,22 @@
                                         <span class="text-xs text-gray-400" x-text="abierta.fecha_texto"></span>
                                     </div>
                                     <h4 class="text-lg font-bold text-gray-800" x-text="abierta.titulo"></h4>
-                                    <p class="mt-1 text-sm font-semibold"
-                                       :class="abierta.hecho ? 'text-[#008c63]' : (abierta.vencido ? 'text-red-600' : 'text-[#008c63]')"
-                                       x-text="abierta.hecho ? '✓ Completado' : (abierta.vencido ? 'Atrasado' : 'En curso')"></p>
+                                    <span class="mt-2 inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full"
+                                        :class="abierta.estado_clase"
+                                        x-text="abierta.estado"></span>
 
-                                    <p class="mt-4 text-sm text-gray-600 leading-relaxed" x-show="abierta.descripcion" x-text="abierta.descripcion"></p>
+                                    <p class="mt-3 text-sm text-gray-600 leading-relaxed" x-show="abierta.descripcion" x-text="abierta.descripcion"></p>
 
-                                    <div class="mt-4 space-y-1 text-sm text-gray-600">
-                                        <p x-show="abierta.fecha_fin_texto" x-text="'Etapa con inicio el ' + abierta.fecha_texto + ' y fin el ' + abierta.fecha_fin_texto"></p>
-                                    </div>
+                                    <p class="mt-3 text-sm text-gray-600" x-show="abierta.fecha_fin_texto"
+                                       x-text="'Etapa con inicio el ' + abierta.fecha_texto + ' y fin el ' + abierta.fecha_fin_texto"></p>
 
                                     {{-- Resumen del sprint redactado por el equipo con IA --}}
-                                    <div x-show="abierta.resumen_ia" class="mt-4 rounded-xl border border-[#d7eee6] bg-[#f5fffb] p-4">
+                                    <div x-show="abierta.resumen_ia" class="mt-3 rounded-xl border border-[#d7eee6] bg-[#f5fffb] p-4">
                                         <p class="text-[10px] font-bold uppercase tracking-widest text-[#008c63] mb-1">Resumen del sprint para vos</p>
                                         <p class="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed" x-text="abierta.resumen_ia"></p>
                                     </div>
 
-                                    <div x-show="abierta.avance !== undefined && abierta.avance !== null" class="mt-4">
+                                    <div x-show="abierta.avance !== undefined && abierta.avance !== null" class="mt-3">
                                         <div class="flex justify-between text-xs text-gray-500 mb-1">
                                             <span>Avance de la etapa</span>
                                             <span x-text="abierta.avance + '%'"></span>
@@ -237,21 +271,14 @@
             <div class="bg-white rounded-2xl shadow-sm p-6">
                 <h3 class="text-lg font-bold text-gray-800 mb-3">Material aprobado para vos</h3>
                 @forelse ($entregables as $entregable)
+                    @php($valoresEntregable = ['titulo' => $entregable->titulo, 'contenido' => $entregable->contenido, 'tipo' => $entregable->tipo, 'estado' => $entregable->estado, 'proyecto' => $entregable->proyecto?->nombre, 'generador' => $entregable->generador?->name, 'fecha' => $entregable->generado_en?->format('d/m/Y')])
                     <div class="border-b last:border-0 border-gray-100 py-3 flex items-start justify-between gap-4">
                         <div>
                             <p class="text-sm font-medium text-gray-800">{{ $entregable->titulo }}</p>
                             <p class="text-xs text-gray-400 mt-0.5">{{ ucfirst($entregable->tipo) }} · {{ $entregable->generado_en?->format('d/m/Y') }}</p>
                         </div>
                         <button type="button" class="text-sm text-[#008c63] hover:underline shrink-0"
-                                data-dispatch="ver-entregable" data-valores='@json([''
-                                    'titulo' => $entregable->titulo,
-                                    'contenido' => $entregable->contenido,
-                                    'tipo' => $entregable->tipo,
-                                    'estado' => $entregable->estado,
-                                    'proyecto' => $entregable->proyecto?->nombre,
-                                    'generador' => $entregable->generador?->name,
-                                    'fecha' => $entregable->generado_en?->format('d/m/Y'),
-                                ])">Ver</button>
+                                data-dispatch="ver-entregable" data-valores='@json($valoresEntregable)'>Ver</button>
                     </div>
                 @empty
                     <p class="text-sm text-gray-400">Todavía no hay material aprobado para este proyecto.</p>

@@ -118,7 +118,7 @@ class ProyectoController extends Controller
                         'fecha_fin_texto' => $fin,
                         'tipo' => 'sprint',
                         'titulo' => $sp->nombre,
-                        'detalle' => trim("{$hechas} de {$total} tareas completadas".($fin ? " · hasta el {$fin}" : '')),
+                        'detalle' => trim("{$hechas} de {$total} tareas listas".($fin ? " · hasta el {$fin}" : '')),
                         'descripcion' => $sp->descripcion,
                         'resumen_ia' => $sp->resumen_ia,
                         'hecho' => $total > 0 && $hechas === $total,
@@ -130,6 +130,29 @@ class ProyectoController extends Controller
             $linea = $hitos->concat($sprints)
                 ->sortBy(fn ($item) => $item['fecha'])
                 ->values();
+
+            // Estado visible de cada punto: Completado / Atrasado / En curso
+            // (el primer punto sin terminar) / Pendiente. Lo consume la linea
+            // de tiempo y el pop-up de detalle, asi ambos muestran lo mismo.
+            $enCursoMarcado = false;
+            $linea = $linea->map(function ($item) use (&$enCursoMarcado) {
+                if ($item['hecho']) {
+                    $item['estado'] = 'Completado';
+                    $item['estado_clase'] = 'bg-emerald-100 text-emerald-700';
+                } elseif ($item['vencido']) {
+                    $item['estado'] = 'Atrasado';
+                    $item['estado_clase'] = 'bg-red-100 text-red-700';
+                } elseif (! $enCursoMarcado) {
+                    $enCursoMarcado = true;
+                    $item['estado'] = 'En curso';
+                    $item['estado_clase'] = 'bg-[#00d99a]/20 text-[#00795a]';
+                } else {
+                    $item['estado'] = 'Pendiente';
+                    $item['estado_clase'] = 'bg-gray-100 text-gray-500';
+                }
+
+                return $item;
+            });
 
             $novedades = $proyecto->actualizaciones()
                 ->with('autor')
