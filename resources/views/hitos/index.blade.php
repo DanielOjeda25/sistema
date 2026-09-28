@@ -23,7 +23,11 @@
                     </div>
                 @endif
 
-                <form method="GET" action="{{ route('hitos.index') }}" class="mb-4 flex flex-wrap gap-3 items-end">
+                {{-- El rango Desde/Hasta solo aplica cuando "Fecha objetivo" = Rango:
+                     el resto del tiempo los campos se ocultan para no confundir. --}}
+                <form method="GET" action="{{ route('hitos.index') }}"
+                      class="mb-4 flex flex-wrap gap-3 items-end"
+                      x-data="{ fechaObjetivo: '{{ request('fecha_objetivo') }}' }">
                     <div class="flex-1 min-w-[200px]">
                         <label for="q" class="block text-xs font-medium text-gray-500 uppercase mb-1">Buscar</label>
                         <input type="text" name="q" id="q" value="{{ request('q') }}" placeholder="Nombre o descripción..."
@@ -48,24 +52,26 @@
                     </div>
                     <div>
                         <label for="fecha_objetivo" class="block text-xs font-medium text-gray-500 uppercase mb-1">Fecha objetivo</label>
-                        <select name="fecha_objetivo" id="fecha_objetivo" class="rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] min-w-[180px]">
+                        <select name="fecha_objetivo" id="fecha_objetivo" x-model="fechaObjetivo" class="rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] min-w-[180px]">
                             <option value="">Todas</option>
-                            @foreach (['vencidos' => 'Vencidos', 'proximos_7_dias' => 'Próximos 7 días', 'rango' => 'Rango'] as $valor => $etiqueta)
+                            @foreach (['vencidos' => 'Vencidos', 'proximos_7_dias' => 'Próximos 7 días', 'rango' => 'Rango personalizado'] as $valor => $etiqueta)
                                 <option value="{{ $valor }}" @selected(request('fecha_objetivo') === $valor)>{{ $etiqueta }}</option>
                             @endforeach
                         </select>
                     </div>
-                    <div>
-                        <label for="fecha_desde" class="block text-xs font-medium text-gray-500 uppercase mb-1">Desde</label>
-                        <input type="date" name="fecha_desde" id="fecha_desde" value="{{ request('fecha_desde') }}"
-                               min="{{ $limitesFecha->desde }}" max="{{ $limitesFecha->hasta }}"
-                               class="rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
-                    </div>
-                    <div>
-                        <label for="fecha_hasta" class="block text-xs font-medium text-gray-500 uppercase mb-1">Hasta</label>
-                        <input type="date" name="fecha_hasta" id="fecha_hasta" value="{{ request('fecha_hasta') }}"
-                               min="{{ $limitesFecha->desde }}" max="{{ $limitesFecha->hasta }}"
-                               class="rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
+                    <div x-show="fechaObjetivo === 'rango'" x-cloak class="flex gap-3">
+                        <div>
+                            <label for="fecha_desde" class="block text-xs font-medium text-gray-500 uppercase mb-1">Desde</label>
+                            <input type="date" name="fecha_desde" id="fecha_desde" value="{{ request('fecha_desde') }}"
+                                   min="{{ $limitesFecha->desde }}" max="{{ $limitesFecha->hasta }}"
+                                   class="rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
+                        </div>
+                        <div>
+                            <label for="fecha_hasta" class="block text-xs font-medium text-gray-500 uppercase mb-1">Hasta</label>
+                            <input type="date" name="fecha_hasta" id="fecha_hasta" value="{{ request('fecha_hasta') }}"
+                                   min="{{ $limitesFecha->desde }}" max="{{ $limitesFecha->hasta }}"
+                                   class="rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
+                        </div>
                     </div>
                     <button type="submit" class="px-4 py-2 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63] inline-flex items-center gap-1.5">
                         <x-heroicon-o-magnifying-glass class="w-4 h-4" />

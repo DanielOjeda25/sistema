@@ -64,6 +64,27 @@
                         <tbody class="bg-white divide-y divide-gray-200 text-gray-700">
                             @forelse ($solicitudes as $solicitud)
                                 @php($valoresSolicitud = $solicitud->only(['titulo', 'descripcion', 'estado', 'prioridad', 'proyecto_id', 'solicitado_por']))
+                                @php($valoresVerSolicitud = [
+                                    'id' => $solicitud->id,
+                                    'puede_editar' => auth()->user()->hasAnyRole('Jefe', 'PM', 'PO'),
+                                    'titulo' => $solicitud->titulo,
+                                    'descripcion' => $solicitud->descripcion,
+                                    'estado' => ucfirst($solicitud->estado),
+                                    'estado_color' => match ($solicitud->estado) {
+                                        'pendiente' => 'bg-amber-100 text-amber-800',
+                                        'aprobada' => 'bg-emerald-100 text-emerald-800',
+                                        'rechazada' => 'bg-red-100 text-red-800',
+                                        default => 'bg-gray-100 text-gray-700',
+                                    },
+                                    'prioridad' => ucfirst($solicitud->prioridad),
+                                    'prioridad_color' => match ($solicitud->prioridad) {
+                                        'alta' => 'bg-red-100 text-red-800',
+                                        'media' => 'bg-yellow-100 text-yellow-800',
+                                        default => 'bg-gray-100 text-gray-700',
+                                    },
+                                    'proyecto' => $solicitud->proyecto?->nombre ?? 'Sin proyecto',
+                                    'solicitante' => $solicitud->solicitante?->name ?? '—',
+                                ])
                                 <tr>
                                     <td class="px-6 py-4">{{ $solicitud->titulo }}</td>
                                     <td class="px-6 py-4">{{ $solicitud->proyecto?->nombre ?? 'N/A' }}</td>
@@ -78,11 +99,13 @@
                                                     <x-heroicon-o-clock class="w-5 h-5" />
                                                 </a>
                                             @endhasanyrole
-                                            <a href="{{ route('solicitudes-cambio.show', $solicitud) }}" class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
+                                            <button type="button" data-dispatch="ver-solicitud" data-valores='@json($valoresVerSolicitud)' class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
                                                 <x-heroicon-o-eye class="w-5 h-5" />
-                                            </a>
+                                            </button>
                                             @hasanyrole('Jefe|PM|PO')
-                                                <button type="button" data-abrir-modal="modal-solicitud-editar"
+                                                {{-- id conocido por el boton "Editar" del modal de lectura --}}
+                                                <button type="button" id="editar-solicitud-{{ $solicitud->id }}"
+                                                        data-abrir-modal="modal-solicitud-editar"
                                                         data-url="{{ route('solicitudes-cambio.update', $solicitud) }}"
                                                         data-valores='@json($valoresSolicitud)'
                                                         class="text-yellow-600 hover:text-yellow-800" title="Editar" aria-label="Editar">
@@ -139,5 +162,6 @@
     @hasanyrole('Jefe|PM|PO')
     @include('solicitudes_cambio._modal_editar')
     @endhasanyrole
+    <x-solicitud-view-modal />
     <x-confirmar-eliminar />
 </x-app-layout>
