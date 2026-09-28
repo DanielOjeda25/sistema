@@ -24,12 +24,11 @@
                     </div>
                     <div>
                         <x-input-label for="proyecto" value="Proyecto" />
-                        <select id="proyecto" name="proyecto" class="mt-1 block w-56 border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
-                            <option value="">— Todos —</option>
-                            @foreach ($proyectos as $p)
-                                <option value="{{ $p->id }}" @selected(request('proyecto') == $p->id)>{{ $p->nombre }}</option>
-                            @endforeach
-                        </select>
+                        <x-buscador-select name="proyecto" label=""
+                                           :opciones="$proyectos->mapWithKeys(fn ($p) => [$p->id => $p->nombre])->all()"
+                                           :seleccionado="request('proyecto')"
+                                           placeholder="Buscar proyecto..."
+                                           textoTodos="— Todos —" />
                     </div>
                     <x-primary-button>Filtrar</x-primary-button>
                     <a href="{{ route('sprints.index') }}" class="text-xs text-gray-500 hover:text-gray-700 underline">Limpiar</a>
@@ -223,7 +222,10 @@
                 const pieResumen = document.getElementById('resumen-sprint-pie');
                 let urlResumen = null;
 
-                const abrirResumen = () => document.body.appendChild(modalResumen) || modalResumen.classList.remove('hidden');
+                const abrirResumen = () => {
+                    document.body.appendChild(modalResumen);
+                    modalResumen.classList.remove('hidden');
+                };
                 const cerrarResumen = () => modalResumen.classList.add('hidden');
                 modalResumen.querySelectorAll('[data-cerrar-resumen]').forEach(el => el.addEventListener('click', cerrarResumen));
                 document.addEventListener('keydown', e => {

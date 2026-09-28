@@ -5,15 +5,18 @@
  * llevan data-valores (JSON nombre => valor) para rellenar el formulario
  * del modal y data-url para sobreescribir su action (edición).
  */
-document.addEventListener('DOMContentLoaded', () => {
-    /*
-     * Los modales de lectura (<x-*-view-modal>) viven dentro del contenedor
-     * del contenido, cuya animacion de entrada deja un transform activo: eso
-     * hace que su position:fixed se calcule respecto de ese contenedor y no
-     * del viewport (quedan descentrados). Los pasamos al <body> apenas carga.
-     */
-    document.querySelectorAll('[data-teleportar]').forEach(el => document.body.appendChild(el));
 
+/*
+ * Los modales de lectura (<x-*-view-modal>) viven dentro del contenedor
+ * del contenido, cuya animacion de entrada deja un transform activo: eso
+ * hace que su position:fixed se calcule respecto de ese contenedor y no
+ * del viewport (quedan descentrados). Los pasamos al <body> ANTES de que
+ * arranque Alpine: moverlos despues de inicializados les rompe los
+ * listeners de window y dejan de abrir.
+ */
+document.querySelectorAll('[data-teleportar]').forEach(el => document.body.appendChild(el));
+
+document.addEventListener('DOMContentLoaded', () => {
     /*
      * Modales de solo lectura (x-buscador... no; los <x-*-view-modal>):
      * el boton lleva data-dispatch="<evento>" y data-valores (JSON). Al hacer
@@ -45,7 +48,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (form) {
                 Object.entries(valores).forEach(([nombre, valor]) => {
                     const campo = form.elements[nombre];
-                    if (campo) campo.value = valor ?? '';
+                    if (campo) {
+                        campo.value = valor ?? '';
+                        // Los buscadores-select escuchan el change del oculto
+                        // para reflejar el valor en su cuadro visible.
+                        campo.dispatchEvent(new Event('change'));
+                    }
                 });
             }
         }

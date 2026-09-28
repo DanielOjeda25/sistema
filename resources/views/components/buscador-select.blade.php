@@ -76,6 +76,13 @@
                     this.texto = this.opciones[this.valor];
                 }
                 this.filtrar();
+                // crud-modal.js setea el input oculto a mano al abrir un modal de
+                // edicion: reflejamos ese valor en el campo visible.
+                this.$refs.oculto.addEventListener('change', () => {
+                    this.valor = this.$refs.oculto.value;
+                    this.texto = this.opciones[this.valor] ?? '';
+                    this.filtrar();
+                });
             },
 
             // Abre la lista hacia el lado con más espacio disponible
