@@ -47,7 +47,9 @@ class TareaController extends Controller
             })
             ->when($request->filled('estado'), fn ($query) => $query->where('estado', $request->string('estado')->toString())
             )
-            // Filtros extra del listado: prioridad y responsable.
+            // Filtros extra del listado: ubicacion, prioridad y responsable.
+            ->when($request->filled('proyecto_id'), fn ($query) => $query->where('proyecto_id', $request->integer('proyecto_id')))
+            ->when($request->filled('sprint_id'), fn ($query) => $query->where('sprint_id', $request->integer('sprint_id')))
             ->when($request->filled('prioridad'), fn ($query) => $query->where('prioridad', $request->string('prioridad')->toString()))
             ->when($request->filled('asignado_a'), fn ($query) => $query->where('asignado_a', $request->integer('asignado_a')))
             ->latest()

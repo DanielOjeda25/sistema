@@ -42,13 +42,20 @@
                     <div class="flex-1 min-w-[200px]">
                         <label for="q" class="block text-xs font-medium text-gray-500 uppercase mb-1">Buscar</label>
                         <input type="text" name="q" id="q" value="{{ request('q') }}" placeholder="Nombre o email..."
-                               class="w-full rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
+                               class="w-full h-11 rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] shadow-sm">
+                    </div>
+                    <div>
+                        <label for="rol" class="block text-xs font-medium text-gray-500 uppercase mb-1">Rol</label>
+                        <x-buscador-select name="rol" textoTodos="Todos"
+                                           :opciones="$roles->pluck('name', 'name')->all()"
+                                           :seleccionado="request('rol')"
+                                           placeholder="Buscar rol..." />
                     </div>
                     <button type="submit" class="px-4 py-2 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63] inline-flex items-center gap-1.5">
                         <x-heroicon-o-magnifying-glass class="w-4 h-4" />
                         Filtrar
                     </button>
-                    @if (request()->filled('q'))
+                    @if (request()->filled('q') || request()->filled('rol'))
                         <a href="{{ route('users.index') }}" class="text-xs text-gray-500 hover:text-gray-700 underline">Limpiar</a>
                     @endif
                 </form>
@@ -143,7 +150,7 @@
 
     @hasrole('Jefe')
         <x-crud-modal id="modal-usuario-crear" abrir-con-errores titulo="Nuevo Usuario">
-            <form method="POST" action="{{ route('users.store') }}" class="space-y-4">
+            <form method="POST" action="{{ route('users.store') }}" class="flex flex-col gap-4">
                 @csrf
                 <input type="hidden" name="desde_modal" value="1">
                 @include('users._campos')
@@ -155,7 +162,7 @@
         </x-crud-modal>
 
         <x-crud-modal id="modal-usuario-editar" abrir-con-errores titulo="Editar Usuario">
-            <form method="POST" action="{{ route('users.store') }}" class="space-y-4">
+            <form method="POST" action="{{ route('users.store') }}" class="flex flex-col gap-4">
                 @csrf
                 @method('PUT')
                 <input type="hidden" name="desde_modal" value="1">
@@ -217,7 +224,7 @@
         </x-crud-modal>
 
         <x-crud-modal id="modal-usuario-rol" titulo="Cambiar rol">
-            <form method="POST" action="{{ route('users.roles.update', ['user' => 0]) }}" class="space-y-4">
+            <form method="POST" action="{{ route('users.roles.update', ['user' => 0]) }}" class="flex flex-col gap-4">
                 @csrf
                 @method('PUT')
                 <p class="text-sm text-gray-500">Elegí el rol del usuario. Un usuario tiene un solo rol en el sistema.</p>

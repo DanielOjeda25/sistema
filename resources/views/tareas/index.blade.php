@@ -31,7 +31,21 @@
                     <div class="flex-1 min-w-[200px]">
                         <label for="q" class="block text-xs font-medium text-gray-500 uppercase mb-1">Buscar</label>
                         <input type="text" name="q" id="q" value="{{ request('q') }}" placeholder="Título o descripción..."
-                               class="w-full rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
+                               class="w-full h-11 rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] shadow-sm">
+                    </div>
+                    <div>
+                        <label for="proyecto_id" class="block text-xs font-medium text-gray-500 uppercase mb-1">Proyecto</label>
+                        <x-buscador-select name="proyecto_id" textoTodos="Todos"
+                                           :opciones="$proyectos->mapWithKeys(fn ($p) => [$p->id => $p->nombre])->all()"
+                                           :seleccionado="request('proyecto_id')"
+                                           placeholder="Buscar proyecto..." />
+                    </div>
+                    <div>
+                        <label for="sprint_id" class="block text-xs font-medium text-gray-500 uppercase mb-1">Sprint</label>
+                        <x-buscador-select name="sprint_id" textoTodos="Todos"
+                                           :opciones="$sprints->mapWithKeys(fn ($s) => [$s->id => trim(($s->proyecto?->nombre ? $s->proyecto->nombre . ' — ' : '') . $s->nombre)])->all()"
+                                           :seleccionado="request('sprint_id')"
+                                           placeholder="Buscar sprint..." />
                     </div>
                     <div>
                         <label for="estado" class="block text-xs font-medium text-gray-500 uppercase mb-1">Estado</label>
@@ -58,7 +72,7 @@
                         <x-heroicon-o-magnifying-glass class="w-4 h-4" />
                         Filtrar
                     </button>
-                    @if (request()->hasAny(['q', 'estado', 'prioridad', 'asignado_a']))
+                    @if (request()->hasAny(['q', 'estado', 'prioridad', 'asignado_a', 'proyecto_id', 'sprint_id']))
                         <a href="{{ route('tareas.index') }}" class="text-xs text-gray-500 hover:text-gray-700 underline">Limpiar</a>
                     @endif
                 </form>
@@ -156,7 +170,7 @@
     </div>
     @hasanyrole('Jefe|PM|PO')
     <x-crud-modal id="modal-tarea-crear" abrir-con-errores titulo="Nueva Tarea">
-        <form method="POST" action="{{ route('tareas.store') }}" class="space-y-4">
+        <form method="POST" action="{{ route('tareas.store') }}" class="flex flex-col gap-4">
             @csrf
             <input type="hidden" name="desde_modal" value="1">
             @include('tareas._campos', ['tarea' => null])

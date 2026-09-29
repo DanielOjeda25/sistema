@@ -48,6 +48,11 @@ class UserController extends Controller
                         ->orWhere('email', 'like', "%{$texto}%");
                 });
             })
+            // Filtro por rol del listado (los roles viven en Spatie).
+            ->when($request->filled('rol'), fn ($query) => $query->whereHas(
+                'roles',
+                fn ($rol) => $rol->where('name', $request->string('rol')->toString())
+            ))
             ->latest()
             ->paginate(15)
             ->withQueryString();
