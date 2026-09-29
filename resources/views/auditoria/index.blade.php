@@ -20,7 +20,7 @@
         @endif
 
         <form method="GET" class="mb-4 rounded-xl border border-gray-100 bg-gray-50/60 p-4">
-            <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
+            <div class="grid grid-cols-2 gap-3 md:grid-cols-5">
                 <div>
                     <label for="q" class="block text-xs font-medium text-gray-500 uppercase mb-1">Buscar</label>
                     <input type="text" id="q" name="q" value="{{ request('q') }}" placeholder="Evento o modelo..."
@@ -40,19 +40,19 @@
                                    :opciones="['created' => 'Creación', 'updated' => 'Modificación', 'deleted' => 'Eliminación']"
                                    :seleccionado="request('accion')"
                                    placeholder="Buscar acción..." />
-            </div>
-            <div class="mt-3 flex flex-wrap items-center gap-3">
-                @if (request('modelo'))
-                    <input type="hidden" name="modelo" value="{{ request('modelo') }}">
-                    <input type="hidden" name="registro" value="{{ request('registro') }}">
-                @endif
-                <button class="px-4 py-2.5 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63] inline-flex items-center gap-1.5">
-                    <x-heroicon-o-magnifying-glass class="w-4 h-4" />
-                    Filtrar
-                </button>
-                @if (request()->filled('q') || request()->filled('usuario') || request()->filled('accion') || request()->filled('rol'))
-                    <a href="{{ route('auditoria.index') }}" class="text-xs text-gray-500 hover:underline">Limpiar filtros</a>
-                @endif
+                <div class="flex items-end justify-end gap-3 col-span-2 md:col-span-1">
+                    @if (request('modelo'))
+                        <input type="hidden" name="modelo" value="{{ request('modelo') }}">
+                        <input type="hidden" name="registro" value="{{ request('registro') }}">
+                    @endif
+                    <button class="px-4 py-2.5 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63] inline-flex items-center gap-1.5">
+                        <x-heroicon-o-magnifying-glass class="w-4 h-4" />
+                        Filtrar
+                    </button>
+                    @if (request()->filled('q') || request()->filled('usuario') || request()->filled('accion') || request()->filled('rol'))
+                        <a href="{{ route('auditoria.index') }}" class="text-xs text-gray-500 hover:underline">Limpiar filtros</a>
+                    @endif
+                </div>
             </div>
         </form>
 

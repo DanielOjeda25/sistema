@@ -67,15 +67,15 @@
                                        class="w-full rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d]">
                             </div>
                         </div>
-                    </div>
-                    <div class="mt-3 flex items-center justify-end gap-3 border-t border-gray-200/70 pt-3">
-                        @if (request()->hasAny(['q', 'estado', 'proyecto_id', 'fecha_objetivo', 'fecha_desde', 'fecha_hasta']))
-                            <a href="{{ route('hitos.index') }}" class="text-xs text-gray-500 hover:text-gray-700 underline">Limpiar</a>
-                        @endif
-                        <button type="submit" class="px-4 py-2 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63] inline-flex items-center gap-1.5">
-                            <x-heroicon-o-magnifying-glass class="w-4 h-4" />
-                            Filtrar
-                        </button>
+                        <div class="flex items-end justify-end gap-3 col-span-2 xl:col-span-1">
+                            @if (request()->hasAny(['q', 'estado', 'proyecto_id', 'fecha_objetivo', 'fecha_desde', 'fecha_hasta']))
+                                <a href="{{ route('hitos.index') }}" class="text-xs text-gray-500 hover:text-gray-700 underline">Limpiar</a>
+                            @endif
+                            <button type="submit" class="px-4 py-2 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63] inline-flex items-center gap-1.5">
+                                <x-heroicon-o-magnifying-glass class="w-4 h-4" />
+                                Filtrar
+                            </button>
+                        </div>
                     </div>
                 </form>
 
@@ -156,7 +156,7 @@
 
     @hasanyrole('Jefe|PM|PO')
     <x-crud-modal id="modal-hito-crear" abrir-con-errores titulo="Nuevo Hito">
-        <form method="POST" action="{{ route('hitos.store') }}" class="space-y-4">
+        <form method="POST" action="{{ route('hitos.store') }}" class="flex flex-col gap-4">
             @csrf
             <input type="hidden" name="desde_modal" value="1">
             @include('hitos._campos', ['hito' => null])
