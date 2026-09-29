@@ -4,23 +4,23 @@
     y el boton del listado le asigna el objeto con los datos de la fila.
 --}}
 <div data-teleportar x-data="{ detalle: null }" @ver-cliente.window="detalle = $event.detail" x-show="detalle" x-cloak class="fixed inset-0 overflow-y-auto" style="z-index: 9999" role="dialog" aria-modal="true" @keydown.escape.window="detalle = null">
-    <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm" @click="detalle = null"></div>
+    <div class="fixed inset-0 bg-gray-900/60" @click="detalle = null"></div>
 
     <div class="min-h-full flex items-center justify-center p-4">
-        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden" x-show="detalle"
+        <div class="relative m-auto h-fit bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden" x-show="detalle"
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="opacity-0 scale-95"
              x-transition:enter-end="opacity-100 scale-100">
             <template x-if="detalle">
                 <div>
-                    {{-- Cabecera con avatar de iniciales, nombre y badge (el cierre esta en el boton "Cerrar" del pie) --}}
-                    <div class="relative bg-gradient-to-br from-[#202225] to-[#2d3134] px-6 py-5 text-white">
-                        <div class="flex items-center gap-4">
-                            <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#00b87d] text-lg font-bold text-white"
+                    {{-- Cabecera con avatar de iniciales, nombre y empresa (el cierre esta en el boton "Cerrar" del pie) --}}
+                    <div class="flex items-start justify-between gap-4 p-6 border-b border-gray-100">
+                        <div class="flex items-center gap-4 min-w-0">
+                            <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-base font-bold text-[#008c63]"
                                   x-text="(detalle.nombre || '?').split(' ').map(p => p[0]).slice(0, 2).join('')"></span>
                             <div class="min-w-0">
-                                <h3 class="text-xl font-bold leading-tight" x-text="detalle.nombre"></h3>
-                                <p class="text-sm text-slate-300 mt-0.5 truncate" x-text="detalle.empresa"></p>
+                                <h3 class="text-xl font-bold text-gray-800 leading-tight" x-text="detalle.nombre"></h3>
+                                <p class="text-xs text-gray-400 mt-0.5 truncate" x-text="detalle.empresa"></p>
                             </div>
                         </div>
                     </div>

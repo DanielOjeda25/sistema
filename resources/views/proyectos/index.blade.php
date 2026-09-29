@@ -85,6 +85,16 @@
                         <tbody class="bg-white divide-y divide-gray-200 text-gray-700">
                             @forelse ($proyectos as $proyecto)
                                 @php($valoresProyecto = $proyecto->only(['nombre', 'descripcion', 'estado', 'cliente_id', 'pm_id']) + ['fecha_inicio' => $proyecto->fecha_inicio?->format('Y-m-d'), 'fecha_fin_estimada' => $proyecto->fecha_fin_estimada?->format('Y-m-d')])
+                                @php($valoresVerProyecto = [
+                                    'nombre' => $proyecto->nombre,
+                                    'cliente' => $proyecto->cliente?->empresa ?: trim(($proyecto->cliente?->nombre ?? '').' '.($proyecto->cliente?->apellido ?? '')) ?: 'Sin cliente',
+                                    'estado' => ucfirst(str_replace('_', ' ', $proyecto->estado)),
+                                    'avance' => $proyecto->tareas->count() > 0 ? (int) round($proyecto->tareas->where('estado', 'completada')->count() * 100 / $proyecto->tareas->count()) : 0,
+                                    'pm' => $proyecto->pm?->name ?? 'Sin asignar',
+                                    'fechas' => trim(($proyecto->fecha_inicio?->format('d/m/Y') ?? 'Sin inicio').' — '.($proyecto->fecha_fin_estimada?->format('d/m/Y') ?? 'sin fecha estimada')),
+                                    'tareas' => $proyecto->tareas->where('estado', 'completada')->count().' de '.$proyecto->tareas->count().' listas',
+                                    'detalle' => route('proyectos.show', $proyecto),
+                                ])
                                 <tr>
                                     <td class="px-6 py-4">{{ $proyecto->nombre }}</td>
                                     <td class="px-6 py-4">{{ $proyecto->cliente?->nombre ?? 'N/A' }}</td>
@@ -99,7 +109,7 @@
                                                     <x-heroicon-o-clock class="w-5 h-5" />
                                                 </a>
                                             @endhasanyrole
-                                            <button type="button" data-panel="{{ route('proyectos.show', $proyecto) }}" class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
+                                            <button type="button" data-dispatch="ver-proyecto" data-valores='@json($valoresVerProyecto)' class="text-blue-600 hover:text-blue-800" title="Ver" aria-label="Ver">
                                                     <x-heroicon-o-eye class="w-5 h-5" />
                                                 </button>
                                             <a href="{{ route('tareas.tablero', ['proyecto' => $proyecto->id]) }}" class="text-indigo-600 hover:text-indigo-800" title="Ver tablero de tareas" aria-label="Ver tablero de tareas">
@@ -163,6 +173,7 @@
     @hasanyrole('Jefe|PM')
     @include('proyectos._modal_editar')
     @endhasanyrole
+    <x-proyecto-view-modal />
     <x-confirmar-eliminar />
     <x-panel-modal />
 </x-app-layout>

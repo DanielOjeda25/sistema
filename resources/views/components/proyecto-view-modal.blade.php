@@ -5,25 +5,23 @@
     tareas, informes) sigue en proyectos.show, enlazado desde el pie.
 --}}
 <div data-teleportar x-data="{ detalle: null }" @ver-proyecto.window="detalle = $event.detail" x-show="detalle" x-cloak class="fixed inset-0 overflow-y-auto" style="z-index: 9999" role="dialog" aria-modal="true" @keydown.escape.window="detalle = null">
-    <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm" @click="detalle = null"></div>
+    <div class="fixed inset-0 bg-gray-900/60" @click="detalle = null"></div>
 
     <div class="min-h-full flex items-center justify-center p-4">
-        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden" x-show="detalle"
+        <div class="relative m-auto h-fit bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden" x-show="detalle"
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="opacity-0 scale-95"
              x-transition:enter-end="opacity-100 scale-100">
             <template x-if="detalle">
                 <div>
-                    {{-- Cabecera: nombre, cliente y estado (el cierre esta en el boton "Cerrar" del pie) --}}
-                    <div class="relative bg-gradient-to-br from-[#202225] to-[#2d3134] px-6 py-5 text-white">
-                        <div class="flex items-center gap-4">
-                            <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white/10">
-                                <x-heroicon-o-squares-2x2 class="h-7 w-7 text-[#00e5a0]" />
-                            </span>
-                            <div class="min-w-0">
-                                <h3 class="text-lg font-bold leading-tight" x-text="detalle.nombre"></h3>
-                                <p class="text-xs text-slate-300 mt-0.5 truncate" x-text="detalle.cliente"></p>
+                    {{-- Cabecera: nombre, insignia de estado y cliente (el cierre esta en el boton "Cerrar" del pie) --}}
+                    <div class="flex items-start justify-between gap-4 p-6 border-b border-gray-100">
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-gray-700" x-text="detalle.estado"></span>
                             </div>
+                            <h3 class="text-xl font-bold text-gray-800" x-text="detalle.nombre"></h3>
+                            <p class="text-xs text-gray-400 mt-1 truncate" x-text="detalle.cliente"></p>
                         </div>
                     </div>
 
@@ -65,17 +63,6 @@
                             <div>
                                 <p class="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Tareas</p>
                                 <p class="text-sm font-medium text-gray-800" x-text="detalle.tareas"></p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3 py-3">
-                            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-[#008c63]">
-                                <x-heroicon-o-flag class="h-5 w-5" />
-                            </span>
-                            <div class="flex items-center justify-between w-full">
-                                <div>
-                                    <p class="text-[11px] font-semibold uppercase tracking-wide text-gray-400">Estado</p>
-                                    <span class="mt-1 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-gray-100 text-gray-700" x-text="detalle.estado"></span>
-                                </div>
                             </div>
                         </div>
                     </div>
