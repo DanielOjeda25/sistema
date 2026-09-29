@@ -48,13 +48,11 @@
     </div>
 </div>
 
-<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-    <div>
-        <x-input-label for="{{ $prefijo ?? '' }}estado" value="Estado" />
-        <x-buscador-select name="estado" :conBuscador="false" textoTodos=""
-                           :opciones="['activo' => 'Activo', 'inactivo' => 'Inactivo']"
-                           :seleccionado="old('estado', $cliente->estado ?? 'activo')"
-                           placeholder="Estado..." />
-        <x-input-error class="mt-2" :messages="$errors->get('estado')" />
-    </div>
+<div>
+    <x-input-label for="{{ $prefijo ?? '' }}estado" value="Estado" />
+    <x-buscador-select name="estado" :conBuscador="false" textoTodos=""
+                       :opciones="['activo' => 'Activo', 'inactivo' => 'Inactivo']"
+                       :seleccionado="old('estado', $cliente->estado ?? 'activo')"
+                       placeholder="Estado..." />
+    <x-input-error class="mt-2" :messages="$errors->get('estado')" />
 </div>
