@@ -166,7 +166,7 @@
 
     @hasanyrole('Jefe|PM|PO')
     <x-crud-modal id="modal-solicitud-crear" abrir-con-errores titulo="Nueva Solicitud de Cambio" ancho="max-w-3xl">
-        <form method="POST" action="{{ route('solicitudes-cambio.store') }}" class="space-y-4">
+        <form method="POST" action="{{ route('solicitudes-cambio.store') }}" class="flex flex-col gap-4">
             @csrf
             <input type="hidden" name="desde_modal" value="1">
             @include('solicitudes_cambio._campos', ['solicitud' => null])

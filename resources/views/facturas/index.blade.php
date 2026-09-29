@@ -129,7 +129,7 @@
 
     @hasanyrole('Jefe|PM')
     <x-crud-modal id="modal-factura-crear" abrir-con-errores titulo="Nueva Factura">
-        <form method="POST" action="{{ route('facturas.store') }}" class="space-y-4">
+        <form method="POST" action="{{ route('facturas.store') }}" class="flex flex-col gap-4">
             @csrf
             <input type="hidden" name="desde_modal" value="1">
             @include('facturas._campos', ['factura' => null])

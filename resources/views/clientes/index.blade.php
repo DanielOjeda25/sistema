@@ -121,7 +121,7 @@
 
     @hasanyrole('Jefe|PM')
         <x-crud-modal id="modal-cliente-crear" abrir-con-errores titulo="Nuevo Cliente">
-            <form method="POST" action="{{ route('clientes.store') }}" class="space-y-4">
+            <form method="POST" action="{{ route('clientes.store') }}" class="flex flex-col gap-4">
                 @csrf
                 <input type="hidden" name="desde_modal" value="1">
                 @include('clientes._campos', ['prefijo' => 'crear-'])

@@ -158,7 +158,7 @@
 
     @hasanyrole('Jefe|PM')
     <x-crud-modal id="modal-proyecto-crear" abrir-con-errores titulo="Nuevo Proyecto">
-        <form method="POST" action="{{ route('proyectos.store') }}" class="space-y-4">
+        <form method="POST" action="{{ route('proyectos.store') }}" class="flex flex-col gap-4">
             @csrf
             <input type="hidden" name="desde_modal" value="1">
             @include('proyectos._campos', ['proyectoItem' => null])

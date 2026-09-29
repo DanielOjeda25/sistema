@@ -1,5 +1,5 @@
     <x-crud-modal id="modal-proyecto-editar" titulo="Editar Proyecto">
-        <form method="POST" action="{{ route('proyectos.store') }}" class="space-y-4">
+        <form method="POST" action="{{ route('proyectos.store') }}" class="flex flex-col gap-4">
             @csrf
             @method('PUT')
             <input type="hidden" name="desde_modal" value="1">

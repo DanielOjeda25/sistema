@@ -1,5 +1,5 @@
     <x-crud-modal id="modal-factura-editar" titulo="Editar Factura">
-        <form method="POST" action="{{ route('facturas.store') }}" class="space-y-4">
+        <form method="POST" action="{{ route('facturas.store') }}" class="flex flex-col gap-4">
             @csrf
             @method('PUT')
             <input type="hidden" name="desde_modal" value="1">

@@ -1,5 +1,5 @@
         <x-crud-modal id="modal-cliente-editar" titulo="Editar Cliente">
-            <form method="POST" action="{{ route('clientes.store') }}" class="space-y-4" data-crud-form>
+            <form method="POST" action="{{ route('clientes.store') }}" class="flex flex-col gap-4" data-crud-form>
                 @csrf
                 @method('PUT')
                 <input type="hidden" name="desde_modal" value="1">

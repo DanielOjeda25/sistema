@@ -1,5 +1,5 @@
     <x-crud-modal id="modal-tarea-editar" titulo="Editar Tarea">
-        <form method="POST" action="{{ route('tareas.store') }}" class="space-y-4" data-crud-form>
+        <form method="POST" action="{{ route('tareas.store') }}" class="flex flex-col gap-4" data-crud-form>
             @csrf
             @method('PUT')
             <input type="hidden" name="desde_modal" value="1">
