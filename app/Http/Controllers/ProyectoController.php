@@ -111,6 +111,26 @@ class ProyectoController extends Controller
                     $hechas = $sp->tareas->where('estado', 'completada')->count();
                     $fin = $sp->fecha_fin?->format('d/m/Y');
                     $avance = $total > 0 ? (int) round($hechas * 100 / $total) : 0;
+                    $completo = $total > 0 && $hechas === $total;
+                    $termino = $sp->fecha_fin?->isPast() ?? false;
+                    // Un sprint que ya termino sin actividades cargadas no deja
+                    // nada pendiente: para el cliente es una etapa cerrada.
+                    $cerrado = $completo || ($termino && $total === 0);
+
+                    // Detalle en lenguaje del cliente: sin contadores triviales
+                    // ("1 de 1") ni la palabra "tareas"; el rango de fechas ya
+                    // se muestra aparte en la linea de tiempo.
+                    if ($completo) {
+                        $detalle = $total === 1 ? 'La actividad está lista' : "Las {$total} actividades están listas";
+                    } elseif ($termino && $total > 0) {
+                        $detalle = "Finalizó el {$fin} con actividades sin completar";
+                    } elseif ($termino) {
+                        $detalle = "Cerró el {$fin} sin actividades registradas";
+                    } elseif ($sp->fecha_inicio?->isFuture()) {
+                        $detalle = $total > 0 ? "{$total} actividades planificadas" : 'Actividades por definir';
+                    } else {
+                        $detalle = $total > 0 ? "{$total} actividades en camino" : 'Actividades por definir';
+                    }
 
                     return [
                         'fecha' => $sp->fecha_inicio,
@@ -118,11 +138,13 @@ class ProyectoController extends Controller
                         'fecha_fin_texto' => $fin,
                         'tipo' => 'sprint',
                         'titulo' => $sp->nombre,
-                        'detalle' => trim("{$hechas} de {$total} tareas listas".($fin ? " · hasta el {$fin}" : '')),
+                        'detalle' => $detalle,
                         'descripcion' => $sp->descripcion,
                         'resumen_ia' => $sp->resumen_ia,
-                        'hecho' => $total > 0 && $hechas === $total,
-                        'vencido' => false,
+                        'hecho' => $cerrado,
+                        // Un sprint que ya termino con actividad pendiente tambien
+                        // queda atrasado: asi el "Estamos acá" no cae en un punto vencido.
+                        'vencido' => ! $completo && $termino && $total > 0,
                         'avance' => $avance,
                     ];
                 });
@@ -153,6 +175,38 @@ class ProyectoController extends Controller
 
                 return $item;
             });
+
+            // Con muchos puntos la linea se vuelve ilegible: el pasado completado
+            // se colapsa en un unico nodo-resumen y queda visible lo relevante
+            // (el ultimo completado como contexto, lo atrasado, lo en curso y lo
+            // pendiente). El historial viaja en el nodo para listarlo en el pop-up.
+            $completados = $linea->filter(fn ($item) => $item['hecho'])->sortBy('fecha');
+            if ($completados->count() > 2) {
+                $corte = $completados->last()['fecha'];
+
+                $historial = $linea
+                    ->filter(fn ($item) => $item['hecho'] && $item['fecha']->lt($corte))
+                    ->values();
+
+                $linea = collect([
+                    [
+                        'fecha' => $historial->first()['fecha'],
+                        'fecha_texto' => null,
+                        'tipo' => 'resumen',
+                        'titulo' => $historial->count() === 1
+                            ? 'Etapa completada'
+                            : 'Etapas completadas ('.$historial->count().')',
+                        'detalle' => 'Toca para ver el historial',
+                        'hecho' => true,
+                        'vencido' => false,
+                        'estado' => 'Completado',
+                        'estado_clase' => 'bg-emerald-100 text-emerald-700',
+                        'historial' => $historial->all(),
+                    ],
+                ])->merge(
+                    $linea->filter(fn ($item) => ! $item['hecho'] || ! $item['fecha']->lt($corte))->values()
+                )->values();
+            }
 
             $novedades = $proyecto->actualizaciones()
                 ->with('autor')

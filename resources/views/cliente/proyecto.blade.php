@@ -16,9 +16,9 @@
     </x-slot>
 
     <div class="py-8">
-        <div class="max-w-7xl mx-auto px-6 grid gap-6 xl:grid-cols-[1fr_320px] xl:items-start">
-
-            <div class="space-y-6 min-w-0">
+        {{-- Una sola columna a lo ancho: la linea de tiempo es la protagonista
+             y necesita todo el ancho para que las etapas no queden apretadas --}}
+        <div class="max-w-7xl mx-auto px-6 space-y-6">
 
             {{-- Resumen de avance --}}
             <div class="bg-white rounded-2xl shadow-sm p-6">
@@ -54,16 +54,28 @@
                     $marcadoCurso = false;
                 @endphp
 
-                {{-- Grilla elastica: todos los puntos entran en el ancho disponible,
-                     sin scroll horizontal sin importar cuantos haya --}}
-                <div class="hidden md:block mt-6 pb-2">
-                    <div class="relative px-6">
-                        {{-- riel de fondo y riel de avance --}}
-                        <div class="absolute top-9 left-8 right-8 h-1.5 bg-gray-200 rounded-full"></div>
-                        <div class="absolute top-9 left-8 h-1.5 bg-gradient-to-r from-[#00b87d] to-[#00d99a] rounded-full animar-riel"
-                             style="width: {{ $llenado }}%"></div>
+                {{-- Linea elastica: con pocos puntos estira todo el ancho; cuando hay
+                     demasiados, cada punto conserva su minimo y aparece un scroll
+                     con flechas en vez de comprimir todo --}}
+                <div class="hidden md:block mt-6 pb-2"
+                     x-data="{ desborde: false, medir() { this.desborde = this.$refs.riel.scrollWidth > this.$refs.riel.clientWidth + 4 }, desplazar(d) { this.$refs.riel.scrollBy({ left: d, behavior: 'smooth' }) } }"
+                     x-init="medir()" @resize.window="medir()">
+                    <div class="flex items-start gap-1">
+                        <button type="button" x-show="desborde" x-cloak @click="desplazar(-460)"
+                                class="mt-12 shrink-0 h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 flex items-center justify-center"
+                                aria-label="Ver etapas anteriores">
+                            <x-heroicon-o-chevron-left class="w-5 h-5" />
+                        </button>
 
-                        <div class="grid" style="grid-template-columns: repeat({{ $linea->count() }}, minmax(0, 1fr));">
+                        <div x-ref="riel" class="flex-1 min-w-0 overflow-x-auto scroll-oculto snap-x">
+                            <div class="relative grid min-w-full"
+                                 style="grid-template-columns: repeat({{ $linea->count() }}, minmax(min-content, 1fr));">
+                                {{-- riel de fondo y riel de avance: dentro de la grilla para
+                                     que abarquen tambien el ancho scrolleable --}}
+                                <div class="absolute top-9 left-8 right-8 h-1.5 bg-gray-200 rounded-full"></div>
+                                <div class="absolute top-9 left-8 h-1.5 bg-gradient-to-r from-[#00b87d] to-[#00d99a] rounded-full animar-riel"
+                                     style="width: {{ $llenado }}%"></div>
+
                             @foreach ($linea as $i => $item)
                                 @php
                                     $esCurso = ! $item['hecho'] && ! $item['vencido'] && ! $marcadoCurso;
@@ -77,7 +89,7 @@
                                         ? trim($item['fecha_texto'].(! empty($item['fecha_fin_texto']) ? ' → '.$item['fecha_fin_texto'] : ''))
                                         : ($item['fecha_texto'] ? 'Fecha clave: '.$item['fecha_texto'] : '');
                                 @endphp
-                                <div class="relative min-w-0 px-2 text-center animar-item cursor-pointer"
+                                <div class="relative px-2 text-center animar-item cursor-pointer snap-start"
                                      style="animation-delay: {{ $i * 0.18 }}s"
                                      @click="abrir({{ $i }})" title="Ver detalle">
                                     {{-- Marcador de donde esta el proyecto hoy --}}
@@ -95,13 +107,14 @@
                                             @elseif ($esCurso)
                                                 <x-heroicon-o-play class="w-4 h-4" />
                                             @else
-                                                <span class="text-sm font-bold">{{ $i + 1 }}</span>
+                                                {{-- Punto gris liso: un numero suelto parecia un contador --}}
+                                                <span class="w-2.5 h-2.5 rounded-full bg-white/90"></span>
                                             @endif
                                         </div>
                                     </div>
                                     <span class="inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full mb-1
-                                        {{ $item['tipo'] === 'hito' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-50 text-emerald-700' }}">
-                                        {{ $item['tipo'] === 'hito' ? 'Hito' : 'Etapa' }}
+                                        {{ $item['tipo'] === 'hito' ? 'bg-amber-100 text-amber-700' : ($item['tipo'] === 'resumen' ? 'bg-indigo-100 text-indigo-700' : 'bg-emerald-50 text-emerald-700') }}">
+                                        {{ $item['tipo'] === 'hito' ? 'Hito' : ($item['tipo'] === 'resumen' ? 'Historial' : 'Etapa') }}
                                     </span>
                                     <p class="text-sm font-semibold text-gray-800 leading-snug">{{ $item['titulo'] }}</p>
                                     <span class="inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-full {{ $estadoClase }}">
@@ -120,7 +133,14 @@
                                     @endif
                                 </div>
                             @endforeach
+                            </div>
                         </div>
+
+                        <button type="button" x-show="desborde" x-cloak @click="desplazar(460)"
+                                class="mt-12 shrink-0 h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 flex items-center justify-center"
+                                aria-label="Ver etapas siguientes">
+                            <x-heroicon-o-chevron-right class="w-5 h-5" />
+                        </button>
                     </div>
                 </div>
 
@@ -186,19 +206,36 @@
                         {{-- h-fit: la tarjeta abraza su contenido; sin esto el flex la
                              estira hasta el alto del contenedor y sobra espacio abajo --}}
                         <div class="relative m-auto h-fit bg-white rounded-2xl shadow-xl w-full max-w-2xl p-5" x-show="abierta">
-                            <button @click="abierta = null" class="absolute top-3 right-4 text-gray-400 hover:text-gray-600 text-xl leading-none" aria-label="Cerrar">×</button>
+                            <button @click="abierta = null" class="absolute top-3 right-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-100 hover:text-gray-700" aria-label="Cerrar">
+                                <x-heroicon-o-x-mark class="h-5 w-5" />
+                            </button>
                             <template x-if="abierta">
                                 <div>
                                     <div class="flex items-center gap-2 mb-2">
                                         <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
-                                            :class="abierta.tipo === 'hito' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-50 text-emerald-700'"
-                                            x-text="abierta.tipo === 'hito' ? 'Hito' : 'Etapa'"></span>
+                                            :class="abierta.tipo === 'hito' ? 'bg-amber-100 text-amber-700' : (abierta.tipo === 'resumen' ? 'bg-indigo-100 text-indigo-700' : 'bg-emerald-50 text-emerald-700')"
+                                            x-text="abierta.tipo === 'hito' ? 'Hito' : (abierta.tipo === 'resumen' ? 'Historial' : 'Etapa')"></span>
                                         <span class="text-xs text-gray-400" x-text="abierta.fecha_texto"></span>
                                     </div>
                                     <h4 class="text-lg font-bold text-gray-800" x-text="abierta.titulo"></h4>
                                     <span class="mt-2 inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full"
                                         :class="abierta.estado_clase"
                                         x-text="abierta.estado"></span>
+
+                                    {{-- Nodo-resumen: lista el historial que quedo colapsado --}}
+                                    <div x-show="abierta.historial" class="mt-3 space-y-2">
+                                        <template x-for="(itemHistorial, idx) in (abierta.historial || [])" :key="idx">
+                                            <div class="flex items-center justify-between gap-3 rounded-lg border border-gray-100 bg-gray-50 px-3 py-2">
+                                                <div class="min-w-0">
+                                                    <span class="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full mr-2"
+                                                        :class="itemHistorial.tipo === 'hito' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-50 text-emerald-700'"
+                                                        x-text="itemHistorial.tipo === 'hito' ? 'Hito' : 'Etapa'"></span>
+                                                    <span class="text-sm text-gray-800" x-text="itemHistorial.titulo"></span>
+                                                </div>
+                                                <span class="text-xs text-gray-400 shrink-0" x-text="itemHistorial.fecha_texto"></span>
+                                            </div>
+                                        </template>
+                                    </div>
 
                                     <p class="mt-3 text-sm text-gray-600 leading-relaxed" x-show="abierta.descripcion" x-text="abierta.descripcion"></p>
 
@@ -228,15 +265,16 @@
 
             </div>
 
-            </div>
+            {{-- Detalle del proyecto: las tres secciones en columnas iguales --}}
+            <div class="grid gap-6 lg:grid-cols-3 lg:items-start">
 
-            <aside class="space-y-6 xl:sticky xl:top-24">
             {{-- Novedades visibles para el cliente --}}
             <div class="bg-white rounded-2xl shadow-sm p-6">
                 <h3 class="text-lg font-bold text-gray-800 mb-3">Novedades del equipo</h3>
                 @forelse ($novedades as $novedad)
                     <div class="border-b last:border-0 border-gray-100 py-3">
-                        <p class="text-sm text-gray-700">{{ $novedad->contenido }}</p>
+                        <p class="text-sm font-medium text-gray-800">{{ $novedad->titulo }}</p>
+                        <p class="text-sm text-gray-600 mt-0.5">{{ $novedad->descripcion }}</p>
                         <p class="text-xs text-gray-400 mt-1">
                             {{ $novedad->autor?->name ?? 'Equipo' }} · {{ $novedad->fecha?->format('d/m/Y') }}
                         </p>
@@ -284,7 +322,7 @@
                     <p class="text-sm text-gray-400">Todavía no hay material aprobado para este proyecto.</p>
                 @endforelse
             </div>
-            </aside>
+            </div>
 
         </div>
     </div>
