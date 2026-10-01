@@ -28,6 +28,7 @@ return [
         ['ruta' => 'tareas.index',        'label' => 'Tareas',              'icono' => 'heroicon-o-queue-list',     'roles' => ['Jefe', 'PM', 'PO', 'Programador'], 'activo_en' => ['tareas.index', 'tareas.show']],
         ['ruta' => 'facturas.index',      'label' => 'Facturas',            'icono' => 'heroicon-o-banknotes',      'roles' => ['Jefe', 'PM', 'PO', 'Programador', 'Cliente']],
         ['ruta' => 'clientes.index',      'label' => 'Clientes y empresas', 'icono' => 'heroicon-o-building-office-2', 'roles' => ['Jefe', 'PM', 'PO', 'Programador']],
+        ['ruta' => 'reportes.index',      'label' => 'Reportes',            'icono' => 'heroicon-o-chart-bar',      'roles' => ['Jefe', 'PM', 'PO'], 'activo_en' => ['reportes.*']],
         ['ruta' => 'sprints.index',       'label' => 'Sprints',             'icono' => 'heroicon-o-rocket-launch',                        'roles' => ['Jefe', 'PM', 'PO', 'Programador'], 'seccion' => 'Modulos'],
         ['ruta' => 'hitos.index',         'label' => 'Hitos',               'icono' => 'heroicon-o-flag',                        'roles' => ['Jefe', 'PM', 'PO', 'Programador'], 'seccion' => 'Modulos'],
         ['ruta' => 'solicitudes-cambio.index', 'label' => 'Cambios',        'icono' => 'heroicon-o-arrow-path',                        'roles' => ['Jefe', 'PM', 'PO', 'Programador'], 'seccion' => 'Modulos'],

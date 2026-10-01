@@ -4,9 +4,15 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 Detalle del Proyecto
             </h2>
-            <a href="{{ route('proyectos.index') }}" class="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-300 rounded-lg text-xs font-semibold text-gray-700 uppercase tracking-widest hover:bg-gray-50">
-                <x-heroicon-o-arrow-left class="w-4 h-4" /> Volver
-            </a>
+            <div class="flex items-center gap-2">
+                <a href="{{ route('reportes.proyecto.pdf', $proyecto) }}"
+                   class="inline-flex items-center gap-1.5 px-3 py-2 bg-[#00b87d] border border-transparent rounded-lg text-xs font-semibold text-white uppercase tracking-widest hover:bg-[#008c63]">
+                    <x-heroicon-o-document-chart-bar class="w-4 h-4" /> Reporte del proyecto
+                </a>
+                <a href="{{ route('proyectos.index') }}" class="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-300 rounded-lg text-xs font-semibold text-gray-700 uppercase tracking-widest hover:bg-gray-50">
+                    <x-heroicon-o-arrow-left class="w-4 h-4" /> Volver
+                </a>
+            </div>
         </div>
     </x-slot>
 

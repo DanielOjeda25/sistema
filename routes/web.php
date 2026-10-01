@@ -9,6 +9,7 @@ use App\Http\Controllers\HitoController;
 use App\Http\Controllers\InformeIAController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProyectoController;
+use App\Http\Controllers\ReportesController;
 use App\Http\Controllers\SolicitudCambioController;
 use App\Http\Controllers\SprintController;
 use App\Http\Controllers\SprintSummaryController;
@@ -20,6 +21,7 @@ use App\Models\Factura;
 use App\Models\Hito;
 use App\Models\Proyecto;
 use App\Models\Tarea;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -78,6 +80,23 @@ Route::get('/dashboard', function () {
             'completada' => Tarea::where('estado', 'completada')->count(),
             'cancelada' => Tarea::where('estado', 'cancelada')->count(),
         ];
+
+        // Donut del dashboard: mismo dato, formato para Chart.js.
+        $datos['tareasDonut'] = [
+            ['etiqueta' => 'Pendientes', 'valor' => $datos['tareasPorEstado']['pendiente'], 'color' => '#f59e0b'],
+            ['etiqueta' => 'En progreso', 'valor' => $datos['tareasPorEstado']['en_progreso'], 'color' => '#38bdf8'],
+            ['etiqueta' => 'Completadas', 'valor' => $datos['tareasPorEstado']['completada'], 'color' => '#00b87d'],
+            ['etiqueta' => 'Canceladas', 'valor' => $datos['tareasPorEstado']['cancelada'], 'color' => '#94a3b8'],
+        ];
+
+        // Carga del equipo: tareas activas (pendientes o en progreso) por persona.
+        $datos['cargaPorPersona'] = User::asignables()
+            ->withCount(['tareasAsignadas as tareas_activas' => fn ($q) => $q->whereIn('estado', ['pendiente', 'en_progreso'])])
+            ->orderByDesc('tareas_activas')
+            ->get()
+            ->filter(fn ($u) => $u->tareas_activas > 0)
+            ->map(fn ($u) => ['etiqueta' => $u->name, 'valor' => $u->tareas_activas])
+            ->values();
 
         $datos['totalFacturado'] = Factura::sum('monto');
 
@@ -261,6 +280,27 @@ Route::middleware(['auth', 'role:Jefe|PM|PO'])->group(function () {
         ->name('informes-ia.publish');
     Route::patch('informes-ia/{entregable}/retirar', [InformeIAController::class, 'unpublish'])
         ->name('informes-ia.unpublish');
+});
+
+// REPORTES — consolidados para el equipo interno. El Cliente no entra:
+// su informacion vive en el portal y en los informes aprobados.
+Route::middleware(['auth', 'role:Jefe|PM|PO'])->group(function () {
+    Route::get('reportes', [ReportesController::class, 'index'])->name('reportes.index');
+    Route::get('reportes/proyectos', [ReportesController::class, 'proyectos'])->name('reportes.proyectos');
+    Route::get('reportes/proyectos/exportar', [ReportesController::class, 'exportarProyectos'])->name('reportes.proyectos.exportar');
+});
+
+// Facturacion y cobranzas: plata, solo Jefe y PM.
+Route::middleware(['auth', 'role:Jefe|PM'])->group(function () {
+    Route::get('reportes/facturacion', [ReportesController::class, 'facturacion'])->name('reportes.facturacion');
+    Route::get('reportes/facturacion/exportar', [ReportesController::class, 'exportarFacturacion'])->name('reportes.facturacion.exportar');
+});
+
+// Reporte de un proyecto puntual: el equipo interno ve todo; el Cliente solo
+// sus propios proyectos y con la informacion aprobada para su vista.
+Route::middleware(['auth'])->group(function () {
+    Route::get('reportes/proyectos/{proyecto}/pdf', [ReportesController::class, 'proyectoPdf'])
+        ->name('reportes.proyecto.pdf');
 });
 
 /*

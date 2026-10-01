@@ -1,17 +1,23 @@
 <x-app-layout>
     <x-slot name="header">
-        <div>
-            <a href="{{ route('proyectos.index') }}" class="inline-flex items-center gap-1 text-xs text-gray-500 hover:underline"><x-heroicon-o-arrow-left class="h-3.5 w-3.5" /> Mis proyectos</a>
-            <div class="flex items-center gap-3">
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ $proyecto->nombre }}</h2>
-                <span class="px-3 py-1 rounded-full text-xs font-semibold
-                    {{ $proyecto->estado === 'completado' ? 'bg-green-100 text-green-700' : '' }}
-                    {{ $proyecto->estado === 'en_progreso' ? 'bg-blue-100 text-blue-700' : '' }}
-                    {{ $proyecto->estado === 'pendiente' ? 'bg-gray-100 text-gray-600' : '' }}
-                    {{ $proyecto->estado === 'cancelado' ? 'bg-red-100 text-red-700' : '' }}">
-                    {{ ucfirst(str_replace('_', ' ', $proyecto->estado)) }}
-                </span>
+        <div class="flex justify-between items-center gap-4">
+            <div>
+                <a href="{{ route('proyectos.index') }}" class="inline-flex items-center gap-1 text-xs text-gray-500 hover:underline"><x-heroicon-o-arrow-left class="h-3.5 w-3.5" /> Mis proyectos</a>
+                <div class="flex items-center gap-3">
+                    <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ $proyecto->nombre }}</h2>
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold
+                        {{ $proyecto->estado === 'completado' ? 'bg-green-100 text-green-700' : '' }}
+                        {{ $proyecto->estado === 'en_progreso' ? 'bg-blue-100 text-blue-700' : '' }}
+                        {{ $proyecto->estado === 'pendiente' ? 'bg-gray-100 text-gray-600' : '' }}
+                        {{ $proyecto->estado === 'cancelado' ? 'bg-red-100 text-red-700' : '' }}">
+                        {{ ucfirst(str_replace('_', ' ', $proyecto->estado)) }}
+                    </span>
+                </div>
             </div>
+            <a href="{{ route('reportes.proyecto.pdf', $proyecto) }}"
+               class="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 bg-[#00b87d] border border-transparent rounded-lg text-xs font-semibold text-white uppercase tracking-widest hover:bg-[#008c63]">
+                <x-heroicon-o-document-arrow-down class="w-4 h-4" /> Descargar reporte
+            </a>
         </div>
     </x-slot>
 

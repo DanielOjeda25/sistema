@@ -36,7 +36,9 @@ class ProyectoSeeder extends Seeder
                 'nombre' => 'Gestor de expedientes Gimenez',
                 'descripcion' => 'CRM legal con flujo de aprobacion y notificaciones.',
                 'fecha_inicio' => now()->subMonths(3)->toDateString(),
-                'fecha_fin_estimada' => now()->addMonths(2)->toDateString(),
+                // Fin estimada ya vencida con el proyecto en curso: asi el
+                // reporte muestra el estado "Retrasado" en la demo.
+                'fecha_fin_estimada' => now()->subDays(10)->toDateString(),
                 'estado' => 'en_progreso',
                 'cliente_id' => $clienteAbog->id,
                 'pm_id' => $pmLaura->id,
