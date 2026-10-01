@@ -34,7 +34,7 @@
             </div>
 
             {{-- Linea de tiempo: hitos y sprints en orden cronologico --}}
-            <div class="bg-white rounded-2xl shadow-sm p-6" x-data="{ abierta: null, linea: @js($linea), abrir(i) { this.abierta = this.linea[i] } }">
+            <div class="bg-white rounded-2xl shadow-sm p-6" x-data>
                 <div class="flex items-center justify-between mb-1">
                     <h3 class="text-lg font-bold text-gray-800">Cómo viene el proyecto</h3>
                     <div class="hidden sm:flex items-center gap-4 text-xs text-gray-500">
@@ -91,7 +91,7 @@
                                 @endphp
                                 <div class="relative px-2 text-center animar-item cursor-pointer snap-start"
                                      style="animation-delay: {{ $i * 0.18 }}s"
-                                     @click="abrir({{ $i }})" title="Ver detalle">
+                                     @click="$dispatch('abrir-linea', {{ $i }})" title="Ver detalle">
                                     {{-- Marcador de donde esta el proyecto hoy --}}
                                     @if ($esCurso)
                                         <p class="text-[10px] font-bold uppercase tracking-widest text-[#008c63]">▼ Estamos acá</p>
@@ -149,7 +149,7 @@
                     @php
                         $marcadoMovil = false;
                     @endphp
-                    @forelse ($linea as $item)
+                    @forelse ($linea as $i => $item)
                         @php
                             $esCursoMovil = ! $item['hecho'] && ! $item['vencido'] && ! $marcadoMovil;
                             if ($esCursoMovil) { $marcadoMovil = true; }
@@ -160,7 +160,7 @@
                                 ? trim($item['fecha_texto'].(! empty($item['fecha_fin_texto']) ? ' → '.$item['fecha_fin_texto'] : ''))
                                 : ($item['fecha_texto'] ? 'Fecha clave: '.$item['fecha_texto'] : '');
                         @endphp
-                        <div class="mb-3 rounded-xl bg-white border-l-4 {{ $borde }} shadow-sm p-4 animar-item">
+                        <div class="mb-3 rounded-xl bg-white border-l-4 {{ $borde }} shadow-sm p-4 animar-item cursor-pointer" @click="$dispatch('abrir-linea', {{ $i }})" title="Ver detalle">
                             <div class="flex items-center justify-between">
                                 <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full
                                     {{ $item['tipo'] === 'hito' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-50 text-emerald-700' }}">
@@ -197,71 +197,7 @@
                     .scroll-oculto::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 9999px; }
                 </style>
 
-                {{-- Pop-up con el detalle del hito o etapa --}}
-                <div x-show="abierta" x-cloak class="fixed inset-0 overflow-y-auto" style="z-index: 9999" role="dialog" aria-modal="true" @keydown.escape.window="abierta = null">
-                    <div class="fixed inset-0 bg-gray-900/60" @click="abierta = null"></div>
-                    {{-- m-auto en la tarjeta: la centra cuando entra en pantalla y
-                         permite scrollear hasta el borde cuando es mas alta --}}
-                    <div class="min-h-full flex justify-center p-4">
-                        {{-- h-fit: la tarjeta abraza su contenido; sin esto el flex la
-                             estira hasta el alto del contenedor y sobra espacio abajo --}}
-                        <div class="relative m-auto h-fit bg-white rounded-2xl shadow-xl w-full max-w-2xl p-5" x-show="abierta">
-                            <button @click="abierta = null" class="absolute top-3 right-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-100 hover:text-gray-700" aria-label="Cerrar">
-                                <x-heroicon-o-x-mark class="h-5 w-5" />
-                            </button>
-                            <template x-if="abierta">
-                                <div>
-                                    <div class="flex items-center gap-2 mb-2">
-                                        <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
-                                            :class="abierta.tipo === 'hito' ? 'bg-amber-100 text-amber-700' : (abierta.tipo === 'resumen' ? 'bg-indigo-100 text-indigo-700' : 'bg-emerald-50 text-emerald-700')"
-                                            x-text="abierta.tipo === 'hito' ? 'Hito' : (abierta.tipo === 'resumen' ? 'Historial' : 'Etapa')"></span>
-                                        <span class="text-xs text-gray-400" x-text="abierta.fecha_texto"></span>
-                                    </div>
-                                    <h4 class="text-lg font-bold text-gray-800" x-text="abierta.titulo"></h4>
-                                    <span class="mt-2 inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full"
-                                        :class="abierta.estado_clase"
-                                        x-text="abierta.estado"></span>
 
-                                    {{-- Nodo-resumen: lista el historial que quedo colapsado --}}
-                                    <div x-show="abierta.historial" class="mt-3 space-y-2">
-                                        <template x-for="(itemHistorial, idx) in (abierta.historial || [])" :key="idx">
-                                            <div class="flex items-center justify-between gap-3 rounded-lg border border-gray-100 bg-gray-50 px-3 py-2">
-                                                <div class="min-w-0">
-                                                    <span class="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full mr-2"
-                                                        :class="itemHistorial.tipo === 'hito' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-50 text-emerald-700'"
-                                                        x-text="itemHistorial.tipo === 'hito' ? 'Hito' : 'Etapa'"></span>
-                                                    <span class="text-sm text-gray-800" x-text="itemHistorial.titulo"></span>
-                                                </div>
-                                                <span class="text-xs text-gray-400 shrink-0" x-text="itemHistorial.fecha_texto"></span>
-                                            </div>
-                                        </template>
-                                    </div>
-
-                                    <p class="mt-3 text-sm text-gray-600 leading-relaxed" x-show="abierta.descripcion" x-text="abierta.descripcion"></p>
-
-                                    <p class="mt-3 text-sm text-gray-600" x-show="abierta.fecha_fin_texto"
-                                       x-text="'Etapa con inicio el ' + abierta.fecha_texto + ' y fin el ' + abierta.fecha_fin_texto"></p>
-
-                                    {{-- Resumen del sprint redactado por el equipo con IA --}}
-                                    <div x-show="abierta.resumen_ia" class="mt-3 rounded-xl border border-[#d7eee6] bg-[#f5fffb] p-4">
-                                        <p class="text-[10px] font-bold uppercase tracking-widest text-[#008c63] mb-1">Resumen del sprint para vos</p>
-                                        <p class="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed" x-text="abierta.resumen_ia"></p>
-                                    </div>
-
-                                    <div x-show="abierta.avance !== undefined && abierta.avance !== null" class="mt-3">
-                                        <div class="flex justify-between text-xs text-gray-500 mb-1">
-                                            <span>Avance de la etapa</span>
-                                            <span x-text="abierta.avance + '%'"></span>
-                                        </div>
-                                        <div class="w-full bg-gray-100 rounded-full h-2">
-                                            <div class="bg-[#00b87d] h-2 rounded-full transition-all" :style="'width: ' + abierta.avance + '%'"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </template>
-                        </div>
-                    </div>
-                </div>
 
             </div>
 
@@ -326,5 +262,76 @@
 
         </div>
     </div>
+{{-- Pop-up con el detalle del hito o etapa: autocontenido y teleportado al
+     body por crud-modal.js, para que quede fijo al viewport y no al
+     contenedor animado del contenido (que lo descentraba). --}}
+                <div data-teleportar x-data="{ abierta: null, linea: @js($linea), abrir(i) { this.abierta = this.linea[i] } }" @abrir-linea.window="abrir($event.detail)" x-show="abierta" x-cloak class="fixed inset-0 overflow-y-auto" style="z-index: 9999" role="dialog" aria-modal="true" @keydown.escape.window="abierta = null">
+                    <div class="fixed inset-0 bg-gray-900/60" @click="abierta = null"></div>
+                    {{-- La tarjeta nunca crece mas alla de la pantalla: el cuerpo
+                         scrollea por dentro y el titulo con el cierre quedan fijos --}}
+                    <div class="min-h-full flex justify-center p-4">
+                        <div class="relative m-auto h-fit bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden" x-show="abierta">
+                            <template x-if="abierta">
+                                <div class="flex min-h-0 flex-col">
+                                    {{-- Cabecera fija: el avance de la etapa vive aca, al lado del estado --}}
+                                    <div class="flex items-start justify-between gap-4 p-5 pb-3 border-b border-gray-100">
+                                        <div class="min-w-0">
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
+                                                    :class="abierta.tipo === 'hito' ? 'bg-amber-100 text-amber-700' : (abierta.tipo === 'resumen' ? 'bg-indigo-100 text-indigo-700' : 'bg-emerald-50 text-emerald-700')"
+                                                    x-text="abierta.tipo === 'hito' ? 'Hito' : (abierta.tipo === 'resumen' ? 'Historial' : 'Etapa')"></span>
+                                                <span class="text-xs text-gray-400" x-text="abierta.fecha_texto"></span>
+                                            </div>
+                                            <h4 class="text-lg font-bold text-gray-800" x-text="abierta.titulo"></h4>
+                                            <span class="mt-2 inline-flex items-center gap-2 text-[11px] font-semibold px-2 py-0.5 rounded-full"
+                                                :class="abierta.estado_clase"
+                                                x-text="abierta.estado"></span>
+                                            <span x-show="abierta.avance !== undefined && abierta.avance !== null"
+                                                  class="ml-2 inline-flex items-center gap-1.5 text-[11px] font-semibold text-gray-500 align-middle">
+                                                <span class="inline-block h-1.5 w-16 bg-gray-100 rounded-full overflow-hidden align-middle">
+                                                    <span class="block h-full bg-[#00b87d] rounded-full" :style="'width: ' + abierta.avance + '%'"></span>
+                                                </span>
+                                                <span x-text="abierta.avance + '%'"></span>
+                                            </span>
+                                        </div>
+                                        <button @click="abierta = null" class="shrink-0 flex h-8 w-8 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-100 hover:text-gray-700" aria-label="Cerrar">
+                                            <x-heroicon-o-x-mark class="h-5 w-5" />
+                                        </button>
+                                    </div>
+
+                                    {{-- Cuerpo scrolleable --}}
+                                    <div class="overflow-y-auto p-5 pt-4">
+
+                                    {{-- Nodo-resumen: lista el historial que quedo colapsado --}}
+                                    <div x-show="abierta.historial" class="mt-3 space-y-2">
+                                        <template x-for="(itemHistorial, idx) in (abierta.historial || [])" :key="idx">
+                                            <div class="flex items-center justify-between gap-3 rounded-lg border border-gray-100 bg-gray-50 px-3 py-2">
+                                                <div class="min-w-0">
+                                                    <span class="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full mr-2"
+                                                        :class="itemHistorial.tipo === 'hito' ? 'bg-amber-100 text-amber-700' : 'bg-emerald-50 text-emerald-700'"
+                                                        x-text="itemHistorial.tipo === 'hito' ? 'Hito' : 'Etapa'"></span>
+                                                    <span class="text-sm text-gray-800" x-text="itemHistorial.titulo"></span>
+                                                </div>
+                                                <span class="text-xs text-gray-400 shrink-0" x-text="itemHistorial.fecha_texto"></span>
+                                            </div>
+                                        </template>
+                                    </div>
+
+                                    <p class="mt-3 text-sm text-gray-600 leading-relaxed" x-show="abierta.descripcion" x-text="abierta.descripcion"></p>
+
+                                    <p class="mt-3 text-sm text-gray-600" x-show="abierta.fecha_fin_texto"
+                                       x-text="'Etapa con inicio el ' + abierta.fecha_texto + ' y fin el ' + abierta.fecha_fin_texto"></p>
+
+                                    {{-- Resumen del sprint redactado por el equipo con IA --}}
+                                    <div x-show="abierta.resumen_ia" class="mt-3 rounded-xl border border-[#d7eee6] bg-[#f5fffb] p-4">
+                                        <p class="text-[10px] font-bold uppercase tracking-widest text-[#008c63] mb-1">Resumen del sprint para vos</p>
+                                        <p class="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed" x-text="abierta.resumen_ia"></p>
+                                    </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
     <x-entregable-view-modal />
 </x-app-layout>
