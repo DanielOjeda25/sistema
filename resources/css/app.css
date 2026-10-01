@@ -8,6 +8,26 @@
     display: none !important;
 }
 
+/* --- Bloqueo del scroll del fondo mientras haya un modal abierto ----------
+   Cubre los tres mecanismos del sistema con un solo selector: modales CRUD y
+   tablero (se abren quitando la clase .hidden), modales de lectura y el
+   pop-up del cliente (Alpine los oculta con display:none inline). Antes de
+   que Alpine inicialice, x-cloak mantiene el overlay fuera del calculo. */
+body:has([role="dialog"].fixed.inset-0:not(.hidden):not([x-cloak]):not([style*="display: none"])) {
+    overflow: hidden;
+}
+
+/* La rueda del mouse nunca "se escapa" del modal: cuando el contenido interno
+   llega al final, el scroll no debe encadenarse a la pagina de atras. */
+[role="dialog"].fixed.inset-0 {
+    overscroll-behavior: contain;
+}
+
+[role="dialog"] .overflow-y-auto,
+[role="dialog"] .overflow-x-auto {
+    overscroll-behavior: contain;
+}
+
 /* --- Barras de scroll acordes al diseño ---------------------------------
    Estilizamos ambos cuerpos (sidebar oscuro y contenido claro) para que la
    barra nativa de Windows no rompa la estética. Firefox usa scrollbar-color;
