@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             ClienteSeeder::class,
             UserSeeder::class,
             ProyectoSeeder::class,
+            ActualizacionProyectoSeeder::class,
             HitoSeeder::class,
             SolicitudCambioSeeder::class,
             TareaSeeder::class,

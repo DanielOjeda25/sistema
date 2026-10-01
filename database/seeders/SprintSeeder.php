@@ -14,10 +14,14 @@ class SprintSeeder extends Seeder
         $obraLR = Proyecto::where('nombre', 'Sistema de obra L&R')->first();
         $gestor = Proyecto::where('nombre', 'Gestor de expedientes Gimenez')->first();
 
+        // Sprints cerrados en el pasado y uno ACTIVO alrededor de hoy: es el que
+        // se usa en la demo para generar el resumen IA en vivo.
         $sprints = [
-            ['proyecto_id' => $obraLR->id, 'nombre' => 'Sprint 1', 'fecha_inicio' => '2026-03-02', 'fecha_fin' => '2026-03-13'],
-            ['proyecto_id' => $obraLR->id, 'nombre' => 'Sprint 2', 'fecha_inicio' => '2026-03-16', 'fecha_fin' => '2026-03-27'],
-            ['proyecto_id' => $gestor->id, 'nombre' => 'Sprint 1', 'fecha_inicio' => '2026-04-06', 'fecha_fin' => '2026-04-17'],
+            ['proyecto_id' => $obraLR->id, 'nombre' => 'Sprint 1 — Fundaciones', 'fecha_inicio' => now()->subWeeks(8)->toDateString(), 'fecha_fin' => now()->subWeeks(6)->toDateString(), 'estado' => 'finalizado'],
+            ['proyecto_id' => $obraLR->id, 'nombre' => 'Sprint 2 — Listados', 'fecha_inicio' => now()->subWeeks(6)->toDateString(), 'fecha_fin' => now()->subWeeks(4)->toDateString(), 'estado' => 'finalizado'],
+            ['proyecto_id' => $obraLR->id, 'nombre' => 'Sprint 3 — Nucleo de obras', 'fecha_inicio' => now()->subWeek()->toDateString(), 'fecha_fin' => now()->addWeek()->toDateString(), 'estado' => 'activo'],
+            ['proyecto_id' => $gestor->id, 'nombre' => 'Sprint 1 — Modelo de datos', 'fecha_inicio' => now()->subWeeks(3)->toDateString(), 'fecha_fin' => now()->subWeek()->toDateString(), 'estado' => 'finalizado'],
+            ['proyecto_id' => $gestor->id, 'nombre' => 'Sprint 2 — Seguridad', 'fecha_inicio' => now()->toDateString(), 'fecha_fin' => now()->addWeeks(2)->toDateString(), 'estado' => 'activo'],
         ];
 
         foreach ($sprints as $data) {
@@ -29,9 +33,11 @@ class SprintSeeder extends Seeder
 
         // Reparte las tareas existentes de cada proyecto entre sus sprints.
         $porSprint = [
-            'Sistema de obra L&R|Sprint 1' => ['Disenar pantalla de avance por obra', 'Implementar listado de obras'],
-            'Sistema de obra L&R|Sprint 2' => ['PDF reporte mensual de horas'],
-            'Gestor de expedientes Gimenez|Sprint 1' => ['Crear modelo Expediente'],
+            'Sistema de obra L&R|Sprint 1 — Fundaciones' => ['Disenar pantalla de avance por obra'],
+            'Sistema de obra L&R|Sprint 2 — Listados' => ['Implementar listado de obras'],
+            'Sistema de obra L&R|Sprint 3 — Nucleo de obras' => ['Ajustes de la reunion con el cliente', 'PDF reporte mensual de horas', 'Conectar API de presupuestos'],
+            'Gestor de expedientes Gimenez|Sprint 1 — Modelo de datos' => ['Crear modelo Expediente'],
+            'Gestor de expedientes Gimenez|Sprint 2 — Seguridad' => ['Importar expedientes historicos', 'Login con dos factores'],
         ];
 
         foreach ($porSprint as $clave => $titulos) {
@@ -42,5 +48,13 @@ class SprintSeeder extends Seeder
 
             Tarea::whereIn('titulo', $titulos)->update(['sprint_id' => $sprintId]);
         }
+
+        // El sprint ya cerrado guarda el resumen que dejo el job semanal: sirve de
+        // plan B si la IA no responde el dia de la demo (el sprint activo se
+        // resume en vivo).
+        $sprintListados = Sprint::where('nombre', 'Sprint 2 — Listados')->first();
+        $sprintListados?->update([
+            'resumen_ia' => "Durante el sprint se completo la pantalla de diseno de avance y el listado de obras llego a un 60%. El equipo destaco la integracion temprana con el cliente. Como riesgo queda definido el formato del reporte mensual de horas, que se aborda en el sprint 3 con prioridad alta.",
+        ]);
     }
 }

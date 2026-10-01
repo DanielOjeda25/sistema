@@ -19,12 +19,15 @@ class ProyectoSeeder extends Seeder
         $clienteCoop = Cliente::where('email', 'patri@cooperativaUnion.com')->first();
         $clienteLucia = Cliente::where('email', 'lucia.f@gmail.com')->first();
 
+        // Fechas relativas a hoy: la demo siempre muestra un calendario coherente
+        // sin importar cuando se siembre.
         $proyectos = [
             [
+                // Proyecto principal de la demo: activo, con sprint en curso.
                 'nombre' => 'Sistema de obra L&R',
                 'descripcion' => 'Plataforma interna para seguimiento de obra: avance, presupuesto, materiales.',
-                'fecha_inicio' => '2026-03-01',
-                'fecha_fin_estimada' => '2026-09-30',
+                'fecha_inicio' => now()->subMonths(5)->toDateString(),
+                'fecha_fin_estimada' => now()->addMonths(2)->toDateString(),
                 'estado' => 'en_progreso',
                 'cliente_id' => $clienteLR->id,
                 'pm_id' => $pmLaura->id,
@@ -32,8 +35,8 @@ class ProyectoSeeder extends Seeder
             [
                 'nombre' => 'Gestor de expedientes Gimenez',
                 'descripcion' => 'CRM legal con flujo de aprobacion y notificaciones.',
-                'fecha_inicio' => '2026-04-15',
-                'fecha_fin_estimada' => '2026-08-15',
+                'fecha_inicio' => now()->subMonths(3)->toDateString(),
+                'fecha_fin_estimada' => now()->addMonths(2)->toDateString(),
                 'estado' => 'en_progreso',
                 'cliente_id' => $clienteAbog->id,
                 'pm_id' => $pmLaura->id,
@@ -41,8 +44,8 @@ class ProyectoSeeder extends Seeder
             [
                 'nombre' => 'Portal del socio — Cooperativa Union',
                 'descripcion' => 'Sitio publico para que los socios consulten saldos y soliciten creditos.',
-                'fecha_inicio' => '2026-01-10',
-                'fecha_fin_estimada' => '2026-05-20',
+                'fecha_inicio' => now()->subMonths(9)->toDateString(),
+                'fecha_fin_estimada' => now()->subMonths(4)->toDateString(),
                 'estado' => 'completado',
                 'cliente_id' => $clienteCoop->id,
                 'pm_id' => $pmJefe->id,
@@ -50,8 +53,8 @@ class ProyectoSeeder extends Seeder
             [
                 'nombre' => 'Landing personal — Lucia',
                 'descripcion' => 'Pagina de presentacion profesional con CV y portfolio.',
-                'fecha_inicio' => '2026-05-20',
-                'fecha_fin_estimada' => '2026-06-30',
+                'fecha_inicio' => now()->addWeek()->toDateString(),
+                'fecha_fin_estimada' => now()->addMonths(2)->toDateString(),
                 'estado' => 'pendiente',
                 'cliente_id' => $clienteLucia->id,
                 'pm_id' => $pmLaura->id,

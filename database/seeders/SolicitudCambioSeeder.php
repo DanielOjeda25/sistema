@@ -16,12 +16,22 @@ class SolicitudCambioSeeder extends Seeder
         $cliente = User::where('email', 'cliente@example.com')->first();
         $pm = User::where('email', 'pm@example.com')->first();
 
+        // La ultima solicitud (panel de indicadores) queda pendiente a proposito:
+        // es la que se aprueba en vivo durante la demo.
         $solicitudes = [
             [
                 'titulo' => 'Agregar reporte de horas por obra',
                 'descripcion' => 'El cliente pide un PDF mensual con horas hombre por obra.',
                 'estado' => 'aprobada',
                 'prioridad' => 'alta',
+                'proyecto_id' => $obraLR->id,
+                'solicitado_por' => $cliente->id,
+            ],
+            [
+                'titulo' => 'Agregar panel de indicadores al inicio',
+                'descripcion' => 'Cards con avance, horas y presupuestos al abrir el proyecto.',
+                'estado' => 'pendiente',
+                'prioridad' => 'media',
                 'proyecto_id' => $obraLR->id,
                 'solicitado_por' => $cliente->id,
             ],
