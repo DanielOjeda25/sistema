@@ -181,14 +181,18 @@
                                 </div>
                                 <div class="rounded-xl border border-[#d7eee6] bg-white p-5 shadow-sm">
                                     <div class="flex items-center justify-between"><div><h2 class="font-semibold text-slate-800">Estado de tareas</h2><p class="mt-1 text-xs text-slate-400">Rendimiento del equipo</p></div><a href="{{ route('tareas.index') }}" class="text-xs font-semibold text-[#009d70]">Ver todo</a></div>
-                                    <div class="mt-4 divide-y divide-slate-100 rounded-lg border border-slate-100">
-                                        @php($maxTareas = max($tareasPorEstado) ?: 1)
-                                        @foreach (['pendiente' => ['Pendientes', 'bg-slate-100 text-slate-700'], 'en_progreso' => ['En progreso', 'bg-blue-50 text-blue-700'], 'completada' => ['Completadas', 'bg-emerald-50 text-emerald-700'], 'cancelada' => ['Canceladas', 'bg-rose-50 text-rose-700']] as $estado => [$label, $style])
-                                            <a href="{{ route('tareas.index', ['estado' => $estado]) }}" class="block px-4 py-2.5 hover:bg-[#f0fff9]">
-                                                <div class="flex items-center justify-between"><span class="text-sm text-slate-700">{{ $label }}</span><span class="{{ $style }} rounded-md px-2 py-0.5 text-xs font-bold">{{ $tareasPorEstado[$estado] }}</span></div>
-                                                <div class="mt-1.5 h-1.5 bg-slate-100 rounded-full overflow-hidden"><div class="h-full bg-[#00b87d] rounded-full animar-alto" style="width: {{ round($tareasPorEstado[$estado] / $maxTareas * 100) }}%"></div></div>
-                                            </a>
-                                        @endforeach
+                                    <div class="mt-4 h-52">
+                                        <canvas data-grafico="dona" data-valores='@json($tareasDonut)'></canvas>
+                                    </div>
+                                </div>
+                                <div class="rounded-xl border border-[#d7eee6] bg-white p-5 shadow-sm xl:col-span-2">
+                                    <div class="flex items-center justify-between"><div><h2 class="font-semibold text-slate-800">Carga del equipo</h2><p class="mt-1 text-xs text-slate-400">Tareas activas por persona</p></div><a href="{{ route('tareas.index') }}" class="text-xs font-semibold text-[#009d70]">Ver todo</a></div>
+                                    <div class="mt-4 h-44">
+                                        @if ($cargaPorPersona->isNotEmpty())
+                                            <canvas data-grafico="barras-h" data-valores='@json($cargaPorPersona)'></canvas>
+                                        @else
+                                            <p class="text-sm text-slate-400 text-center mt-16">No hay tareas activas ahora mismo.</p>
+                                        @endif
                                     </div>
                                 </div>
                                 <div class="divide-y divide-[#edf7f3] rounded-xl border border-[#d7eee6] bg-white shadow-sm xl:col-span-2">

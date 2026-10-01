@@ -7,3 +7,4 @@ window.Alpine = Alpine;
 Alpine.start();
 
 import './crud-modal';
+import './graficos';

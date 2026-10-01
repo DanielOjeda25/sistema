@@ -44,8 +44,8 @@
                             </div>
 
                             <div class="mt-3 flex gap-4 text-xs text-gray-600">
-                                <span>✅ {{ $hechas }}/{{ $total }} tareas</span>
-                                <span>🏁 {{ $proyecto->hitos_completados }} hitos</span>
+                                <span class="inline-flex items-center gap-1"><x-heroicon-o-check-circle class="h-4 w-4 text-[#00b87d]" /> {{ $hechas }}/{{ $total }} tareas</span>
+                                <span class="inline-flex items-center gap-1"><x-heroicon-o-flag class="h-4 w-4 text-amber-500" /> {{ $proyecto->hitos_completados }} hitos</span>
                             </div>
                         </div>
                     </a>
