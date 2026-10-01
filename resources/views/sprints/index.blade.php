@@ -146,7 +146,9 @@
             <div class="bg-white rounded-xl shadow-xl w-full max-w-xl p-6">
                 <div class="flex items-center justify-between">
                     <h3 class="font-semibold text-lg text-gray-800">Resumen IA — <span id="resumen-sprint-nombre"></span></h3>
-                    <button type="button" data-cerrar-resumen class="text-gray-400 hover:text-gray-600" aria-label="Cerrar">✕</button>
+                    <button type="button" data-cerrar-resumen class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-100 hover:text-gray-700" aria-label="Cerrar">
+                        <x-heroicon-o-x-mark class="h-5 w-5" />
+                    </button>
                 </div>
 
                 <div id="resumen-sprint-cuerpo" class="mt-4 text-sm text-gray-700 whitespace-pre-wrap leading-relaxed min-h-[80px]"></div>

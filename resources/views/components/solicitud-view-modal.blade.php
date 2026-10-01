@@ -31,7 +31,9 @@
                                 <span x-text="detalle.proyecto"></span> · pedida por <span x-text="detalle.solicitante"></span>
                             </p>
                         </div>
-                        <button @click="detalle = null" class="text-gray-400 hover:text-gray-600 text-xl leading-none" aria-label="Cerrar">×</button>
+                        <button @click="detalle = null" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-100 hover:text-gray-700" aria-label="Cerrar">
+                            <x-heroicon-o-x-mark class="h-5 w-5" />
+                        </button>
                     </div>
 
                     <div class="p-6">

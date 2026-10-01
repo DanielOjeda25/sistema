@@ -171,7 +171,9 @@
                     <form id="form-crear-tarea" method="POST" class="space-y-4">
                         <div class="flex items-center justify-between">
                             <h3 class="font-semibold text-lg text-gray-800">Nueva tarea</h3>
-                            <button type="button" data-cerrar-modal class="text-gray-400 hover:text-gray-600">✕</button>
+                            <button type="button" data-cerrar-modal class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-100 hover:text-gray-700" aria-label="Cerrar">
+                                <x-heroicon-o-x-mark class="h-5 w-5" />
+                            </button>
                         </div>
 
                         <div>
@@ -272,7 +274,9 @@
                                 <span id="detalle-proyecto"></span><span id="detalle-sprint-wrapper" class="hidden"> &middot; Sprint: <span id="detalle-sprint"></span></span>
                             </p>
                         </div>
-                        <button type="button" data-cerrar-detalle class="shrink-0 text-gray-400 hover:text-gray-600 text-xl leading-none" aria-label="Cerrar">×</button>
+                        <button type="button" data-cerrar-detalle class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-100 hover:text-gray-700" aria-label="Cerrar">
+                            <x-heroicon-o-x-mark class="h-5 w-5" />
+                        </button>
                     </div>
 
                     <div class="mt-4 bg-gray-50 border border-gray-100 rounded-xl p-4">
@@ -314,7 +318,9 @@
                     <form id="form-editar-tarea" method="POST" class="space-y-4">
                         <div class="flex items-center justify-between">
                             <h3 class="font-semibold text-lg text-gray-800">Editar tarea</h3>
-                            <button type="button" data-cerrar-modal class="text-gray-400 hover:text-gray-600">✕</button>
+                            <button type="button" data-cerrar-modal class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-100 hover:text-gray-700" aria-label="Cerrar">
+                                <x-heroicon-o-x-mark class="h-5 w-5" />
+                            </button>
                         </div>
 
                         <div>
