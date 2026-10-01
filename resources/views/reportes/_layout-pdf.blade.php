@@ -17,13 +17,21 @@
         }
         body { font-family: DejaVu Sans, sans-serif; font-size: 10px; color: #374151; }
         table.detalle { width: 100%; border-collapse: collapse; }
-        table.detalle th { background: #2f8f76; color: #ffffff; border: 1px solid #26705c; padding: 5px 6px; font-size: 8.5px; text-transform: uppercase; text-align: left; }
+        table.detalle th { background: #008c63; color: #ffffff; border: 1px solid #e5e7eb; padding: 5px 6px; font-size: 8px; text-transform: uppercase; text-align: left; letter-spacing: 0.5px; }
         table.detalle td { border: 1px solid #e5e7eb; padding: 5px 6px; }
         table.detalle tr:nth-child(even) td { background: #f8fafc; }
         .mostrando { margin-top: 6px; font-size: 9px; color: #6b7280; }
         h2.seccion { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: #008c63; margin: 14px 0 4px; }
         .criterio { font-size: 9.5px; color: #374151; }
         .criterio p { margin: 0 0 3px; }
+
+        /* Metricas: fila sobria con lineas finas, sin cajas de color */
+        table.metricas { width: 100%; border-collapse: collapse; margin-bottom: 12px; border-top: 2px solid #008c63; border-bottom: 1px solid #e5e7eb; }
+        table.metricas td { padding: 9px 8px; text-align: center; border-right: 1px solid #e5e7eb; }
+        table.metricas td:last-child { border-right: none; }
+        table.metricas .valor { font-size: 14px; font-weight: bold; color: #008c63; }
+        table.metricas .valor.alerta { color: #dc2626; }
+        table.metricas .rotulo { font-size: 7.5px; text-transform: uppercase; letter-spacing: 0.5px; color: #6b7280; margin-top: 2px; }
     </style>
 </head>
 <body>
@@ -66,7 +74,7 @@
     <p style="margin: 0 0 10px; font-size: 10px; color: #6b7280;">{{ $subtitulo }}</p>
 
     {{-- Caja de alcance: periodo, emisor y filtros --}}
-    <div style="background: #eef7f3; border-radius: 8px; padding: 12px 14px; margin-bottom: 12px;">
+    <div style="border: 1px solid #e5e7eb; border-top: 2px solid #008c63; padding: 12px 14px; margin-bottom: 12px;">
         <table style="width: 100%; border-collapse: collapse; margin-bottom: 6px;">
             <tr>
                 <td style="width: 25%;"><div style="font-size: 8px; font-weight: bold; color: #008c63; text-transform: uppercase; letter-spacing: 0.5px;">Fecha desde</div><div style="font-size: 11px; font-weight: bold;">{{ $desde }}</div></td>
@@ -75,14 +83,14 @@
                 <td><div style="font-size: 8px; font-weight: bold; color: #008c63; text-transform: uppercase; letter-spacing: 0.5px;">Fecha y hora</div><div style="font-size: 11px; font-weight: bold;">{{ $fechaHora }}</div></td>
             </tr>
         </table>
-        <div style="border-top: 1px solid #d7eee6; padding-top: 6px;">
+        <div style="border-top: 1px solid #e5e7eb; padding-top: 6px;">
             <span style="font-size: 8px; font-weight: bold; color: #008c63; text-transform: uppercase; letter-spacing: 0.5px;">Filtros aplicados</span><br>
             <span style="font-size: 9.5px; color: #374151;">{{ $filtrosTexto }}</span>
         </div>
     </div>
 
     {{-- Banner de resultados --}}
-    <div style="background: #0b6b52; color: #ffffff; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px;">
+    <div style="background: #008c63; color: #ffffff; padding: 10px 14px; margin-bottom: 12px;">
         <table style="width: 100%; border-collapse: collapse;">
             <tr>
                 <td style="font-size: 13px; font-weight: bold;">{{ $banner }}</td>

@@ -2,13 +2,13 @@
 
 @section('contenido')
     {{-- Resumen de montos --}}
-    <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px;">
+    <table class="metricas">
         <tr>
-            <td style="background: #eef7f3; border: 1px solid #d7eee6; padding: 8px; text-align: center;"><div style="font-size: 13px; font-weight: bold; color: #008c63;">{{ $resumen['facturas'] }}</div><div style="font-size: 8px; color: #6b7280; text-transform: uppercase;">Facturas</div></td>
-            <td style="background: #eef7f3; border: 1px solid #d7eee6; padding: 8px; text-align: center;"><div style="font-size: 13px; font-weight: bold; color: #008c63;">$ {{ number_format($resumen['facturado'], 0, ',', '.') }}</div><div style="font-size: 8px; color: #6b7280; text-transform: uppercase;">Facturado</div></td>
-            <td style="background: #eef7f3; border: 1px solid #d7eee6; padding: 8px; text-align: center;"><div style="font-size: 13px; font-weight: bold; color: #008c63;">$ {{ number_format($resumen['pagado'], 0, ',', '.') }}</div><div style="font-size: 8px; color: #6b7280; text-transform: uppercase;">Cobrado</div></td>
-            <td style="background: #f3f4f6; border: 1px solid #d1d5db; padding: 8px; text-align: center;"><div style="font-size: 13px; font-weight: bold; color: #374151;">$ {{ number_format($resumen['pendiente'], 0, ',', '.') }}</div><div style="font-size: 8px; color: #6b7280; text-transform: uppercase;">Pendiente</div></td>
-            <td style="background: #fef2f2; border: 1px solid #fecaca; padding: 8px; text-align: center;"><div style="font-size: 13px; font-weight: bold; color: #dc2626;">$ {{ number_format($resumen['vencido'], 0, ',', '.') }}</div><div style="font-size: 8px; color: #dc2626; text-transform: uppercase;">Vencido</div></td>
+            <td><div class="valor">{{ $resumen['facturas'] }}</div><div class="rotulo">Facturas</div></td>
+            <td><div class="valor">$ {{ number_format($resumen['facturado'], 0, ',', '.') }}</div><div class="rotulo">Facturado</div></td>
+            <td><div class="valor">$ {{ number_format($resumen['pagado'], 0, ',', '.') }}</div><div class="rotulo">Cobrado</div></td>
+            <td><div class="valor">$ {{ number_format($resumen['pendiente'], 0, ',', '.') }}</div><div class="rotulo">Pendiente</div></td>
+            <td><div class="valor alerta">$ {{ number_format($resumen['vencido'], 0, ',', '.') }}</div><div class="rotulo">Vencido</div></td>
         </tr>
     </table>
 

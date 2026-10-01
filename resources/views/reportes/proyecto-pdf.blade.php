@@ -17,13 +17,13 @@
     </table>
 
     {{-- Avance --}}
-    <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px;">
+    <table class="metricas">
         <tr>
-            <td style="background: #eef7f3; border: 1px solid #d7eee6; padding: 8px; text-align: center;"><div style="font-size: 13px; font-weight: bold; color: #008c63;">{{ $resumen['avance'] }}%</div><div style="font-size: 8px; color: #6b7280; text-transform: uppercase;">Avance</div></td>
-            <td style="background: #eef7f3; border: 1px solid #d7eee6; padding: 8px; text-align: center;"><div style="font-size: 13px; font-weight: bold; color: #008c63;">{{ $resumen['tareas_completadas'] }}/{{ $resumen['tareas_total'] }}</div><div style="font-size: 8px; color: #6b7280; text-transform: uppercase;">Tareas listas</div></td>
-            <td style="background: #eef7f3; border: 1px solid #d7eee6; padding: 8px; text-align: center;"><div style="font-size: 13px; font-weight: bold; color: #008c63;">{{ $resumen['tareas_en_progreso'] }}</div><div style="font-size: 8px; color: #6b7280; text-transform: uppercase;">En progreso</div></td>
-            <td style="background: #eef7f3; border: 1px solid #d7eee6; padding: 8px; text-align: center;"><div style="font-size: 13px; font-weight: bold; color: #008c63;">{{ $resumen['tareas_pendientes'] }}</div><div style="font-size: 8px; color: #6b7280; text-transform: uppercase;">Pendientes</div></td>
-            <td style="background: #eef7f3; border: 1px solid #d7eee6; padding: 8px; text-align: center;"><div style="font-size: 13px; font-weight: bold; color: #008c63;">{{ $resumen['hitos_completados'] }}/{{ $resumen['hitos_total'] }}</div><div style="font-size: 8px; color: #6b7280; text-transform: uppercase;">Hitos</div></td>
+            <td><div class="valor">{{ $resumen['avance'] }}%</div><div class="rotulo">Avance</div></td>
+            <td><div class="valor">{{ $resumen['tareas_completadas'] }}/{{ $resumen['tareas_total'] }}</div><div class="rotulo">Tareas listas</div></td>
+            <td><div class="valor">{{ $resumen['tareas_en_progreso'] }}</div><div class="rotulo">En progreso</div></td>
+            <td><div class="valor">{{ $resumen['tareas_pendientes'] }}</div><div class="rotulo">Pendientes</div></td>
+            <td><div class="valor">{{ $resumen['hitos_completados'] }}/{{ $resumen['hitos_total'] }}</div><div class="rotulo">Hitos</div></td>
         </tr>
     </table>
 

@@ -2,13 +2,13 @@
 
 @section('contenido')
     {{-- Resumen de metricas: solo lo esencial, el detalle va en la tabla --}}
-    <table style="width: 100%; border-collapse: collapse; margin-bottom: 12px;">
+    <table class="metricas">
         <tr>
-            <td style="background: #eef7f3; border: 1px solid #d7eee6; padding: 10px; text-align: center;"><div style="font-size: 14px; font-weight: bold; color: #008c63;">{{ $resumen['total'] }}</div><div style="font-size: 8px; color: #6b7280; text-transform: uppercase;">Proyectos</div></td>
-            <td style="background: #eef7f3; border: 1px solid #d7eee6; padding: 10px; text-align: center;"><div style="font-size: 14px; font-weight: bold; color: #008c63;">{{ $resumen['avance_global'] }}%</div><div style="font-size: 8px; color: #6b7280; text-transform: uppercase;">Avance global</div></td>
-            <td style="background: #fef2f2; border: 1px solid #fecaca; padding: 10px; text-align: center;"><div style="font-size: 14px; font-weight: bold; color: #dc2626;">{{ $resumen['retrasados'] }}</div><div style="font-size: 8px; color: #dc2626; text-transform: uppercase;">Retrasados</div></td>
-            <td style="background: #fef2f2; border: 1px solid #fecaca; padding: 10px; text-align: center;"><div style="font-size: 14px; font-weight: bold; color: #dc2626;">{{ $resumen['tareas_vencidas'] }}</div><div style="font-size: 8px; color: #dc2626; text-transform: uppercase;">Tareas vencidas</div></td>
-            <td style="background: #fef2f2; border: 1px solid #fecaca; padding: 10px; text-align: center;"><div style="font-size: 14px; font-weight: bold; color: #dc2626;">{{ $resumen['hitos_vencidos'] }}</div><div style="font-size: 8px; color: #dc2626; text-transform: uppercase;">Hitos vencidos</div></td>
+            <td><div class="valor">{{ $resumen['total'] }}</div><div class="rotulo">Proyectos</div></td>
+            <td><div class="valor">{{ $resumen['avance_global'] }}%</div><div class="rotulo">Avance global</div></td>
+            <td><div class="valor alerta">{{ $resumen['retrasados'] }}</div><div class="rotulo">Retrasados</div></td>
+            <td><div class="valor alerta">{{ $resumen['tareas_vencidas'] }}</div><div class="rotulo">Tareas vencidas</div></td>
+            <td><div class="valor alerta">{{ $resumen['hitos_vencidos'] }}</div><div class="rotulo">Hitos vencidos</div></td>
         </tr>
     </table>
 
