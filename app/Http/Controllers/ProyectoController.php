@@ -7,27 +7,41 @@ use App\Models\EntregableIA;
 use App\Models\Proyecto;
 use App\Models\User;
 use App\Services\AI\ProjectContextBuilder;
+use App\Support\LineaDeTiempo;
 use Illuminate\Http\Request;
 
 class ProyectoController extends Controller
 {
     public function index(Request $request)
     {
-        // Portal del Cliente: tarjetas simples con el avance de cada proyecto.
+        // Misma URL, dos experiencias: el Cliente ve tarjetas con el avance
+        // de sus proyectos; el equipo interno, el listado con filtros.
         if ($request->user()->esCliente()) {
-            $proyectos = Proyecto::visiblePara($request->user())
-                ->with(['cliente', 'pm'])
-                ->withCount([
-                    'tareas',
-                    'tareas as tareas_completadas' => fn ($q) => $q->where('estado', 'completada'),
-                    'hitos as hitos_completados' => fn ($q) => $q->where('completado', true),
-                ])
-                ->orderBy('fecha_inicio')
-                ->get();
-
-            return view('cliente.proyectos', compact('proyectos'));
+            return $this->misProyectos($request->user());
         }
 
+        return $this->listadoInterno($request);
+    }
+
+    /** Portal del Cliente: tarjetas simples con el avance de cada proyecto. */
+    private function misProyectos(User $usuario)
+    {
+        $proyectos = Proyecto::visiblePara($usuario)
+            ->with(['cliente', 'pm'])
+            ->withCount([
+                'tareas',
+                'tareas as tareas_completadas' => fn ($q) => $q->where('estado', 'completada'),
+                'hitos as hitos_completados' => fn ($q) => $q->where('completado', true),
+            ])
+            ->orderBy('fecha_inicio')
+            ->get();
+
+        return view('cliente.proyectos', compact('proyectos'));
+    }
+
+    /** Listado interno: buscador, filtros y paginación, con modales de alta/edición. */
+    private function listadoInterno(Request $request)
+    {
         $proyectos = Proyecto::visiblePara($request->user())
             ->with(['cliente', 'pm'])
             ->when($request->filled('q'), function ($query) use ($request) {
@@ -88,161 +102,64 @@ class ProyectoController extends Controller
     {
         abort_unless($request->user()->puedeVer($proyecto), 403);
 
-        // Portal del Cliente: una linea de tiempo simple con hitos, sprints,
-        // novedades y entregables aprobados del proyecto.
+        // Misma URL, dos experiencias: el Cliente ve su portal y el equipo
+        // interno, la ficha completa. Cada una arma lo suyo en su método.
         if ($request->user()->esCliente()) {
-            $proyecto->load(['cliente', 'pm', 'hitos', 'sprints.tareas']);
-
-            $hitos = $proyecto->hitos
-                ->map(fn ($h) => [
-                    'fecha' => $h->fecha_objetivo,
-                    'fecha_texto' => $h->fecha_objetivo?->format('d/m/Y'),
-                    'tipo' => 'hito',
-                    'titulo' => $h->nombre,
-                    'detalle' => $h->descripcion,
-                    'descripcion' => $h->descripcion,
-                    'hecho' => (bool) $h->completado,
-                    'vencido' => ! $h->completado && $h->fecha_objetivo->isPast(),
-                ]);
-
-            $sprints = $proyecto->sprints
-                ->map(function ($sp) {
-                    $total = $sp->tareas->count();
-                    $hechas = $sp->tareas->where('estado', 'completada')->count();
-                    $fin = $sp->fecha_fin?->format('d/m/Y');
-                    $avance = $total > 0 ? (int) round($hechas * 100 / $total) : 0;
-                    $completo = $total > 0 && $hechas === $total;
-                    $termino = $sp->fecha_fin?->isPast() ?? false;
-                    // Un sprint que ya termino sin actividades cargadas no deja
-                    // nada pendiente: para el cliente es una etapa cerrada.
-                    $cerrado = $completo || ($termino && $total === 0);
-
-                    // Detalle en lenguaje del cliente: sin contadores triviales
-                    // ("1 de 1") ni la palabra "tareas"; el rango de fechas ya
-                    // se muestra aparte en la linea de tiempo.
-                    if ($completo) {
-                        $detalle = $total === 1 ? 'La actividad está lista' : "Las {$total} actividades están listas";
-                    } elseif ($termino && $total > 0) {
-                        $detalle = "Finalizó el {$fin} con actividades sin completar";
-                    } elseif ($termino) {
-                        $detalle = "Cerró el {$fin} sin actividades registradas";
-                    } elseif ($sp->fecha_inicio?->isFuture()) {
-                        $detalle = $total > 0 ? "{$total} actividades planificadas" : 'Actividades por definir';
-                    } else {
-                        $detalle = $total > 0 ? "{$total} actividades en camino" : 'Actividades por definir';
-                    }
-
-                    return [
-                        'fecha' => $sp->fecha_inicio,
-                        'fecha_texto' => $sp->fecha_inicio?->format('d/m/Y'),
-                        'fecha_fin_texto' => $fin,
-                        'tipo' => 'sprint',
-                        'titulo' => $sp->nombre,
-                        'detalle' => $detalle,
-                        'descripcion' => $sp->descripcion,
-                        'resumen_ia' => $sp->resumen_ia,
-                        'hecho' => $cerrado,
-                        // Un sprint que ya termino con actividad pendiente tambien
-                        // queda atrasado: asi el "Estamos acá" no cae en un punto vencido.
-                        'vencido' => ! $completo && $termino && $total > 0,
-                        'avance' => $avance,
-                    ];
-                });
-
-            $linea = $hitos->concat($sprints)
-                ->sortBy(fn ($item) => $item['fecha'])
-                ->values();
-
-            // Estado visible de cada punto: Completado / Atrasado / En curso
-            // (el primer punto sin terminar) / Pendiente. Lo consume la linea
-            // de tiempo y el pop-up de detalle, asi ambos muestran lo mismo.
-            $enCursoMarcado = false;
-            $linea = $linea->map(function ($item) use (&$enCursoMarcado) {
-                if ($item['hecho']) {
-                    $item['estado'] = 'Completado';
-                    $item['estado_clase'] = 'bg-emerald-100 text-emerald-700';
-                } elseif ($item['vencido']) {
-                    $item['estado'] = 'Atrasado';
-                    $item['estado_clase'] = 'bg-red-100 text-red-700';
-                } elseif (! $enCursoMarcado) {
-                    $enCursoMarcado = true;
-                    $item['estado'] = 'En curso';
-                    $item['estado_clase'] = 'bg-[#00d99a]/20 text-[#00795a]';
-                } else {
-                    $item['estado'] = 'Pendiente';
-                    $item['estado_clase'] = 'bg-gray-100 text-gray-500';
-                }
-
-                return $item;
-            });
-
-            // Con muchos puntos la linea se vuelve ilegible: el pasado completado
-            // se colapsa en un unico nodo-resumen y queda visible lo relevante
-            // (el ultimo completado como contexto, lo atrasado, lo en curso y lo
-            // pendiente). El historial viaja en el nodo para listarlo en el pop-up.
-            $completados = $linea->filter(fn ($item) => $item['hecho'])->sortBy('fecha');
-            if ($completados->count() > 2) {
-                $corte = $completados->last()['fecha'];
-
-                $historial = $linea
-                    ->filter(fn ($item) => $item['hecho'] && $item['fecha']->lt($corte))
-                    ->values();
-
-                $linea = collect([
-                    [
-                        'fecha' => $historial->first()['fecha'],
-                        'fecha_texto' => null,
-                        'tipo' => 'resumen',
-                        'titulo' => $historial->count() === 1
-                            ? 'Etapa completada'
-                            : 'Etapas completadas ('.$historial->count().')',
-                        'detalle' => 'Toca para ver el historial',
-                        'hecho' => true,
-                        'vencido' => false,
-                        'estado' => 'Completado',
-                        'estado_clase' => 'bg-emerald-100 text-emerald-700',
-                        'historial' => $historial->all(),
-                    ],
-                ])->merge(
-                    $linea->filter(fn ($item) => ! $item['hecho'] || ! $item['fecha']->lt($corte))->values()
-                )->values();
-            }
-
-            $novedades = $proyecto->actualizaciones()
-                ->with('autor')
-                ->where('visible_cliente', true)
-                ->latest('fecha')
-                ->latest('id')
-                ->take(5)
-                ->get();
-
-            $entregables = EntregableIA::where('proyecto_id', $proyecto->id)
-                ->where('estado', 'aprobado')
-                ->latest('generado_en')
-                ->take(5)
-                ->get();
-
-            $cambios = $proyecto->solicitudesCambio()
-                ->with('solicitante')
-                ->latest()
-                ->take(5)
-                ->get();
-
-            $totalTareas = $proyecto->tareas()->count();
-            $tareasHechas = $proyecto->tareas()->where('estado', 'completada')->count();
-            $avanceProyecto = $totalTareas > 0 ? (int) round($tareasHechas * 100 / $totalTareas) : 0;
-
-            return view('cliente.proyecto', compact(
-                'proyecto', 'linea', 'novedades', 'entregables', 'cambios',
-                'totalTareas', 'tareasHechas', 'avanceProyecto'
-            ));
+            return $this->portalCliente($proyecto);
         }
 
+        return $this->fichaInterna($request, $proyecto, $contextBuilder);
+    }
+
+    /**
+     * Portal del Cliente: línea de tiempo con hitos, sprints, novedades y
+     * entregables aprobados. Las reglas de la línea viven en
+     * App\Support\LineaDeTiempo; acá solo se reúnen los datos de la vista.
+     */
+    private function portalCliente(Proyecto $proyecto)
+    {
+        $proyecto->load(['cliente', 'pm', 'hitos', 'sprints.tareas']);
+
+        $linea = (new LineaDeTiempo)->construir($proyecto);
+
+        $novedades = $proyecto->actualizaciones()
+            ->with('autor')
+            ->where('visible_cliente', true)
+            ->latest('fecha')
+            ->latest('id')
+            ->take(5)
+            ->get();
+
+        // El Cliente solo recibe entregables aprobados (regla del dominio).
+        $entregables = EntregableIA::where('proyecto_id', $proyecto->id)
+            ->where('estado', 'aprobado')
+            ->latest('generado_en')
+            ->take(5)
+            ->get();
+
+        $cambios = $proyecto->solicitudesCambio()
+            ->with('solicitante')
+            ->latest()
+            ->take(5)
+            ->get();
+
+        $totalTareas = $proyecto->tareas()->count();
+        $tareasHechas = $proyecto->tareas()->where('estado', 'completada')->count();
+        $avanceProyecto = $totalTareas > 0 ? (int) round($tareasHechas * 100 / $totalTareas) : 0;
+
+        return view('cliente.proyecto', compact(
+            'proyecto', 'linea', 'novedades', 'entregables', 'cambios',
+            'totalTareas', 'tareasHechas', 'avanceProyecto'
+        ));
+    }
+
+    /** Ficha completa para los roles internos: todo lo del proyecto. */
+    private function fichaInterna(Request $request, Proyecto $proyecto, ProjectContextBuilder $contextBuilder)
+    {
         $proyecto->load(['cliente', 'pm', 'tareas', 'hitos', 'facturas']);
 
         $actualizaciones = $proyecto->actualizaciones()
             ->with('autor')
-            ->when($request->user()->esCliente(), fn ($query) => $query->where('visible_cliente', true))
             ->latest('fecha')
             ->latest('id')
             ->get();
