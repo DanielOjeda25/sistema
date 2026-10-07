@@ -132,4 +132,29 @@ class ModulosTest extends TestCase
         $resp = $this->actingAs($pm)->get("/tareas?asignado_a={$roberto->id}&prioridad=alta")->assertOk();
         $resp->assertSee('No hay tareas registradas');
     }
+
+    public function test_un_usuario_sin_rol_interno_no_puede_crear_nada(): void
+    {
+        // La escritura se corta en la ruta, no solo en la vista: un Cliente
+        // recibe 403 en cualquier módulo aunque teclee la petición a mano.
+        Role::firstOrCreate(['name' => 'Cliente']);
+        $cliente = User::create([
+            'name' => 'Cliente', 'apellido' => 'Escritura', 'email' => 'cliente.escritura@test.com',
+            'estado' => 'activo', 'password' => bcrypt('1234'),
+        ]);
+        $cliente->assignRole('Cliente');
+
+        $this->actingAs($cliente)->post('/clientes', [
+            'nombre' => 'X', 'apellido' => 'Y', 'email' => 'x@x.com', 'estado' => 'activo',
+        ])->assertForbidden();
+
+        $this->actingAs($cliente)->post('/hitos', [
+            'nombre' => 'X', 'fecha_objetivo' => '2026-12-01',
+            'completado' => '0', 'proyecto_id' => 1,
+        ])->assertForbidden();
+
+        $this->actingAs($cliente)->post('/sprints', [
+            'nombre' => 'X', 'proyecto_id' => 1,
+        ])->assertForbidden();
+    }
 }
