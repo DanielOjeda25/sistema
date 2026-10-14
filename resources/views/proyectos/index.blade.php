@@ -1,4 +1,5 @@
 <x-app-layout>
+    {{-- Encabezado del módulo; el alta solo está disponible para Jefe y PM. --}}
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
@@ -16,12 +17,14 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
 
+                {{-- Confirmación mostrada después de crear, editar o eliminar. --}}
                 @if (session('success'))
                     <div class="mb-4 p-4 bg-green-100 text-green-700 rounded-lg">
                         {{ session('success') }}
                     </div>
                 @endif
 
+                {{-- Buscador y filtros combinables del listado interno. --}}
                 <form method="GET" action="{{ route('proyectos.index') }}" class="mb-5 rounded-xl border border-gray-100 bg-gray-50/60 p-4">
                     <div class="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                         <div class="col-span-2 md:col-span-3 xl:col-span-2">
@@ -70,6 +73,7 @@
                     </div>
                 </form>
 
+                {{-- Tabla paginada de proyectos y acciones permitidas por rol. --}}
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
@@ -84,6 +88,7 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200 text-gray-700">
                             @forelse ($proyectos as $proyecto)
+                                {{-- Datos serializados que consumen los modales de edición y vista rápida. --}}
                                 @php($valoresProyecto = $proyecto->only(['nombre', 'descripcion', 'estado', 'cliente_id', 'pm_id']) + ['fecha_inicio' => $proyecto->fecha_inicio?->format('Y-m-d'), 'fecha_fin_estimada' => $proyecto->fecha_fin_estimada?->format('Y-m-d')])
                                 @php($valoresVerProyecto = [
                                     'nombre' => $proyecto->nombre,
@@ -103,6 +108,7 @@
                                     <td class="px-6 py-4">{{ $proyecto->fecha_inicio?->format('d/m/Y') ?? 'N/A' }}</td>
                                     <td class="px-6 py-4 text-sm font-medium">
                                         <div class="flex items-center gap-3">
+                                            {{-- El historial y la eliminación son exclusivos del Jefe. --}}
                                             @hasanyrole('Jefe')
                                                 <a href="{{ route('auditoria.index', ['modelo' => 'App\Models\Proyecto', 'registro' => $proyecto->id]) }}"
                                                    class="text-gray-400 hover:text-gray-700" title="Historial de cambios" aria-label="Historial">
@@ -115,6 +121,7 @@
                                             <a href="{{ route('tareas.tablero', ['proyecto' => $proyecto->id]) }}" class="text-indigo-600 hover:text-indigo-800" title="Ver tablero de tareas" aria-label="Ver tablero de tareas">
                                                 <x-heroicon-o-squares-2x2 class="w-5 h-5" />
                                             </a>
+                                            {{-- Jefe y PM pueden abrir el formulario de edición. --}}
                                             @hasanyrole('Jefe|PM')
                                                 <button type="button" data-abrir-modal="modal-proyecto-editar"
                                                         data-url="{{ route('proyectos.update', $proyecto) }}"
@@ -148,6 +155,7 @@
                     </table>
                 </div>
 
+                {{-- Conserva los filtros actuales al navegar entre páginas. --}}
                 <div class="mt-4">
                     {{ $proyectos->links() }}
                 </div>
@@ -156,6 +164,7 @@
         </div>
     </div>
 
+    {{-- Modal de creación reutilizando los campos compartidos del proyecto. --}}
     @hasanyrole('Jefe|PM')
     <x-crud-modal id="modal-proyecto-crear" abrir-con-errores titulo="Nuevo Proyecto">
         <form method="POST" action="{{ route('proyectos.store') }}" class="flex flex-col gap-4">
@@ -170,6 +179,7 @@
     </x-crud-modal>
     @endhasanyrole
 
+    {{-- Modales compartidos para editar, consultar y confirmar eliminaciones. --}}
     @hasanyrole('Jefe|PM')
     @include('proyectos._modal_editar')
     @endhasanyrole

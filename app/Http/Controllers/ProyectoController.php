@@ -12,6 +12,9 @@ use Illuminate\Http\Request;
 
 class ProyectoController extends Controller
 {
+    /**
+     * Muestra la entrada al módulo según el rol del usuario autenticado.
+     */
     public function index(Request $request)
     {
         // Misma URL, dos experiencias: el Cliente ve tarjetas con el avance
@@ -81,6 +84,9 @@ class ProyectoController extends Controller
 
     }
 
+    /**
+     * Valida y registra un proyecto nuevo.
+     */
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -98,6 +104,9 @@ class ProyectoController extends Controller
         return ($request->input('desde_modal') ? redirect()->back() : redirect()->route('proyectos.index'))->with('success', 'Proyecto creado correctamente.');
     }
 
+    /**
+     * Muestra el detalle del proyecto con la experiencia correspondiente al rol.
+     */
     public function show(Request $request, Proyecto $proyecto, ProjectContextBuilder $contextBuilder)
     {
         abort_unless($request->user()->puedeVer($proyecto), 403);
@@ -182,6 +191,9 @@ class ProyectoController extends Controller
         return view('proyectos.show', compact('proyecto', 'actualizaciones', 'informes', 'progreso', 'clientes', 'usuarios', 'proyectos'));
     }
 
+    /**
+     * Valida y guarda los cambios realizados sobre un proyecto existente.
+     */
     public function update(Request $request, Proyecto $proyecto)
     {
         $data = $request->validate([
@@ -199,6 +211,9 @@ class ProyectoController extends Controller
         return ($request->input('desde_modal') ? redirect()->back() : redirect()->route('proyectos.index'))->with('success', 'Proyecto actualizado correctamente.');
     }
 
+    /**
+     * Elimina el proyecto y vuelve al listado con una confirmación.
+     */
     public function destroy(Proyecto $proyecto)
     {
         $proyecto->delete();
