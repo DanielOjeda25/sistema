@@ -1,0 +1,118 @@
+CRUZNEGRA                                                                                                                                                                   Análisis y Diseño de Sistemas - Octubre 2026
+Sistema de Gestión Interna - Documentación de Análisis y Diseño                                                                                                                     Diagramas - Casos de uso y dominio
+
+
+
+Casos de uso actualizados
+Asociaciones y permisos verificados contra routes/web.php y controladores.
+
+
+
+
+    Sistema Cruz Negra - Módulo Proyectos
+
+
+         CU-01                                                      CU-02                                                        CU-03                           CU-04
+
+         Crear proyecto                                             Consultar proyectos visibles                                 Editar proyecto                 Eliminar proyecto
+
+
+
+
+           Jefe     PM                                                Jefe     PM       PO      Prog     Cliente                   Jefe     PM                    Jefe
+
+
+
+
+         CU-05                                                      CU-06                                                        CU-07                           CU-08
+
+         Planificar tareas, hitos y sprints                         Registrar actualización                                      Gestionar solicitud de cambio   Gestionar entregables
+
+
+
+
+           Jefe     PM      PO                                        Jefe     PM       PO      Prog                               Jefe     PM      PO            Jefe        PM     PO      Prog
+
+
+
+
+         CU-09                                                      CU-10                                                        CU-11                           CU-12
+
+         Generar informe de avance IA                               Aprobar o retirar informe IA                                 Generar resumen IA de sprint    Ver portal e informes aprobados
+
+
+
+
+           Jefe     PM      PO       Prog                             Jefe     PM       PO                                         Jefe     PM      PO   Prog     Cliente
+
+
+
+
+         Los distintivos de rol expresan la asociación actor-caso de uso. Cliente: solo proyectos de su empresa y contenido aprobado.
+         Programador figura como Prog. Las operaciones de escritura están protegidas por middleware; la visibilidad también se verifica en el dominio.
+
+
+
+
+Diagramas - Casos de uso y dominio                                                                                                                                                     DOC-PRO-2026-011 - Página 1 de 2
+CRUZNEGRA                                                                                                                                                                                                                   Análisis y Diseño de Sistemas - Octubre 2026
+Sistema de Gestión Interna - Documentación de Análisis y Diseño                                                                                                                                                                       Diagramas - Casos de uso y dominio
+
+
+
+Modelo de dominio actualizado
+Entidades, claves de relación y cardinalidades implementadas en modelos Eloquent y migraciones.
+
+
+
+                       CLIENTE                                                               USUARIO                                                                       SPRINT                                                           HITO
+
+  id (PK)                                                              id (PK) - cliente_id (FK, nullable)                                          id (PK) - proyecto_id (FK)                                      id (PK) - proyecto_id (FK)
+  nombre - apellido - email                                            name - apellido - email                                                      nombre - descripcion                                            nombre - descripcion
+  telefono - empresa                                                   estado - password                                                            fecha_inicio - fecha_fin                                        fecha_objetivo
+  estado: activo | inactivo                                            roles con Spatie Permission                                                  estado - resumen_ia                                             completado (booleano)
+
+
+
+
+                               1                                                                     1                                                                     N                                                               N
+                                                               posee                                     gestiona como PM                                       organiza                                    marca
+                                                                                                          N                 N                              1               1
+
+                                                                                                                                  PROYECTO
+
+                                                                                               id (PK) - cliente_id (FK) - pm_id (FK Usuario)
+                                                                                               nombre - descripcion
+                                                                                               fecha_inicio - fecha_fin_estimada
+                                                                                               estado: pendiente | en_progreso | completado | cancelado
+                                                                                               created_at - updated_at
+
+
+
+
+                                                                                                                                      1        1
+
+
+                                                                           contiene                           recibe                      informa                       genera                    factura
+
+
+                           N                                                       N                                                       N                                                        N                                                 N
+
+                     TAREA                                        SOLICITUD CAMBIO                                                ACTUALIZACIÓN                                              ENTREGABLE IA                                          FACTURA
+
+  proyecto_id (FK)                                      proyecto_id (FK)                                               proyecto_id (FK)                                          proyecto_id (FK)                                   proyecto_id (FK)
+  sprint_id (FK, nullable)                              solicitado_por (FK Usuario)                                    creado_por (FK Usuario)                                   generado_por - aprobado_por?                       emitida_por (FK Usuario)
+  solicitud_cambio_id (nullable)                        titulo - descripcion                                           titulo - descripcion                                      titulo - contenido - tipo                          numero - monto - detalle
+  asignado_a (FK Usuario)                               estado                                                         tipo - fecha                                              origen - modelo_ia - estado                        fecha_emision
+  titulo - estado - prioridad                           prioridad                                                      visible_cliente                                           visible_cliente - generado_en                      fecha_vencimiento - estado
+  fecha_limite - orden                                                                                                                                                           contexto_fuente - mensaje_error
+
+
+
+
+   Relaciones complementarias verificadas
+   Cliente 1:N Usuario - Sprint 1:N Tarea opcional - SolicitudCambio 1:N Tarea opcional - Usuario crea actualizaciones, genera/aprueba entregables, solicita cambios, ejecuta tareas y emite facturas.
+
+
+Diagramas - Casos de uso y dominio                                                                                                                                                                                                       DOC-PRO-2026-011 - Página 2 de 2
+

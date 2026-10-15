@@ -121,10 +121,11 @@
 
     @hasanyrole('Jefe|PM')
         <x-crud-modal id="modal-cliente-crear" abrir-con-errores titulo="Nuevo Cliente">
-            <form method="POST" action="{{ route('clientes.store') }}" class="flex flex-col gap-4">
+            <form method="POST" action="{{ route('clientes.store') }}" class="flex flex-col gap-4"
+                  data-crud-create data-crud-defaults='{"estado":"activo"}' autocomplete="off">
                 @csrf
                 <input type="hidden" name="desde_modal" value="1">
-                @include('clientes._campos', ['prefijo' => 'crear-'])
+                @include('clientes._campos', ['prefijo' => 'crear-', 'esCreacion' => true])
                 <div class="flex items-center justify-end space-x-4 pt-2 border-t border-gray-200">
                     <button type="button" data-crud-cerrar class="text-sm text-gray-600 hover:underline">Cancelar</button>
                     <x-primary-button>Guardar Cliente</x-primary-button>

@@ -49,7 +49,7 @@ class ProyectosCrudTest extends TestCase
     {
         $this->actingAs($this->jefe())->post(route('proyectos.store'), [
             'nombre' => 'Proyecto nuevo del Jefe', 'descripcion' => 'prueba',
-            'fecha_inicio' => '2026-10-01', 'fecha_fin_estimada' => '2026-12-01',
+            'fecha_inicio' => now()->toDateString(), 'fecha_fin_estimada' => now()->addMonths(2)->toDateString(),
             'estado' => 'pendiente', 'cliente_id' => 1, 'pm_id' => $this->jefe()->id,
         ])->assertRedirect();
 
@@ -90,7 +90,7 @@ class ProyectosCrudTest extends TestCase
         // tiene permiso según las rutas (role:Jefe|PM).
         $this->actingAs($this->pm())->post(route('proyectos.store'), [
             'nombre' => 'Proyecto nuevo del PM', 'descripcion' => 'prueba',
-            'fecha_inicio' => '2026-10-01', 'fecha_fin_estimada' => '2026-12-01',
+            'fecha_inicio' => now()->toDateString(), 'fecha_fin_estimada' => now()->addMonths(2)->toDateString(),
             'estado' => 'pendiente', 'cliente_id' => 1, 'pm_id' => $this->pm()->id,
         ])->assertRedirect();
 
@@ -124,5 +124,19 @@ class ProyectosCrudTest extends TestCase
         $this->actingAs($this->pm())->delete(route('proyectos.destroy', $proyecto))->assertForbidden();
 
         $this->assertDatabaseHas('proyectos', ['id' => $proyecto->id]);
+    }
+
+    #[Test]
+    public function no_se_puede_crear_un_proyecto_con_fecha_de_inicio_pasada(): void
+    {
+        $this->actingAs($this->jefe())->post(route('proyectos.store'), [
+            'nombre' => 'Proyecto con fecha vieja',
+            'fecha_inicio' => now()->subDay()->toDateString(),
+            'estado' => 'pendiente',
+            'cliente_id' => 1,
+            'pm_id' => $this->jefe()->id,
+        ])->assertSessionHasErrors('fecha_inicio');
+
+        $this->assertDatabaseMissing('proyectos', ['nombre' => 'Proyecto con fecha vieja']);
     }
 }

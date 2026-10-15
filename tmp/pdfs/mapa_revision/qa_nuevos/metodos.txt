@@ -1,0 +1,171 @@
+CRUZNEGRA                                                                                                                                                      Análisis y Diseño de Sistemas - Octubre 2026
+Sistema de Gestión Interna - Documentación de Análisis y Diseño                                                                                                    Métodos y funciones - Módulo Proyectos
+
+
+
+Métodos del controlador de Proyectos
+Firmas, visibilidad y responsabilidades verificadas en ProyectoController y rutas.
+
+
+
+   ProyectoController - navegación y consulta                                        ProyectoController - escritura
+
+   public index(Request)                                                             public store(Request)
+   Elige listado interno o portal Cliente según el rol autenticado.                  Valida y crea. La fecha inicial debe ser hoy o posterior.
+
+   private misProyectos(User)                                                        public update(Request, Proyecto)
+   Obtiene proyectos visibles y contadores de tareas e hitos.                        Valida y actualiza datos y asociaciones del proyecto.
+
+   private listadoInterno(Request)                                                   public destroy(Proyecto)
+   Aplica texto, estado, cliente, PM, fechas y paginación de 15.                     Elimina el proyecto; la ruta está reservada al Jefe.
+
+   public show(Request, Proyecto, ProjectContextBuilder)                             GET /proyectos
+   Comprueba puedeVer() y deriva a la experiencia del rol.                           index(); cualquier usuario autenticado, con visibilidad por empresa.
+
+   private portalCliente(Proyecto)                                                   GET /proyectos/{proyecto}
+   Reúne línea de tiempo, novedades, cambios, avance e informes aprobados.           show(); devuelve 403 cuando el Cliente intenta abrir un proyecto ajeno.
+
+   private fichaInterna(Request, Proyecto, Builder)                                  POST y PUT/PATCH
+   Carga operación interna, progreso, actualizaciones e informes IA.                 store/update; Jefe y PM mediante middleware de rol.
+
+                                                                                     DELETE /proyectos/{proyecto}
+                                                                                     destroy; acceso exclusivo del rol Jefe.
+
+
+
+
+Métodos y funciones - Módulo Proyectos                                                                                                                                    DOC-PRO-2026-011 - Página 1 de 4
+CRUZNEGRA                                                                                                                                                                                         Análisis y Diseño de Sistemas - Octubre 2026
+Sistema de Gestión Interna - Documentación de Análisis y Diseño                                                                                                                                         Métodos y funciones - Módulo Proyectos
+
+
+
+Métodos del modelo y entidades relacionadas
+Relaciones Eloquent, scopes de visibilidad y reglas de acceso implementadas.
+
+
+
+   Proyecto                                                                                                            Usuario y Cliente
+
+   casts()                                                                                                             User::esCliente()
+   Convierte fecha_inicio y fecha_fin_estimada en fechas.                                                              Determina si la cuenta tiene rol Cliente.
+
+   scopeVisiblePara(Builder, User)                                                                                     User::puedeVer(Model)
+   Restringe al Cliente por cliente_id; roles internos ven todos.                                                      Comprueba pertenencia del proyecto a la empresa representada.
+
+   cliente() / pm()                                                                                                    User::scopeAsignables()
+   Relaciones belongsTo con Cliente y Usuario responsable.                                                             Limita asignaciones a PM, PO y Programador.
+
+   tareas() / sprints() / hitos()                                                                                      User::proyectosComoPm()
+   Colecciones de planificación y ejecución del proyecto.                                                              Proyectos gestionados por el usuario mediante pm_id.
+
+   entregablesIa() / facturas()                                                                                        Cliente::proyectos() / usuarios()
+   Colecciones de resultados y facturación.                                                                            Proyectos y cuentas asociadas a la ficha Cliente.
+
+   actualizaciones() / solicitudesCambio()
+   Novedades publicables y pedidos de cambio relacionados.
+
+
+
+
+   Trabajo                                                              Seguimiento                                                                                  Entregables
+
+   Tarea::scopeVisiblePara()                                            Hito::scopeVisiblePara()                                                                     EntregableIA::scopeVisiblePara()
+   Filtra tareas por empresa para el Cliente.                           Aplica el límite de visibilidad por empresa.                                                 Cliente ve manuales o IA aprobados y publicados.
+
+   proyecto() / sprint()                                                SolicitudCambio::tareas()                                                                    generador() / aprobador()
+   Proyecto obligatorio y sprint opcional.                              Tareas nacidas de una solicitud aceptada.                                                    Usuarios que generaron y aprobaron el contenido.
+
+   asignado() / solicitudCambio()                                       ActualizacionProyecto::autor()                                                               TIPOS
+   Responsable y origen opcional de la tarea.                           Usuario que registró la novedad.                                                             Documento, informe, avance, resumen, transcripción y
+                                                                                                                                                                     diagrama.
+   Sprint::tareas()                                                     Factura::emisor()
+   Actividades organizadas dentro del sprint.                           Usuario responsable de emitir la factura.
+
+
+
+
+Métodos y funciones - Módulo Proyectos                                                                                                                                                                         DOC-PRO-2026-011 - Página 2 de 4
+CRUZNEGRA                                                                                                                                               Análisis y Diseño de Sistemas - Octubre 2026
+Sistema de Gestión Interna - Documentación de Análisis y Diseño                                                                                             Métodos y funciones - Módulo Proyectos
+
+
+
+Funciones de IA, progreso y portal Cliente
+Servicios desacoplados que preparan contexto, generan, revisan y publican resultados.
+
+
+
+   Informes de avance                                                                   Aprobación y publicación
+
+   ProjectContextBuilder::build(Proyecto)                                               InformeIAController::store()
+   Construye contexto publicable: proyecto, progreso, tareas, hitos y actualizaciones   Solicita el borrador y devuelve éxito o error controlado.
+   visibles.
+                                                                                        InformeIAController::publish()
+   ProjectReportService::generate(Proyecto, User)                                       Aprueba, marca visible y registra aprobador y fecha.
+   Genera un EntregableIA borrador y registra errores sin publicarlo.
+                                                                                        InformeIAController::unpublish()
+   ProjectReportGenerator::generate(array)                                              Retira el informe del Cliente y vuelve a revisado.
+   Contrato intercambiable del proveedor de inteligencia artificial.
+                                                                                        EntregableIA::scopeVisiblePara()
+   OpenRouterProjectReportGenerator::generate(array)                                    Evita exponer al Cliente borradores, fallos o IA no aprobada.
+   Invoca modelo primario/fallback y limpia el texto resultante.
+
+
+
+
+   Línea de tiempo                                                                      Resumen de sprint
+
+   LineaDeTiempo::construir(Proyecto)                                                   SprintContextBuilder::build(Sprint)
+   Combina hitos y sprints, ordena y prepara puntos visibles.                           Prepara el contexto de actividades y avance del sprint.
+
+   hitos() / sprints()                                                                  SprintSummaryService::generate(Sprint, bool)
+   Calculan detalle, avance, completado y atraso.                                       Usa caché salvo regeneración forzada y persiste resumen_ia.
+
+   marcarEstados()                                                                      OpenRouterSprintSummaryGenerator::generate(array)
+   Asigna Completado, Atrasado, En curso o Pendiente.                                   Genera resumen estructurado con modelo y fallback.
+
+   colapsarHistorial()                                                                  SprintSummaryController::store()
+   Resume etapas antiguas cuando el historial crece.                                    Expone JSON con resumen, modelo y bandera cacheado.
+
+
+
+
+Métodos y funciones - Módulo Proyectos                                                                                                                             DOC-PRO-2026-011 - Página 3 de 4
+CRUZNEGRA                                                                                                                                                                            Análisis y Diseño de Sistemas - Octubre 2026
+Sistema de Gestión Interna - Documentación de Análisis y Diseño                                                                                                                           Métodos y funciones - Módulo Proyectos
+
+
+
+Flujo funcional hasta el resumen visible
+Secuencia real de llamadas y controles desde la carga del trabajo hasta el portal Cliente.
+
+
+
+
+     1     Crear proyecto                                          2     Planificar                                                  3     Registrar avances                  4     Construir contexto
+
+   ProyectoController::store valida y                            Se cargan hitos, sprints y tareas                                 ActualizacionProyectoController::store   ProjectContextBuilder::build calcula
+   persiste Cliente, PM, fechas y estado.                        vinculadas al proyecto.                                           guarda novedades y decide visibilidad.   progreso y reúne datos publicables.
+
+
+
+
+     5     Generar borrador IA                                     6     Revisar y publicar                                          7     Consultar portal                   8     Retirar si corresponde
+
+   ProjectReportService::generate crea                           InformeIAController::publish aprueba y                            ProyectoController::portalCliente        unpublish oculta el informe y conserva
+   EntregableIA como borrador no visible.                        habilita visible_cliente.                                         muestra línea, avances e informes        trazabilidad para revisión.
+                                                                                                                                   aprobados.
+
+
+
+
+    Regla de publicación
+    El modelo de IA nunca publica directamente. El resultado nace como borrador, requiere aprobación de Jefe/PM/PO y solo entonces se muestra al Cliente.
+    El Cliente queda limitado a su empresa mediante visiblePara() y puedeVer(); los informes fallidos o retirados no se exponen.
+
+
+
+
+Métodos y funciones - Módulo Proyectos                                                                                                                                                           DOC-PRO-2026-011 - Página 4 de 4
+

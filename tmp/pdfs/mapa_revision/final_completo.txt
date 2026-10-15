@@ -1,0 +1,1017 @@
+CRUZNEGRA                                                                                                                                                                    Análisis y Diseño de Sistemas · Octubre 2026
+Sistema de Gestión Interna · Documentación de Análisis y Diseño                                                                                                Alcance exclusivo: módulo Proyectos · CU-01 Crear proyecto
+
+
+
+
+                                                                  MÓDULO PROYECTOS
+                                                       Documentación actualizada del CRUD completo
+                                                         Crear · Consultar · Editar · Eliminar · DSS · DSD · Contratos · Pruebas · Evidencia real
+
+
+
+
+                         Propósito. Documentar el CRUD completo del módulo Proyectos, incluidos sus contratos de operación. El contenido fue contrastado con
+                         la migración, el modelo Eloquent, ProyectoController, las rutas, los permisos y las pruebas automatizadas del repositorio al 5 de octubre
+                                                                                          de 2026.
+
+
+                                              Fuente verificada                              Resultado
+
+                                              Migración y modelo Proyecto                    8 campos funcionales, claves foráneas y marcas de tiempo
+
+                                              ProyectoController y rutas                     Listado/detalle, alta, modificación y eliminación implementados
+
+                                              Permisos                                       Lectura por rol; Jefe/PM escriben; solo Jefe elimina
+
+                                              Pruebas automatizadas                          12 pruebas relacionadas con proyecto aprobadas, 44 aserciones
+
+
+
+
+Portada y alcance                                                                                                                                                                   DOC-PRO-2026-010 · Página
+                                                                                                                                                                                      DOC-PRO-2026-010        1 de
+                                                                                                                                                                                                        · Página 1 18
+                                                                                                                                                                                                                   de 24
+   Documentación del módulo Proyectos                                                                                                                                              DOC-PRO-2026-010 · Página 1 de 25
+CRUZNEGRA                                                                                                                                                 Análisis y Diseño de Sistemas · Octubre 2026
+Sistema de Gestión Interna · Documentación de Análisis y Diseño                                                                             Alcance exclusivo: módulo Proyectos · CU-01 Crear proyecto
+
+
+
+
+Tabla proyectos
+Estructura implementada en 2026_05_28_033949_create_proyectos_table.php
+
+
+ Campo                           Tipo y nulabilidad               Regla                                               Uso
+
+ id                              BIGINT UNSIGNED · PK             Autoincremental                                     Identificador único
+
+ nombre                          VARCHAR(255) · NOT NULL          required|string|max:255                             Nombre visible del proyecto
+
+ descripcion                     TEXT · NULL                      nullable|string                                     Detalle funcional
+
+ fecha_inicio                    DATE · NOT NULL                  required|date                                       Inicio planificado
+
+ fecha_fin_estimada              DATE · NULL                      nullable|date|after_or_equal:fecha_inicio           Fin estimado
+
+ estado                          ENUM · NOT NULL                  pendiente | en_progreso | completado | cancelado    Por defecto: pendiente
+
+ cliente_id                      BIGINT UNSIGNED · FK             exists:clientes,id · ON DELETE CASCADE              Cliente propietario
+
+ pm_id                           BIGINT UNSIGNED · FK             exists:users,id · ON DELETE CASCADE                 Responsable asignado
+
+ created_at / updated_at         TIMESTAMP · NULL                 Gestionados por Eloquent                            Trazabilidad temporal
+
+
+
+
+                        Relaciones principales
+
+                                                           CLIENTE 1 —— N PROYECTO USUARIO 1 —— N PROYECTO (pm_id)
+                                         PROYECTO 1 —— N TAREA / SPRINT / HITO / ACTUALIZACIÓN / ENTREGABLE IA / SOLICITUD DE CAMBIO / FACTURA
+
+
+
+
+Modelo de datos                                                                                                                                                  DOC-PRO-2026-010 · Página
+                                                                                                                                                                   DOC-PRO-2026-010        2 de
+                                                                                                                                                                                     · Página 2 18
+                                                                                                                                                                                                de 24
+      Modelo de datos                                                                                                                                           DOC-PRO-2026-010 · Página 2 de 25
+CRUZNEGRA                                                                                                                                                                                                                    Análisis y Diseño de Sistemas · Octubre 2026
+Sistema de Gestión Interna · Documentación de Análisis y Diseño                                                                                                                                     Alcance exclusivo: módulo Proyectos · Modelo verificado con el código
+
+
+
+Modelo de dominio actualizado
+Entidades, claves de relación y cardinalidades implementadas en modelos Eloquent y migraciones.
+
+
+
+                       CLIENTE                                                             USUARIO                                                                        SPRINT                                                             HITO
+
+  id (PK)                                                             id (PK) · cliente_id (FK, nullable)                                          id (PK) · proyecto_id (FK)                                        id (PK) · proyecto_id (FK)
+  nombre · apellido · email                                           name · apellido · email                                                      nombre · descripcion                                              nombre · descripcion
+  telefono · empresa                                                  estado · password                                                            fecha_inicio · fecha_fin                                          fecha_objetivo
+  estado: activo | inactivo                                           roles mediante Spatie Permission                                             estado · resumen_ia                                               completado (booleano)
+                                                                                                                                                   Tarea.sprint_id es opcional
+
+
+                              1                                                                   1                                                                       N                                                                 N
+                                                              posee                                   gestiona como PM                                         organiza                                     marca
+                                                                                                       N                 N                                1               1
+
+                                                                                                                                PROYECTO
+
+                                                                                             id (PK) · cliente_id (FK) · pm_id (FK Usuario)
+                                                                                             nombre · descripcion
+                                                                                             fecha_inicio · fecha_fin_estimada
+                                                                                             estado: pendiente | en_progreso | completado | cancelado
+                                                                                             created_at · updated_at
+
+
+
+
+                                                                                                                                     1        1
+
+
+                                                                          contiene                         recibe                        informa                      genera                      factura
+
+
+                          N                                                      N                                                        N                                                        N                                                   N
+
+                     TAREA                                        SOLICITUD CAMBIO                                              ACTUALIZACIÓN                                                ENTREGABLE IA                                           FACTURA
+
+  proyecto_id (FK)                                      proyecto_id (FK)                                            proyecto_id (FK)                                             proyecto_id (FK)                                    proyecto_id (FK)
+  sprint_id (FK, nullable)                              solicitado_por (FK Usuario)                                 creado_por (FK Usuario)                                      generado_por · aprobado_por?                        emitida_por (FK Usuario)
+  solicitud_cambio_id (nullable)                        titulo · descripcion                                        titulo · descripcion                                         titulo · contenido · tipo                           numero · monto · detalle
+  asignado_a (FK Usuario)                               estado                                                      tipo · fecha                                                 origen · modelo_ia · estado                         fecha_emision
+  titulo · estado · prioridad                           prioridad                                                   visible_cliente (booleano)                                   visible_cliente · generado_en                       fecha_vencimiento · estado
+  fecha_limite · orden                                                                                                                                                           contexto_fuente · mensaje_error
+
+
+
+
+   Relaciones complementarias verificadas
+   Cliente 1:N Usuario · Sprint 1:N Tarea (opcional) · SolicitudCambio 1:N Tarea (opcional) · Usuario crea actualizaciones, genera/aprueba entregables, solicita cambios, ejecuta tareas y emite facturas.
+
+
+
+Modelo de datos                                                                                                                                                                                                                          DOC-PRO-2026-010 · Página 3 de 25
+CRUZNEGRA                                                                                                                                                                                 Análisis y Diseño de Sistemas · Octubre 2026
+Sistema de Gestión Interna · Documentación de Análisis y Diseño                                                                                                          Alcance exclusivo: módulo Proyectos · CU-01 Crear proyecto
+
+
+
+
+CRUD completo de Proyectos
+Operaciones, rutas y autorización efectiva
+
+
+ Operación                        Método y ruta                               Controlador                  Roles autorizados                         Resultado
+
+ Crear                            POST /proyectos                             store()                      Jefe · PM                                 Inserta y redirige con mensaje de éxito.
+
+ Consultar listado                GET /proyectos                              index()                      Todos autenticados                        Internos: listado filtrable. Cliente: solo proyectos de su empresa.
+
+                                                                                                                                                     Internos: ficha operativa. Cliente: avance, línea de tiempo y
+ Consultar detalle                GET /proyectos/{proyecto}                   show()                       Todos autenticados con visibilidad
+                                                                                                                                                     contenido publicado.
+
+ Editar                           PUT/PATCH /proyectos/{proyecto}             update()                     Jefe · PM                                 Valida, actualiza y redirige.
+
+ Eliminar                         DELETE /proyectos/{proyecto}                destroy()                    Solo Jefe                                 Elimina y vuelve al listado.
+
+
+
+
+                                         Rol                              Listar / ver                                         Crear                    Editar                       Eliminar
+
+                                         Jefe                             Sí · todos                                           Sí                       Sí                           Sí
+
+                                         PM                               Sí · todos                                           Sí                       Sí                           No
+
+                                         PO                               Sí · todos                                           No                       No                           No
+
+                                         Programador                      Sí · todos                                           No                       No                           No
+
+                                         Cliente                          Sí · solo su empresa                                 No                       No                           No
+
+
+
+
+                 Regla de seguridad: ocultar botones no alcanza. Las rutas de escritura están protegidas por middleware de rol y show() vuelve a comprobar puedeVer(proyecto), devolviendo 403 ante acceso
+                 ajeno.
+
+
+
+
+Alcance CRUD                                                                                                                                                                                     DOC-PRO-2026-010 · Página
+                                                                                                                                                                                                   DOC-PRO-2026-010        3 de
+                                                                                                                                                                                                                     · Página 3 18
+                                                                                                                                                                                                                                de 24
+   Documentación del módulo Proyectos                                                                                                                                                           DOC-PRO-2026-010 · Página 4 de 25
+CRUZNEGRA                                                                                                                                                                            Análisis y Diseño de Sistemas · Octubre 2026
+Sistema de Gestión Interna · Documentación de Análisis y Diseño                                                                                                       Alcance exclusivo: módulo Proyectos · CU-01 Crear proyecto
+
+
+
+
+CU-01 Crear proyecto
+Especificación funcional alineada al comportamiento actual
+
+
+                                                                                                                                         Elemento                Definición actual
+
+                                                                                                                                         Actor principal         Jefe o PM autenticado.
+
+                                                                                                                                                                 Registra un proyecto y lo vincula con un cliente y un
+                                                                                                                                         Descripción
+                                                                                                                                                                 usuario responsable.
+
+                                                                                                                                                                 Existen el cliente y el usuario seleccionado; el actor
+                                                                                                                                         Precondiciones
+                                                                                                                                                                 posee rol Jefe o PM.
+
+                                                                 CU-01 Crear proyecto                                                                            Se crea una fila en proyectos, se registra la auditoría y se
+                                                                                                                                         Postcondiciones
+                                                                                                                                                                 muestra “Proyecto creado correctamente.”
+
+                                                                                                                                                                 1. Abre Proyectos. 2. Pulsa “Nuevo proyecto”. 3.
+                                                                                                                                                                 Completa nombre, descripción, fechas, estado, cliente y
+                                                                                                                                         Flujo principal
+                                                                                                                                                                 responsable. 4. Pulsa “Guardar proyecto”. 5. El sistema
+           Jefe / PM                                                                                                                                             valida. 6. Persiste y vuelve al listado.
+
+                                                                                                                                                                 Si faltan datos obligatorios o las referencias no existen,
+                                                                                                                                         Alternativa 5a
+                                                                                                                                                                 vuelve al formulario con errores y no persiste.
+
+                                                                                                                                                                 Si fecha_fin_estimada es anterior a fecha_inicio, rechaza
+                                                                                                                                         Alternativa 5b
+                                                                                                                                                                 el alta.
+
+                                                                                                                                                                 Cliente, Programador y PO no disponen de la ruta de
+                                                                                                                                         Restricción de acceso
+                                                                                                                                                                 creación.
+
+
+
+
+Corrección respecto de la versión anterior: no existe ProyectoController::create(); el formulario vive en el modal del método index().
+
+
+
+
+Caso de uso                                                                                                                                                                                 DOC-PRO-2026-010 · Página
+                                                                                                                                                                                              DOC-PRO-2026-010        4 de
+                                                                                                                                                                                                                · Página 4 18
+                                                                                                                                                                                                                           de 24
+   Documentación del módulo Proyectos                                                                                                                                                      DOC-PRO-2026-010 · Página 5 de 25
+CRUZNEGRA                                                                                                                                                                       Análisis y Diseño de Sistemas · Octubre 2026
+Sistema de Gestión Interna · Documentación de Análisis y Diseño                                                                                                   Alcance exclusivo: módulo Proyectos · CU-01 Crear proyecto
+
+
+
+
+CU-02 Gestionar proyecto - Consulta
+Listado, filtros, detalle y aislamiento del Cliente
+
+
+
+                           Elemento                               Definición actual
+
+                           Actor principal                        Jefe, PM, PO, Programador o Cliente autenticado.
+
+                           Descripción                            Consulta el listado y el detalle de proyectos visibles para el usuario.
+
+                           Precondiciones                         Sesión iniciada. Para el Cliente, la cuenta debe estar vinculada a una empresa mediante cliente_id.
+
+                                                                  Abre Proyectos, aplica búsqueda por nombre/descripción y filtros por estado, cliente, PM y fechas; el sistema pagina de a
+                           Flujo listado interno
+                                                                  15.
+
+                           Flujo detalle                          Pulsa Ver; el sistema muestra estado, cliente, PM, fechas, tareas y avance. Desde “Ver detalle completo” accede a la ficha.
+
+                           Flujo Cliente                          El sistema restringe por cliente_id y presenta proyectos propios, hitos, sprints, novedades visibles e informes aprobados.
+
+                           Alternativa                            Proyecto ajeno solicitado por URL: aborta con 403. Filtros sin coincidencias: muestra el estado vacío.
+
+                           Postcondición                          No modifica la base de datos.
+
+
+
+
+Caso de uso                                                                                                                                                                             DOC-PRO-2026-010 · Página
+                                                                                                                                                                                          DOC-PRO-2026-010        5 de
+                                                                                                                                                                                                            · Página 5 18
+                                                                                                                                                                                                                       de 24
+   Documentación del módulo Proyectos                                                                                                                                                 DOC-PRO-2026-010 · Página 6 de 25
+CRUZNEGRA                                                                                                                                                                             Análisis y Diseño de Sistemas · Octubre 2026
+Sistema de Gestión Interna · Documentación de Análisis y Diseño                                                                                                      Alcance exclusivo: módulo Proyectos · CU-01 Crear proyecto
+
+
+
+
+CU-02 Gestionar proyecto - Edición
+Actualización controlada desde el modal del listado o la ficha
+
+
+
+                           Elemento                               Definición actual
+
+                           Actor principal                        Jefe o PM autenticado.
+
+                           Precondiciones                         El proyecto existe y el actor posee permiso de edición.
+
+                                                                  1. Abre Proyectos. 2. Pulsa Editar. 3. El modal recibe la URL y los valores actuales. 4. Modifica campos. 5. Pulsa Guardar
+                           Flujo principal
+                                                                  cambios. 6. El sistema valida y ejecuta update(). 7. Redirige con “Proyecto actualizado correctamente.”
+
+                           Reglas                                 Las mismas de creación: nombre obligatorio, fechas válidas, estado permitido y referencias existentes.
+
+                           Alternativa                            Si hay errores, no actualiza y vuelve al formulario con mensajes. Una fecha final anterior al inicio es inválida.
+
+                           Postcondición                          Los atributos quedan actualizados; Laravel Auditing conserva la trazabilidad del cambio.
+
+
+
+
+Caso de uso                                                                                                                                                                                  DOC-PRO-2026-010 · Página
+                                                                                                                                                                                               DOC-PRO-2026-010        6 de
+                                                                                                                                                                                                                 · Página 6 18
+                                                                                                                                                                                                                            de 24
+   Documentación del módulo Proyectos                                                                                                                                                       DOC-PRO-2026-010 · Página 7 de 25
+CRUZNEGRA                                                                                                                                                                     Análisis y Diseño de Sistemas · Octubre 2026
+Sistema de Gestión Interna · Documentación de Análisis y Diseño                                                                                                 Alcance exclusivo: módulo Proyectos · CU-01 Crear proyecto
+
+
+
+
+CU-02 Gestionar proyecto - Eliminación
+Baja restringida al rol Jefe con confirmación previa
+
+
+
+                           Elemento                               Definición actual
+
+                           Actor principal                        Jefe autenticado.
+
+                           Precondiciones                         El proyecto existe y el actor tiene rol Jefe.
+
+                                                                  1. Abre Proyectos. 2. Pulsa Eliminar. 3. El sistema muestra una confirmación. 4. Confirma “Sí, eliminar”. 5. Envía DELETE
+                           Flujo principal
+                                                                  /proyectos/{id}. 6. destroy() elimina y redirige con mensaje de éxito.
+
+                           Alternativa                            Cancelar o cerrar el diálogo no envía la solicitud y no modifica datos.
+
+                           Seguridad                              PM, PO, Programador y Cliente no tienen la ruta DELETE; un intento directo devuelve 403.
+
+                                                                  La base define ON DELETE CASCADE en varias relaciones dependientes. La baja es irreversible desde la interfaz y debe
+                           Impacto
+                                                                  usarse con criterio.
+
+                           Postcondición                          La fila deja de existir y el listado se actualiza.
+
+
+
+
+Caso de uso                                                                                                                                                                          DOC-PRO-2026-010 · Página
+                                                                                                                                                                                       DOC-PRO-2026-010        7 de
+                                                                                                                                                                                                         · Página 7 18
+                                                                                                                                                                                                                    de 24
+   Documentación del módulo Proyectos                                                                                                                                               DOC-PRO-2026-010 · Página 8 de 25
+CRUZNEGRA                                                                                                                                                                                           Análisis y Diseño de Sistemas · Octubre 2026
+Sistema de Gestión Interna · Documentación de Análisis y Diseño                                                                                                                       Alcance exclusivo: módulo Proyectos · CU-01 Crear proyecto
+
+
+
+
+DSS CU-01 Crear proyecto
+Diagrama de Secuencia del Sistema: interacción Actor–Sistema
+
+
+
+                                 Jefe / PM                                                                                                                                                    Sistema CRUZNEGRA
+
+
+
+
+                                        1. Solicitar listado de proyectos
+
+
+
+
+                                        2. Mostrar listado y opción “Nuevo proyecto”
+
+
+
+
+                                        3. Solicitar alta de proyecto
+
+
+
+
+                                        4. Mostrar formulario modal
+
+
+
+
+                                        5. confirmarAlta(nombre, descripción, fechas, estado, cliente, responsable)
+
+
+
+
+                                        6. Confirmar creación y mostrar listado actualizado
+
+
+
+
+                                                         Alternativa: si los datos son inválidos, el sistema informa los errores, conserva la entrada disponible y no crea el registro.
+
+
+
+
+DSS                                                                                                                                                                                                        DOC-PRO-2026-010 · Página
+                                                                                                                                                                                                             DOC-PRO-2026-010        8 de
+                                                                                                                                                                                                                               · Página 8 18
+                                                                                                                                                                                                                                          de 24
+   Documentación del módulo Proyectos                                                                                                                                                                     DOC-PRO-2026-010 · Página 9 de 25
+CRUZNEGRA                                                                                                                                                                                  Análisis y Diseño de Sistemas · Octubre 2026
+Sistema de Gestión Interna · Documentación de Análisis y Diseño                                                                                                              Alcance exclusivo: módulo Proyectos · CU-01 Crear proyecto
+
+
+
+
+DSS de las operaciones RUD
+Mensajes Actor-Sistema para consultar, editar y eliminar
+
+
+
+      Operación                         Secuencia principal del sistema                                                                                        Alternativa
+
+                                        1. solicitarListado(filtros) → 2. mostrarResultadosPaginados → 3. solicitarDetalle(proyecto) → 4.
+      Consultar                                                                                                                                                Proyecto ajeno al Cliente → 403. Sin coincidencias → lista vacía.
+                                        mostrarDetalleYAvance
+
+                                        1. solicitarEdición(proyecto) → 2. mostrarDatosActuales → 3. confirmarCambios(datos) → 4. validar → 5.
+      Editar                                                                                                                                                   Datos inválidos → informar errores y no modificar.
+                                        confirmarActualización
+
+      Eliminar                          1. solicitarEliminación(proyecto) → 2. pedirConfirmación → 3. confirmar → 4. eliminar → 5. mostrarListadoActualizado   Cancelar → no enviar solicitud. Rol distinto de Jefe → 403.
+
+
+
+
+                           Límite del DSS: representa al sistema como una caja negra. Los controladores, modelos, consultas Eloquent y middleware aparecen recién en los DSD.
+
+
+
+
+DSS                                                                                                                                                                                               DOC-PRO-2026-010 · Página
+                                                                                                                                                                                                    DOC-PRO-2026-010        9 de
+                                                                                                                                                                                                                      · Página 9 18
+                                                                                                                                                                                                                                 de 24
+   Documentación del módulo Proyectos                                                                                                                                                           DOC-PRO-2026-010 · Página 10 de 25
+CRUZNEGRA                                                                                                                                                                                 Análisis y Diseño de Sistemas · Octubre 2026
+Sistema de Gestión Interna · Documentación de Análisis y Diseño                                                                                                             Alcance exclusivo: módulo Proyectos · CU-01 Crear proyecto
+
+
+
+
+DSD CU-01 Crear proyecto
+Diagrama de Secuencia de Diseño según el código vigente
+
+
+      Jefe / PM                               Vista proyectos.index                             :ProyectoController                                       :Request                    Proyecto (modelo)                  Base de datos
+
+
+
+
+            1. Clic en “Nuevo proyecto”
+
+
+
+            2. Mostrar modal
+
+
+
+
+            3. POST /proyectos + campos + desde_modal=1
+
+
+
+
+                                                                                                             4. validate(reglas)
+
+
+
+
+                                                                                                             5. data validada
+
+
+
+
+                                                                                                             6. Proyecto::create(data)
+
+
+
+                                                                                                                                                                                                7. INSERT proyectos +
+                                                                                                                                                                                                auditoría
+
+
+
+
+                                                                                                                                                                                                8. Proyecto persistido
+
+
+
+
+            9. redirect()->back() + success
+
+
+
+
+                                                                      alt Validación fallida: Laravel lanza ValidationException, vuelve al modal con errores y no ejecuta
+                                                                      Proyecto::create().
+
+
+
+
+DSD                                                                                                                                                                                             DOC-PRO-2026-010 · Página
+                                                                                                                                                                                                  DOC-PRO-2026-010        10 de
+                                                                                                                                                                                                                    · Página 10 18
+                                                                                                                                                                                                                                de 24
+   Documentación del módulo Proyectos                                                                                                                                                          DOC-PRO-2026-010 · Página 11 de 25
+CRUZNEGRA                                                                                                                                                                           Análisis y Diseño de Sistemas · Octubre 2026
+Sistema de Gestión Interna · Documentación de Análisis y Diseño                                                                                                       Alcance exclusivo: módulo Proyectos · CU-01 Crear proyecto
+
+
+
+
+DSD de las operaciones RUD
+Colaboraciones internas según ProyectoController y el modelo Proyecto
+
+
+
+       Operación                              Colaboraciones de diseño
+
+                                              Ruta GET → middleware auth → ProyectoController::index(Request) → Proyecto::visiblePara(usuario) → with(cliente, pm) → when(filtros) → paginate(15) → vista proyectos.index o
+       Consultar listado
+                                              cliente.proyectos.
+
+       Consultar detalle                      Route model binding → ProyectoController::show() → usuario->puedeVer(proyecto) → load(relaciones) → cálculo de avance/línea de tiempo → vista interna o cliente.proyecto.
+
+       Editar                                 Ruta PUT/PATCH → middleware role:Jefe|PM → ProyectoController::update(Request, Proyecto) → validate(reglas) → proyecto->update(data) → auditoría → redirect con success.
+
+       Eliminar                               Ruta DELETE → middleware role:Jefe → route model binding → ProyectoController::destroy(Proyecto) → proyecto->delete() → base de datos aplica cascadas → redirect con success.
+
+
+
+
+           Punto de atención: el texto visible de confirmación indica que tareas y facturas “quedan sin dueño”, pero las migraciones de esas tablas usan proyecto_id con ON DELETE CASCADE. La documentación
+           toma como fuente de verdad el esquema real: los registros dependientes se eliminan.
+
+
+
+
+DSD                                                                                                                                                                                       DOC-PRO-2026-010 · Página
+                                                                                                                                                                                            DOC-PRO-2026-010        11 de
+                                                                                                                                                                                                              · Página 11 18
+                                                                                                                                                                                                                          de 24
+   Documentación del módulo Proyectos                                                                                                                                                    DOC-PRO-2026-010 · Página 12 de 25
+CRUZNEGRA                                                                                                                                                           Análisis y Diseño de Sistemas · Octubre 2026
+Sistema de Gestión Interna · Documentación de Análisis y Diseño                                                                                       Alcance exclusivo: módulo Proyectos · CU-01 Crear proyecto
+
+
+
+
+Casos de prueba del CRUD de Proyectos
+Entradas de creación y cobertura funcional de las cuatro operaciones
+
+
+ Dato                                   CP-01 Datos válidos                                                    CP-02 Datos inválidos
+
+ Actor                                  Jefe autenticado                                                       Jefe autenticado
+
+ nombre                                 “Portal de seguimiento del cliente”                                    Vacío
+
+ descripcion                            Texto opcional                                                         “Prueba”
+
+ fecha_inicio                           2026-10-05                                                             2026-10-05
+
+ fecha_fin_estimada                     2026-12-18                                                             2025-01-01
+
+ estado                                 pendiente                                                              Vacío
+
+ cliente_id                             ID existente                                                           -1
+
+ pm_id                                  ID de usuario existente                                                abc
+
+ Resultado esperado                     Redirect, mensaje de éxito y fila persistida.                          Errores de validación y ninguna fila nueva.
+
+
+
+
+                   Caso                          Acción                                     Criterio de aprobación
+
+                   CP-03 Consultar               GET /proyectos y GET /proyectos/{id}       200 para proyectos visibles; 403 para proyecto ajeno al Cliente.
+
+                   CP-04 Editar                  PUT /proyectos/{id}                        Redirect y assertDatabaseHas con los valores nuevos.
+
+                   CP-05 Eliminar                DELETE /proyectos/{id}                     Como Jefe redirige y assertDatabaseMissing.
+
+                   CP-06 Permisos                POST/PUT/DELETE con roles no autorizados   La respuesta es 403 y la base no cambia.
+
+
+
+
+Pruebas                                                                                                                                                                   DOC-PRO-2026-010 · Página
+                                                                                                                                                                            DOC-PRO-2026-010        12 de
+                                                                                                                                                                                              · Página 12 18
+                                                                                                                                                                                                          de 24
+   Documentación del módulo Proyectos                                                                                                                                    DOC-PRO-2026-010 · Página 13 de 25
+CRUZNEGRA                                                                                                                                                                            Análisis y Diseño de Sistemas · Octubre 2026
+Sistema de Gestión Interna · Documentación de Análisis y Diseño                                                                                                        Alcance exclusivo: módulo Proyectos · CU-01 Crear proyecto
+
+
+
+
+Evidencia de verificación
+Ejecución contra el repositorio actual el 5 de octubre de 2026
+
+
+
+
+      12 pruebas aprobadas
+      44 aserciones · 0 fallas · 6,91 segundos
+
+
+
+                      Cobertura observada                                        Resultado
+
+                      Ciclo completo de proyecto                                 Crear, editar y eliminar por HTTP con persistencia verificada.
+
+                      Visibilidad                                                Cliente solo ve proyectos de su empresa; equipo interno ve todos.
+
+                      Seguridad del Cliente                                      La escritura por POST /proyectos queda bloqueada con 403.
+
+                      Experiencia del Cliente                                    El detalle presenta avance y línea de tiempo sin herramientas internas.
+
+                      Reportes y módulos vinculados                              Reportes, filtros, hitos y notificaciones asociados al proyecto aprobaron.
+
+
+
+
+              Nota metodológica: el caso positivo está automatizado en CrudModulosTest. El caso negativo se define aquí según las reglas del controlador; conviene incorporarlo luego como prueba automatizada
+              específica para evitar regresiones.
+
+
+
+
+Pruebas                                                                                                                                                                                    DOC-PRO-2026-010 · Página
+                                                                                                                                                                                             DOC-PRO-2026-010        13 de
+                                                                                                                                                                                                               · Página 13 18
+                                                                                                                                                                                                                           de 24
+   Documentación del módulo Proyectos                                                                                                                                                     DOC-PRO-2026-010 · Página 14 de 25
+CRUZNEGRA                                                                       Análisis y Diseño de Sistemas · Octubre 2026
+Sistema de Gestión Interna · Documentación de Análisis y Diseño   Alcance exclusivo: módulo Proyectos · CU-01 Crear proyecto
+
+
+
+
+CU-01 en la aplicación real
+Paso 1 · El actor abre el listado de Proyectos
+
+
+
+
+Caso de uso real                                                                      DOC-PRO-2026-010 · Página
+                                                                                        DOC-PRO-2026-010        14 de
+                                                                                                          · Página 14 18
+                                                                                                                      de 24
+   Documentación del módulo Proyectos                                                DOC-PRO-2026-010 · Página 15 de 25
+CRUZNEGRA                                                                       Análisis y Diseño de Sistemas · Octubre 2026
+Sistema de Gestión Interna · Documentación de Análisis y Diseño   Alcance exclusivo: módulo Proyectos · CU-01 Crear proyecto
+
+
+
+
+CU-01 en la aplicación real
+Pasos 2 a 4 · Nuevo proyecto, carga de datos y confirmación
+
+
+
+
+Caso de uso real                                                                      DOC-PRO-2026-010 · Página
+                                                                                        DOC-PRO-2026-010        15 de
+                                                                                                          · Página 15 18
+                                                                                                                      de 24
+   Documentación del módulo Proyectos                                                DOC-PRO-2026-010 · Página 16 de 25
+CRUZNEGRA                                                                       Análisis y Diseño de Sistemas · Octubre 2026
+Sistema de Gestión Interna · Documentación de Análisis y Diseño   Alcance exclusivo: módulo Proyectos · CU-01 Crear proyecto
+
+
+
+
+Consultar proyecto en la aplicación real
+Vista rápida con estado, avance, responsable, fechas y tareas
+
+
+
+
+Caso de uso real                                                                      DOC-PRO-2026-010 · Página
+                                                                                        DOC-PRO-2026-010        16 de
+                                                                                                          · Página 16 18
+                                                                                                                      de 24
+   Documentación del módulo Proyectos                                                DOC-PRO-2026-010 · Página 17 de 25
+CRUZNEGRA                                                                              Análisis y Diseño de Sistemas · Octubre 2026
+Sistema de Gestión Interna · Documentación de Análisis y Diseño          Alcance exclusivo: módulo Proyectos · CU-01 Crear proyecto
+
+
+
+
+Editar proyecto en la aplicación real
+El modal recibe y presenta los datos actuales antes de guardar cambios
+
+
+
+
+Caso de uso real                                                                             DOC-PRO-2026-010 · Página
+                                                                                               DOC-PRO-2026-010        17 de
+                                                                                                                 · Página 17 18
+                                                                                                                             de 24
+   Documentación del módulo Proyectos                                                       DOC-PRO-2026-010 · Página 18 de 25
+CRUZNEGRA                                                                                       Análisis y Diseño de Sistemas · Octubre 2026
+Sistema de Gestión Interna · Documentación de Análisis y Diseño                   Alcance exclusivo: módulo Proyectos · CU-01 Crear proyecto
+
+
+
+
+Eliminar proyecto en la aplicación real
+Confirmación previa exclusiva del rol Jefe; la captura se realizó sin confirmar
+
+
+
+
+Caso de uso real                                                                                      DOC-PRO-2026-010 · Página
+                                                                                                        DOC-PRO-2026-010        18 de
+                                                                                                                          · Página 18 18
+                                                                                                                                      de 24
+   Documentación del módulo Proyectos                                                                DOC-PRO-2026-010 · Página 19 de 25
+CU-01 — Crear proyecto
+
+Actor: Jefe / PM · Responsable: [ Daniel Ojeda ] · Operaciones: listarProyectos() · seleccionarNuevoProyecto() · crearProyecto()
+                                                             DSS — CU-01 — Crear proyecto
+
+
+                                                                                                                      :Sistema
+
+
+
+
+                                              Jefe / PM
+                                                      1. listarProyectos()
+
+
+
+
+                                                     listado y opción “Nuevo proyecto”
+
+
+
+
+                                                     2. crearProyecto(datos, cliente, responsable)
+
+
+
+
+                                                     confirmación “Proyecto creado correctamente”
+
+
+
+
+listarProyectos() y seleccionarNuevoProyecto() son consultas → sin contrato. crearProyecto() crea estado del dominio → se contrata.
+
+
+ Operación                            crearProyecto(nombre : String, descripcion : String, fechaInicio : Date, fechaFinEstimada : Date?, estado :
+                                      EstadoProyecto, cliente : Cliente, responsable : User)
+
+ Referencia                           Caso de Uso CU-01 «Crear proyecto»
+
+ Tipo                                 Sistema (Cruz Negra)
+
+ Responsabilidades                    Registrar un nuevo proyecto, asignarlo a un Cliente existente y establecer el usuario responsable de su gestión.
+
+ Excepciones                          nombre vacío · fecha de inicio inválida · fecha fin anterior a fecha inicio · estado no permitido · Cliente inexistente ·
+                                      User inexistente · actor sin rol Jefe o PM.
+
+
+
+ PRECONDICIONES
+
+     • El actor está autenticado y posee rol Jefe o PM.
+     • El Cliente recibido existe y está registrado en el Sistema.
+     • El User responsable recibido existe y está registrado en el Sistema.
+     • La fecha de inicio es válida y la fecha final estimada, si se informa, es igual o posterior.
+     • El estado pertenece a {pendiente, en_progreso, completado, cancelado}.
+
+
+
+
+CRUZNEGRA · Contratos de Operación · Proyectos                                                                                   DOC-PRO-2026-010Página 1 de
+                                                                                                                                                  · Página 196 de 24
+ Documentación del módulo Proyectos
+ POSCONDICIONES
+
+
+
+   Instancias
+      • Se creó una instancia de Proyecto.
+
+   Atributos
+      • Proyecto.nombre se estableció con el nombre recibido.
+      • Proyecto.descripcion se estableció con la descripción recibida o quedó nula.
+      • Proyecto.fecha_inicio y Proyecto.fecha_fin_estimada se establecieron con las fechas recibidas.
+      • Proyecto.estado se estableció con el estado recibido; la interfaz propone «pendiente».
+      • Proyecto.created_at y Proyecto.updated_at se establecieron con el reloj del Sistema.
+
+   Asociaciones
+      • Se formó una asociación entre el nuevo Proyecto y el Cliente seleccionado.
+      • Se formó una asociación entre el nuevo Proyecto y el User responsable mediante pm_id.
+
+
+
+
+CRUZNEGRA · Contratos de Operación · Proyectos                                                           DOC-PRO-2026-010Página 2 de
+                                                                                                                          · Página 206 de 24
+ Documentación del módulo Proyectos
+CU-02 — Gestionar proyecto · Editar
+
+Actor: Jefe / PM · Responsable: [ Daniel Ojeda ] · Operaciones: listarProyectos() · seleccionarProyecto() · editarProyecto()
+                                                     DSS — CU-02 — Gestionar proyecto · Editar
+
+
+                                                                                                                       :Sistema
+
+
+
+
+                                              Jefe / PM
+                                                      1. listarProyectos()
+
+
+
+
+                                                      listado de proyectos
+
+
+
+
+                                                      2. seleccionarProyecto(proyecto)
+
+
+
+
+                                                      datos actuales
+
+
+
+
+                                                      3. editarProyecto(proyecto, datos)
+
+
+
+
+                                                      confirmación “Proyecto actualizado correctamente”
+
+
+
+
+listarProyectos() y seleccionarProyecto() son consultas → sin contrato. editarProyecto() modifica atributos y asociaciones → se contrata.
+
+
+ Operación                            editarProyecto(proyecto : Proyecto, nombre : String, descripcion : String, fechaInicio : Date, fechaFinEstimada :
+                                      Date?, estado : EstadoProyecto, cliente : Cliente, responsable : User)
+
+ Referencia                           Caso de Uso CU-02 «Gestionar proyecto» — subflujo Editar
+
+ Tipo                                 Sistema (Cruz Negra)
+
+ Responsabilidades                    Actualizar los datos de un Proyecto existente y, si corresponde, reemplazar su Cliente o responsable asociado.
+
+ Excepciones                          Proyecto inexistente · datos inválidos · fecha fin anterior a fecha inicio · referencias inexistentes · actor sin rol Jefe
+                                      o PM.
+
+
+
+ PRECONDICIONES
+
+     • El actor está autenticado y posee rol Jefe o PM.
+     • El Proyecto recibido existe y está registrado en el Sistema.
+     • El Cliente y el User responsable recibidos existen.
+     • Las fechas y el estado cumplen las mismas reglas definidas para la creación.
+
+
+
+
+CRUZNEGRA · Contratos de Operación · Proyectos                                                                                    DOC-PRO-2026-010Página 3 de
+                                                                                                                                                   · Página 216 de 24
+ Documentación del módulo Proyectos
+ POSCONDICIONES
+
+
+
+   Instancias
+      • No se crearon ni se eliminaron instancias de Proyecto.
+
+   Atributos
+      • Proyecto.nombre, descripcion, fecha_inicio, fecha_fin_estimada y estado se modificaron con los valores recibidos.
+      • Proyecto.updated_at se modificó con el reloj del Sistema.
+      • Los valores anteriores quedaron registrados por el mecanismo de auditoría del Sistema.
+
+   Asociaciones
+      • Si cambió cliente_id, se canceló la asociación anterior Proyecto–Cliente y se formó la nueva.
+      • Si cambió pm_id, se canceló la asociación anterior Proyecto–User responsable y se formó la nueva.
+      • Las demás asociaciones del Proyecto se conservaron.
+
+
+
+
+CRUZNEGRA · Contratos de Operación · Proyectos                                                                              DOC-PRO-2026-010Página 4 de
+                                                                                                                                             · Página 226 de 24
+ Documentación del módulo Proyectos
+CU-02 — Gestionar proyecto · Eliminar
+
+Actor: Jefe · Responsable: [ Daniel Ojeda ] · Operaciones: listarProyectos() · seleccionarProyecto() · eliminarProyecto()
+                                                   DSS — CU-02 — Gestionar proyecto · Eliminar
+
+
+                                                                                                                    :Sistema
+
+
+
+
+                                                 Jefe
+                                                        1. listarProyectos()
+
+
+
+
+                                                        listado con acción Eliminar
+
+
+
+
+                                                        2. seleccionarProyecto(proyecto)
+
+
+
+
+                                                        solicitar confirmación
+
+
+
+
+                                                        3. eliminarProyecto(proyecto)
+
+
+
+
+                                                        confirmación “Proyecto eliminado correctamente”
+
+
+
+
+listarProyectos() y seleccionarProyecto() son consultas → sin contrato. eliminarProyecto() elimina instancias y vínculos → se contrata.
+
+
+ Operación                            eliminarProyecto(proyecto : Proyecto)
+
+ Referencia                           Caso de Uso CU-02 «Gestionar proyecto» — subflujo Eliminar
+
+ Tipo                                 Sistema (Cruz Negra)
+
+ Responsabilidades                    Eliminar definitivamente un Proyecto y mantener la integridad referencial de sus datos dependientes.
+
+ Excepciones                          Proyecto inexistente · actor sin rol Jefe · solicitud cancelada en el diálogo de confirmación.
+
+
+
+ PRECONDICIONES
+
+     • El actor está autenticado y posee rol Jefe.
+     • El Proyecto recibido existe y está registrado en el Sistema.
+     • El actor confirmó expresamente la eliminación.
+
+
+
+
+CRUZNEGRA · Contratos de Operación · Proyectos                                                                                 DOC-PRO-2026-010Página 5 de
+                                                                                                                                                · Página 236 de 24
+ Documentación del módulo Proyectos
+ POSCONDICIONES
+
+
+
+   Instancias
+      • Se eliminó la instancia de Proyecto.
+      • Por las reglas ON DELETE CASCADE se eliminaron sus Tarea, Sprint, Hito, ActualizacionProyecto, EntregableIA, SolicitudCambio y Factura
+      dependientes.
+
+   Atributos
+      • No se modificaron atributos: las instancias alcanzadas fueron eliminadas.
+
+   Asociaciones
+      • Se cancelaron las asociaciones del Proyecto con Cliente y User responsable.
+      • Se cancelaron las asociaciones con todas las instancias dependientes eliminadas.
+
+
+
+
+CRUZNEGRA · Contratos de Operación · Proyectos                                                                      DOC-PRO-2026-010Página 6 de
+                                                                                                                                     · Página 246 de 24
+ Documentación del módulo Proyectos
+

@@ -2,20 +2,22 @@
     Campos del formulario de Cliente, compartidos por los modales del
     listado. $cliente es null al crear. Compacto: nombre y apellido van
     juntos, telefono con empresa, y el estado (siempre arranca Activo) con
-    "activo" por defecto para que cargar un cliente tome segundos. Con
-    autocomplete los navegadores rellenan solos cuando ya conocen los datos.
+    "activo" por defecto para que cargar un cliente tome segundos.
 --}}
+@php($esCreacion = $esCreacion ?? false)
 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     <div>
         <x-input-label for="{{ $prefijo ?? '' }}nombre" value="Nombre" />
         <x-text-input maxlength="255" id="{{ $prefijo ?? '' }}nombre" name="nombre" type="text" placeholder="Patricia"
-            autocomplete="given-name" class="mt-1 block w-full" :value="old('nombre', $cliente->nombre ?? '')" required />
+            autocomplete="{{ $esCreacion ? 'new-password' : 'given-name' }}" class="mt-1 block w-full"
+            :value="old('nombre', $cliente->nombre ?? '')" @if($esCreacion) data-no-autofill readonly onfocus="this.removeAttribute('readonly')" onpointerdown="this.removeAttribute('readonly')" @endif required />
         <x-input-error class="mt-2" :messages="$errors->get('nombre')" />
     </div>
     <div>
         <x-input-label for="{{ $prefijo ?? '' }}apellido" value="Apellido" />
         <x-text-input maxlength="255" id="{{ $prefijo ?? '' }}apellido" name="apellido" type="text" placeholder="Martinez"
-            autocomplete="family-name" class="mt-1 block w-full" :value="old('apellido', $cliente->apellido ?? '')" required />
+            autocomplete="{{ $esCreacion ? 'new-password' : 'family-name' }}" class="mt-1 block w-full"
+            :value="old('apellido', $cliente->apellido ?? '')" @if($esCreacion) data-no-autofill readonly onfocus="this.removeAttribute('readonly')" onpointerdown="this.removeAttribute('readonly')" @endif required />
         <x-input-error class="mt-2" :messages="$errors->get('apellido')" />
     </div>
 </div>
@@ -23,7 +25,8 @@
 <div>
     <x-input-label for="{{ $prefijo ?? '' }}email" value="Correo electronico" />
     <x-text-input id="{{ $prefijo ?? '' }}email" name="email" type="email" placeholder="patricia@empresa.com"
-        autocomplete="email" class="mt-1 block w-full" :value="old('email', $cliente->email ?? '')" required />
+        autocomplete="{{ $esCreacion ? 'new-password' : 'email' }}" class="mt-1 block w-full"
+        :value="old('email', $cliente->email ?? '')" @if($esCreacion) data-no-autofill readonly onfocus="this.removeAttribute('readonly')" onpointerdown="this.removeAttribute('readonly')" @endif required />
     <x-input-error class="mt-2" :messages="$errors->get('email')" />
 </div>
 
@@ -34,7 +37,8 @@
             <span class="text-[11px] text-gray-400">opcional</span>
         </div>
         <x-text-input maxlength="50" id="{{ $prefijo ?? '' }}telefono" name="telefono" type="text" placeholder="0981-111-222"
-            autocomplete="tel" class="mt-1 block w-full" :value="old('telefono', $cliente->telefono ?? '')" />
+            autocomplete="{{ $esCreacion ? 'new-password' : 'tel' }}" class="mt-1 block w-full"
+            :value="old('telefono', $cliente->telefono ?? '')" @if($esCreacion) data-no-autofill readonly onfocus="this.removeAttribute('readonly')" onpointerdown="this.removeAttribute('readonly')" @endif />
         <x-input-error class="mt-2" :messages="$errors->get('telefono')" />
     </div>
     <div>
@@ -43,7 +47,8 @@
             <span class="text-[11px] text-gray-400">opcional</span>
         </div>
         <x-text-input maxlength="255" id="{{ $prefijo ?? '' }}empresa" name="empresa" type="text" placeholder="Constructora L&R"
-            autocomplete="organization" class="mt-1 block w-full" :value="old('empresa', $cliente->empresa ?? '')" />
+            autocomplete="{{ $esCreacion ? 'new-password' : 'organization' }}" class="mt-1 block w-full"
+            :value="old('empresa', $cliente->empresa ?? '')" @if($esCreacion) data-no-autofill readonly onfocus="this.removeAttribute('readonly')" onpointerdown="this.removeAttribute('readonly')" @endif />
         <x-input-error class="mt-2" :messages="$errors->get('empresa')" />
     </div>
 </div>

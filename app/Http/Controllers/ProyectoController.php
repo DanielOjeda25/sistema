@@ -92,7 +92,7 @@ class ProyectoController extends Controller
         $data = $request->validate([
             'nombre' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
-            'fecha_inicio' => 'required|date',
+            'fecha_inicio' => 'required|date|after_or_equal:today',
             'fecha_fin_estimada' => 'nullable|date|after_or_equal:fecha_inicio',
             'estado' => 'required|in:pendiente,en_progreso,completado,cancelado',
             'cliente_id' => 'required|exists:clientes,id',

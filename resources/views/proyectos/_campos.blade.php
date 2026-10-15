@@ -3,25 +3,28 @@
     listado. $proyectoItem es null al crear (se evita $proyecto para no
     chocar con la variable del loop del listado).
 --}}
-<div>
+@php($esCreacion = $esCreacion ?? false)
+<div data-inline-field="nombre">
     <x-input-label for="nombre" value="Nombre del Proyecto" />
     <x-text-input maxlength="255" id="nombre" name="nombre" type="text" class="mt-1 block w-full" :value="old('nombre', $proyectoItem->nombre ?? '')" required />
     <x-input-error class="mt-2" :messages="$errors->get('nombre')" />
 </div>
 
-<div>
+<div data-inline-field="descripcion">
     <x-input-label for="descripcion" value="Descripción (opcional)" />
     <textarea id="descripcion" name="descripcion" rows="3" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">{{ old('descripcion', $proyectoItem->descripcion ?? '') }}</textarea>
     <x-input-error class="mt-2" :messages="$errors->get('descripcion')" />
 </div>
 
 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-    <div>
+    <div data-inline-field="fecha_inicio">
         <x-input-label for="fecha_inicio" value="Fecha de Inicio" />
-        <x-text-input id="fecha_inicio" name="fecha_inicio" type="date" class="mt-1 block w-full" :value="old('fecha_inicio', $proyectoItem?->fecha_inicio?->format('Y-m-d'))" required />
+        <x-text-input id="fecha_inicio" name="fecha_inicio" type="date" class="mt-1 block w-full"
+                      :value="old('fecha_inicio', $proyectoItem?->fecha_inicio?->format('Y-m-d'))"
+                      :min="$esCreacion ? now()->toDateString() : null" required />
         <x-input-error class="mt-2" :messages="$errors->get('fecha_inicio')" />
     </div>
-    <div>
+    <div data-inline-field="fecha_fin_estimada">
         <div class="flex items-baseline justify-between gap-2">
             <x-input-label for="fecha_fin_estimada" value="Fin estimado" />
             <span class="text-[11px] text-gray-400">opcional</span>
@@ -31,7 +34,7 @@
     </div>
 </div>
 
-<div>
+<div data-inline-field="estado">
     <x-input-label for="estado" value="Estado" />
     <x-buscador-select name="estado" :conBuscador="false" textoTodos=""
                        :opciones="['pendiente' => 'Pendiente', 'en_progreso' => 'En progreso', 'completado' => 'Completado', 'cancelado' => 'Cancelado']"
@@ -41,7 +44,7 @@
 </div>
 
 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-    <div>
+    <div data-inline-field="cliente_id">
         <x-input-label for="cliente_id" value="Cliente" />
         <x-buscador-select name="cliente_id"
                            :opciones="$clientes->mapWithKeys(fn ($c) => [$c->id => trim($c->nombre.' '.$c->apellido)])->all()"
@@ -49,7 +52,7 @@
                            placeholder="Buscar cliente..." textoTodos="Todos" />
         <x-input-error class="mt-2" :messages="$errors->get('cliente_id')" />
     </div>
-    <div>
+    <div data-inline-field="pm_id">
         <x-input-label for="pm_id" value="Project Manager" />
         <x-buscador-select name="pm_id"
                            :opciones="$usuarios->mapWithKeys(fn ($u) => [$u->id => trim($u->name.' '.($u->apellido ?? ''))])->all()"
