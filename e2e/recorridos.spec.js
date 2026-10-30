@@ -40,7 +40,9 @@ test('el cliente no ve botones de creacion en sus listados', async ({ page }) =>
 
   await page.goto('/entregables');
   await expect(page.getByText('Nuevo Entregable')).toHaveCount(0);
-  await expect(page.getByText('Borrador de manual de usuario')).toBeVisible();
+  // El cliente solo ve entregables aprobados: el informe sí, el borrador no.
+  await expect(page.getByText('Informe de avance mensual — Obra L&R')).toBeVisible();
+  await expect(page.getByText('Borrador de manual de usuario')).toHaveCount(0);
 
   await page.goto('/proyectos');
   await expect(page.getByText('Nuevo Proyecto')).toHaveCount(0);

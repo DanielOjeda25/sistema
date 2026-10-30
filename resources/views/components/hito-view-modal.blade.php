@@ -27,9 +27,8 @@
 
                     <div class="p-6">
                         <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2">Descripción</p>
-                        <div class="bg-[#f8fafc] border border-gray-100 rounded-xl p-4 text-sm text-gray-700 whitespace-pre-wrap leading-relaxed max-h-72 overflow-y-auto">
-                            <span x-text="detalle.descripcion || 'Sin descripción.'"></span>
-                        </div>
+                        <div class="bg-[#f8fafc] border border-gray-100 rounded-xl p-4 text-sm text-gray-700 whitespace-pre-wrap leading-relaxed max-h-72 overflow-y-auto"
+                             x-text="detalle.descripcion || 'Sin descripción.'"></div>
                     </div>
                 </div>
             </template>

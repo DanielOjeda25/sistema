@@ -35,6 +35,8 @@ class TareaController extends Controller
 {
     public function index(Request $request)
     {
+        [$desde, $hasta] = $this->rangoFechas($request);
+
         $tareas = Tarea::visiblePara($request->user())
             ->with(['proyecto', 'asignado', 'sprint', 'solicitudCambio'])
             ->when($request->filled('q'), function ($query) use ($request) {
@@ -52,6 +54,9 @@ class TareaController extends Controller
             ->when($request->filled('sprint_id'), fn ($query) => $query->where('sprint_id', $request->integer('sprint_id')))
             ->when($request->filled('prioridad'), fn ($query) => $query->where('prioridad', $request->string('prioridad')->toString()))
             ->when($request->filled('asignado_a'), fn ($query) => $query->where('asignado_a', $request->integer('asignado_a')))
+            // Rango de fecha limite (si vienen al reves, se invierten).
+            ->when($desde, fn ($query) => $query->whereDate('fecha_limite', '>=', $desde))
+            ->when($hasta, fn ($query) => $query->whereDate('fecha_limite', '<=', $hasta))
             ->latest()
             ->paginate(15)
             ->withQueryString();
@@ -62,7 +67,7 @@ class TareaController extends Controller
         $solicitudes = SolicitudCambio::orderBy('titulo')->get();
         $sprints = Sprint::with('proyecto')->orderBy('proyecto_id')->orderBy('fecha_inicio')->get();
 
-        return view('tareas.index', compact('tareas', 'proyectos', 'usuarios', 'solicitudes', 'sprints'));
+        return view('tareas.index', compact('tareas', 'proyectos', 'usuarios', 'solicitudes', 'sprints', 'desde', 'hasta'));
     }
 
     public function tablero(Request $request)
@@ -173,18 +178,18 @@ class TareaController extends Controller
     {
         $data = $request->validate([
             'titulo' => 'required|string|max:255',
-            'descripcion' => 'nullable|string',
+            'descripcion' => 'nullable|string|max:5000',
             'estado' => 'required|in:pendiente,en_progreso,completada,cancelada',
             'prioridad' => 'required|in:baja,media,alta',
-            'fecha_limite' => 'nullable|date',
+            'fecha_limite' => 'nullable|date|after:1999-12-31|before:2101-01-01',
             'proyecto_id' => 'required|exists:proyectos,id',
-            'sprint_id' => 'nullable|exists:sprints,id',
+            'sprint_id' => ['nullable', Rule::exists('sprints', 'id')->where('proyecto_id', $request->input('proyecto_id'))],
             'asignado_a' => [
                 'required',
                 // Solo roles de trabajo: Jefe y Clientes no reciben tareas.
                 Rule::in(User::asignables()->pluck('id')),
             ],
-            'solicitud_cambio_id' => 'nullable|exists:solicitudes_cambio,id',
+            'solicitud_cambio_id' => ['nullable', Rule::exists('solicitudes_cambio', 'id')->where('proyecto_id', $request->input('proyecto_id'))],
             'orden' => 'nullable|integer',
         ]);
 
@@ -220,18 +225,18 @@ class TareaController extends Controller
     {
         $data = $request->validate([
             'titulo' => 'required|string|max:255',
-            'descripcion' => 'nullable|string',
+            'descripcion' => 'nullable|string|max:5000',
             'estado' => 'required|in:pendiente,en_progreso,completada,cancelada',
             'prioridad' => 'required|in:baja,media,alta',
-            'fecha_limite' => 'nullable|date',
+            'fecha_limite' => 'nullable|date|after:1999-12-31|before:2101-01-01',
             'proyecto_id' => 'required|exists:proyectos,id',
-            'sprint_id' => 'nullable|exists:sprints,id',
+            'sprint_id' => ['nullable', Rule::exists('sprints', 'id')->where('proyecto_id', $request->input('proyecto_id'))],
             'asignado_a' => [
                 'required',
                 // Solo roles de trabajo: Jefe y Clientes no reciben tareas.
                 Rule::in(User::asignables()->pluck('id')),
             ],
-            'solicitud_cambio_id' => 'nullable|exists:solicitudes_cambio,id',
+            'solicitud_cambio_id' => ['nullable', Rule::exists('solicitudes_cambio', 'id')->where('proyecto_id', $request->input('proyecto_id'))],
         ]);
 
         $tarea->update($data);

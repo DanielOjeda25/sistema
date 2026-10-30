@@ -11,7 +11,7 @@
 
 <div>
     <x-input-label for="descripcion" value="Descripción (opcional)" />
-    <textarea id="descripcion" name="descripcion" rows="3" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">{{ old('descripcion', $hito->descripcion ?? '') }}</textarea>
+    <textarea maxlength="5000" id="descripcion" name="descripcion" rows="3" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">{{ old('descripcion', $hito->descripcion ?? '') }}</textarea>
     <x-input-error class="mt-2" :messages="$errors->get('descripcion')" />
 </div>
 

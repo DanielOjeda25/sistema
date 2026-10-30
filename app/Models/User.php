@@ -98,6 +98,19 @@ class User extends Authenticatable implements Auditable
      * Usuarios que pueden recibir una tarea asignada: los roles de trabajo
      * (PM, PO, Programador). Quedan fuera Jefe y los Clientes.
      */
+    public function scopeInternos($query)
+    {
+        return $query->whereDoesntHave('roles', fn ($rol) => $rol->where('name', 'Cliente'));
+    }
+
+    /**
+     * Quienes pueden ser el Project Manager de un proyecto: Jefe o PM.
+     */
+    public function scopeGestores($query)
+    {
+        return $query->whereHas('roles', fn ($rol) => $rol->whereIn('name', ['Jefe', 'PM']));
+    }
+
     public function scopeAsignables($query)
     {
         return $query->whereHas('roles', fn ($rol) => $rol->whereIn('name', ['PM', 'PO', 'Programador']));

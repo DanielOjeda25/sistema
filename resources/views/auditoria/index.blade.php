@@ -20,7 +20,7 @@
         @endif
 
         <form method="GET" class="mb-4 rounded-xl border border-gray-100 bg-gray-50/60 p-4">
-            <div class="grid grid-cols-2 gap-3 md:grid-cols-5">
+            <div class="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-7">
                 <div>
                     <label for="q" class="block text-xs font-medium text-gray-500 uppercase mb-1">Buscar</label>
                     <input type="text" id="q" name="q" value="{{ request('q') }}" placeholder="Evento o modelo..."
@@ -40,7 +40,17 @@
                                    :opciones="['created' => 'Creación', 'updated' => 'Modificación', 'deleted' => 'Eliminación']"
                                    :seleccionado="request('accion')"
                                    placeholder="Buscar acción..." />
-                <div class="flex items-end justify-end gap-3 col-span-2 md:col-span-1">
+                <div>
+                    <label for="desde" class="block text-xs font-medium text-gray-500 uppercase mb-1">Desde</label>
+                    <input type="date" id="desde" name="desde" value="{{ $desde }}" max="{{ today()->toDateString() }}"
+                           class="w-full border-gray-300 rounded-lg text-sm focus:border-[#00b87d] focus:ring-[#00b87d]">
+                </div>
+                <div>
+                    <label for="hasta" class="block text-xs font-medium text-gray-500 uppercase mb-1">Hasta</label>
+                    <input type="date" id="hasta" name="hasta" value="{{ $hasta }}" max="{{ today()->toDateString() }}"
+                           class="w-full border-gray-300 rounded-lg text-sm focus:border-[#00b87d] focus:ring-[#00b87d]">
+                </div>
+                <div class="flex items-end justify-end gap-3 col-span-2 md:col-span-4 xl:col-span-1">
                     @if (request('modelo'))
                         <input type="hidden" name="modelo" value="{{ request('modelo') }}">
                         <input type="hidden" name="registro" value="{{ request('registro') }}">
@@ -49,7 +59,7 @@
                         <x-heroicon-o-magnifying-glass class="w-4 h-4" />
                         Filtrar
                     </button>
-                    @if (request()->filled('q') || request()->filled('usuario') || request()->filled('accion') || request()->filled('rol'))
+                    @if (request()->filled('q') || request()->filled('usuario') || request()->filled('accion') || request()->filled('rol') || $desde || $hasta)
                         <a href="{{ route('auditoria.index') }}" class="text-xs text-gray-500 hover:underline">Limpiar filtros</a>
                     @endif
                 </div>

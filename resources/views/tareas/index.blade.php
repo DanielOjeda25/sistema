@@ -68,11 +68,21 @@
                                            :seleccionado="request('asignado_a')"
                                            placeholder="Buscar responsable..." />
                     </div>
+                    <div>
+                        <label for="desde" class="block text-xs font-medium text-gray-500 uppercase mb-1">Límite desde</label>
+                        <input type="date" name="desde" id="desde" value="{{ $desde }}"
+                               class="h-11 rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] shadow-sm">
+                    </div>
+                    <div>
+                        <label for="hasta" class="block text-xs font-medium text-gray-500 uppercase mb-1">Límite hasta</label>
+                        <input type="date" name="hasta" id="hasta" value="{{ $hasta }}"
+                               class="h-11 rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] shadow-sm">
+                    </div>
                     <button type="submit" class="px-4 py-2 bg-[#00b87d] border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-[#008c63] inline-flex items-center gap-1.5">
                         <x-heroicon-o-magnifying-glass class="w-4 h-4" />
                         Filtrar
                     </button>
-                    @if (request()->hasAny(['q', 'estado', 'prioridad', 'asignado_a', 'proyecto_id', 'sprint_id']))
+                    @if (request()->hasAny(['q', 'estado', 'prioridad', 'asignado_a', 'proyecto_id', 'sprint_id', 'desde', 'hasta']))
                         <a href="{{ route('tareas.index') }}" class="text-xs text-gray-500 hover:text-gray-700 underline">Limpiar</a>
                     @endif
                 </form>

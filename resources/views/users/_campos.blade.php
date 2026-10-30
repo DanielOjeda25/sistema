@@ -21,7 +21,7 @@
 
     <div class="sm:col-span-2">
         <x-input-label for="email" value="Correo electrónico" />
-        <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email')" required placeholder="usuario@example.com" />
+        <x-text-input maxlength="255" id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email')" required placeholder="usuario@example.com" />
         <x-input-error class="mt-2" :messages="$errors->get('email')" />
     </div>
 

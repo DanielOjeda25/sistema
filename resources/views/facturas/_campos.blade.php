@@ -54,7 +54,7 @@
 
 <div>
     <x-input-label for="detalle" value="Detalle (opcional)" />
-    <textarea id="detalle" name="detalle" rows="2" placeholder="Ej: pago único — anticipo del 50%" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">{{ old('detalle', $factura->detalle ?? '') }}</textarea>
+    <textarea maxlength="5000" id="detalle" name="detalle" rows="2" placeholder="Ej: pago único — anticipo del 50%" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">{{ old('detalle', $factura->detalle ?? '') }}</textarea>
     <x-input-error class="mt-2" :messages="$errors->get('detalle')" />
 </div>
 
@@ -70,7 +70,7 @@
     <div>
         <x-input-label for="emitida_por" value="Emitida por" />
         <x-buscador-select name="emitida_por"
-                           :opciones="$usuarios->mapWithKeys(fn ($u) => [$u->id => $u->name])->all()"
+                           :opciones="$usuarios->reject(fn ($u) => $u->hasRole('Cliente'))->mapWithKeys(fn ($u) => [$u->id => $u->name])->all()"
                            :seleccionado="old('emitida_por', $factura->emitida_por ?? auth()->id())"
                            placeholder="Buscar usuario..." textoTodos="Nadie" />
         <x-input-error class="mt-2" :messages="$errors->get('emitida_por')" />

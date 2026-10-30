@@ -7,11 +7,16 @@ use App\Models\Proyecto;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class FacturaController extends Controller
 {
     public function index(Request $request)
     {
+        // Una factura pendiente cuyo vencimiento ya paso figura como vencida.
+        Factura::marcarVencidas();
+        [$desde, $hasta] = $this->rangoFechas($request);
+
         $facturas = Factura::visiblePara($request->user())
             ->with(['proyecto', 'emisor'])
             ->when($request->filled('q'), function ($query) use ($request) {
@@ -24,6 +29,9 @@ class FacturaController extends Controller
             })
             ->when($request->filled('estado'), fn ($query) => $query->where('estado', $request->string('estado')->toString())
             )
+            // Rango por fecha de emision.
+            ->when($desde, fn ($query) => $query->whereDate('fecha_emision', '>=', $desde))
+            ->when($hasta, fn ($query) => $query->whereDate('fecha_emision', '<=', $hasta))
             ->latest()
             ->paginate(15)
             ->withQueryString();
@@ -32,20 +40,20 @@ class FacturaController extends Controller
         $proyectos = Proyecto::orderBy('nombre')->get();
         $usuarios = User::orderBy('name')->get();
 
-        return view('facturas.index', compact('facturas', 'proyectos', 'usuarios'));
+        return view('facturas.index', compact('facturas', 'proyectos', 'usuarios', 'desde', 'hasta'));
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
             'numero' => 'required|string|max:255|unique:facturas,numero',
-            'monto' => 'required|numeric|min:0|max:10000000',
-            'fecha_emision' => 'required|date_format:Y-m-d',
-            'fecha_vencimiento' => 'nullable|date_format:Y-m-d|after_or_equal:fecha_emision',
+            'monto' => 'required|numeric|min:0.01|max:10000000',
+            'fecha_emision' => 'required|date_format:Y-m-d|after:1999-12-31|before:2101-01-01',
+            'fecha_vencimiento' => 'nullable|date_format:Y-m-d|after_or_equal:fecha_emision|after:1999-12-31|before:2101-01-01',
             'estado' => 'required|in:pendiente,pagada,vencida',
-            'detalle' => 'nullable|string',
+            'detalle' => 'nullable|string|max:5000',
             'proyecto_id' => 'required|exists:proyectos,id',
-            'emitida_por' => 'required|exists:users,id',
+            'emitida_por' => ['required', Rule::in(User::internos()->pluck('id'))],
         ]);
 
         Factura::create($data);
@@ -69,13 +77,13 @@ class FacturaController extends Controller
     {
         $data = $request->validate([
             'numero' => 'required|string|max:255|unique:facturas,numero,'.$factura->id,
-            'monto' => 'required|numeric|min:0|max:10000000',
-            'fecha_emision' => 'required|date_format:Y-m-d',
-            'fecha_vencimiento' => 'nullable|date_format:Y-m-d|after_or_equal:fecha_emision',
+            'monto' => 'required|numeric|min:0.01|max:10000000',
+            'fecha_emision' => 'required|date_format:Y-m-d|after:1999-12-31|before:2101-01-01',
+            'fecha_vencimiento' => 'nullable|date_format:Y-m-d|after_or_equal:fecha_emision|after:1999-12-31|before:2101-01-01',
             'estado' => 'required|in:pendiente,pagada,vencida',
-            'detalle' => 'nullable|string',
+            'detalle' => 'nullable|string|max:5000',
             'proyecto_id' => 'required|exists:proyectos,id',
-            'emitida_por' => 'required|exists:users,id',
+            'emitida_por' => ['required', Rule::in(User::internos()->pluck('id'))],
         ]);
 
         $factura->update($data);

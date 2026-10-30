@@ -46,7 +46,7 @@ class SolicitudCambioController extends Controller
     {
         $data = $request->validate([
             'titulo' => 'required|string|max:255',
-            'descripcion' => 'required|string',
+            'descripcion' => 'required|string|max:5000',
             'estado' => 'required|in:pendiente,aprobada,rechazada',
             'prioridad' => 'required|in:baja,media,alta',
             'proyecto_id' => 'required|exists:proyectos,id',
@@ -84,7 +84,7 @@ class SolicitudCambioController extends Controller
     {
         $data = $request->validate([
             'titulo' => 'required|string|max:255',
-            'descripcion' => 'required|string',
+            'descripcion' => 'required|string|max:5000',
             'estado' => 'required|in:pendiente,aprobada,rechazada',
             'prioridad' => 'required|in:baja,media,alta',
             'proyecto_id' => 'required|exists:proyectos,id',

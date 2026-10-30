@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Services\AI\ProjectContextBuilder;
 use App\Support\LineaDeTiempo;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ProyectoController extends Controller
 {
@@ -91,12 +92,12 @@ class ProyectoController extends Controller
     {
         $data = $request->validate([
             'nombre' => 'required|string|max:255',
-            'descripcion' => 'nullable|string',
-            'fecha_inicio' => 'required|date|after_or_equal:today',
-            'fecha_fin_estimada' => 'nullable|date|after_or_equal:fecha_inicio',
+            'descripcion' => 'nullable|string|max:5000',
+            'fecha_inicio' => 'required|date|after_or_equal:today|after:1999-12-31|before:2101-01-01',
+            'fecha_fin_estimada' => 'nullable|date|after_or_equal:fecha_inicio|after:1999-12-31|before:2101-01-01',
             'estado' => 'required|in:pendiente,en_progreso,completado,cancelado',
             'cliente_id' => 'required|exists:clientes,id',
-            'pm_id' => 'required|exists:users,id',
+            'pm_id' => ['required', Rule::in(User::gestores()->pluck('id'))],
         ]);
 
         Proyecto::create($data);
@@ -198,12 +199,12 @@ class ProyectoController extends Controller
     {
         $data = $request->validate([
             'nombre' => 'required|string|max:255',
-            'descripcion' => 'nullable|string',
-            'fecha_inicio' => 'required|date',
-            'fecha_fin_estimada' => 'nullable|date|after_or_equal:fecha_inicio',
+            'descripcion' => 'nullable|string|max:5000',
+            'fecha_inicio' => 'required|date|after:1999-12-31|before:2101-01-01',
+            'fecha_fin_estimada' => 'nullable|date|after_or_equal:fecha_inicio|after:1999-12-31|before:2101-01-01',
             'estado' => 'required|in:pendiente,en_progreso,completado,cancelado',
             'cliente_id' => 'required|exists:clientes,id',
-            'pm_id' => 'required|exists:users,id',
+            'pm_id' => ['required', Rule::in(User::gestores()->pluck('id'))],
         ]);
 
         $proyecto->update($data);

@@ -12,9 +12,9 @@ class ActualizacionProyectoController extends Controller
     {
         $data = $request->validate([
             'titulo' => ['required', 'string', 'max:255'],
-            'descripcion' => ['required', 'string'],
+            'descripcion' => ['required', 'string', 'max:5000'],
             'tipo' => ['required', 'in:avance,problema,decision,proximo_paso'],
-            'fecha' => ['required', 'date'],
+            'fecha' => ['required', 'date', 'after:1999-12-31', 'before:2101-01-01'],
             'visible_cliente' => ['nullable', 'boolean'],
         ]);
 

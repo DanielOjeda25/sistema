@@ -53,6 +53,23 @@ class Factura extends Model implements Auditable
         return $query;
     }
 
+    /**
+     * Pasa a "vencida" las facturas pendientes cuyo vencimiento ya paso.
+     * Se hace una por una (no con un UPDATE masivo) para que quede en la
+     * auditoria. Devuelve cuantas cambio.
+     */
+    public static function marcarVencidas(): int
+    {
+        $facturas = static::where('estado', 'pendiente')
+            ->whereNotNull('fecha_vencimiento')
+            ->whereDate('fecha_vencimiento', '<', today())
+            ->get();
+
+        $facturas->each->update(['estado' => 'vencida']);
+
+        return $facturas->count();
+    }
+
     public function emisor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'emitida_por');

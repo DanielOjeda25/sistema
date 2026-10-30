@@ -39,8 +39,8 @@ class SprintController extends Controller
         $data = $request->validate([
             'nombre' => 'required|string|max:255',
             'proyecto_id' => ['required', 'exists:proyectos,id'],
-            'fecha_inicio' => 'nullable|date',
-            'fecha_fin' => 'nullable|date|after_or_equal:fecha_inicio',
+            'fecha_inicio' => 'nullable|date|after:1999-12-31|before:2101-01-01',
+            'fecha_fin' => 'nullable|date|after_or_equal:fecha_inicio|after:1999-12-31|before:2101-01-01',
         ]);
 
         abort_unless(Proyecto::visiblePara($request->user())->whereKey($data['proyecto_id'])->exists(), 403);
@@ -55,8 +55,8 @@ class SprintController extends Controller
         $data = $request->validate([
             'nombre' => 'required|string|max:255',
             'proyecto_id' => ['required', 'exists:proyectos,id'],
-            'fecha_inicio' => 'nullable|date',
-            'fecha_fin' => 'nullable|date|after_or_equal:fecha_inicio',
+            'fecha_inicio' => 'nullable|date|after:1999-12-31|before:2101-01-01',
+            'fecha_fin' => 'nullable|date|after_or_equal:fecha_inicio|after:1999-12-31|before:2101-01-01',
         ]);
 
         abort_unless(Proyecto::visiblePara($request->user())->whereKey($data['proyecto_id'])->exists(), 403);

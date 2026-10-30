@@ -179,7 +179,7 @@
                     </div>
                     <div class="sm:col-span-2">
                         <x-input-label for="edit_email" value="Correo electrónico" />
-                        <x-text-input id="edit_email" name="email" type="email" class="mt-1 block w-full" :value="old('email')" required placeholder="usuario@example.com" />
+                        <x-text-input maxlength="255" id="edit_email" name="email" type="email" class="mt-1 block w-full" :value="old('email')" required placeholder="usuario@example.com" />
                         <x-input-error class="mt-2" :messages="$errors->get('email')" />
                     </div>
                     <div>

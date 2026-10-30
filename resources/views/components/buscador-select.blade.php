@@ -42,8 +42,8 @@
 
         {{-- Lista de opciones filtradas por lo escrito; se abre hacia arriba si no hay espacio abajo --}}
         <div x-show="abierto" x-cloak
-             class="absolute z-20 w-full max-h-60 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg"
-             :class="arriba ? 'bottom-full mb-1' : 'mt-1'">
+             class="z-20 w-full max-h-60 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg"
+             :class="enModal ? 'relative mt-1' : (arriba ? 'absolute bottom-full mb-1' : 'absolute mt-1')">
             @if ($textoTodos !== '')
                 <button type="button" @click="elegir('', '{{ $textoTodos }}')"
                         class="w-full text-left px-3 py-2 text-sm text-gray-500 hover:bg-gray-50"
@@ -77,9 +77,13 @@
             texto: '',
             abierto: false,
             arriba: false,
+            enModal: false,
             conBuscador: true,
 
             init() {
+                // Dentro de un modal el contenedor recorta lo que sobresale: la lista
+                // se muestra en el flujo normal y el modal crece en vez de cortarla.
+                this.enModal = !!this.$el.closest('[data-crud-modal]');
                 this.opciones = opciones ?? {};
                 this.conBuscador = conBuscador;
                 this.valor = seleccionado && this.opciones[seleccionado] ? String(seleccionado) : '';

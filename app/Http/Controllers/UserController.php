@@ -157,7 +157,12 @@ class UserController extends Controller
         }
 
         // Si era una cuenta Cliente, su ficha de empresa no debe quedar huérfana.
-        $user->cliente?->delete();
+        $cliente = $user->cliente;
+        if ($cliente
+            && ! $cliente->proyectos()->exists()
+            && ! User::where('cliente_id', $cliente->id)->where('id', '!=', $user->id)->exists()) {
+            $cliente->delete();
+        }
         $user->delete();
 
         return redirect()->route('users.index')->with('success', 'Usuario eliminado correctamente.');

@@ -10,7 +10,7 @@
 
         <div>
             <x-input-label for="email" value="Correo electrónico" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" placeholder="usuario@example.com" />
+            <x-text-input maxlength="255" id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" placeholder="usuario@example.com" />
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 

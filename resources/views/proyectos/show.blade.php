@@ -166,7 +166,7 @@
                         @csrf
                         <div>
                             <x-input-label for="titulo" value="Título" />
-                            <x-text-input id="titulo" name="titulo" class="mt-1 block w-full"
+                            <x-text-input maxlength="255" id="titulo" name="titulo" class="mt-1 block w-full"
                                           :value="old('titulo')" required />
                             <x-input-error class="mt-2" :messages="$errors->get('titulo')" />
                         </div>
@@ -190,7 +190,7 @@
                         </label>
                         <div class="md:col-span-2">
                             <x-input-label for="descripcion" value="Descripción" />
-                            <textarea id="descripcion" name="descripcion" rows="3" required
+                            <textarea maxlength="5000" id="descripcion" name="descripcion" rows="3" required
                                       class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">{{ old('descripcion') }}</textarea>
                             <x-input-error class="mt-2" :messages="$errors->get('descripcion')" />
                         </div>

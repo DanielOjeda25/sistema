@@ -24,7 +24,7 @@
 
 <div>
     <x-input-label for="{{ $prefijo ?? '' }}email" value="Correo electronico" />
-    <x-text-input id="{{ $prefijo ?? '' }}email" name="email" type="email" placeholder="patricia@empresa.com"
+    <x-text-input maxlength="255" id="{{ $prefijo ?? '' }}email" name="email" type="email" placeholder="patricia@empresa.com"
         autocomplete="{{ $esCreacion ? 'new-password' : 'email' }}" class="mt-1 block w-full"
         :value="old('email', $cliente->email ?? '')" @if($esCreacion) data-no-autofill readonly onfocus="this.removeAttribute('readonly')" onpointerdown="this.removeAttribute('readonly')" @endif required />
     <x-input-error class="mt-2" :messages="$errors->get('email')" />

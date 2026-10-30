@@ -50,7 +50,7 @@ class ClienteController extends Controller
         $data = $request->validate([
             'nombre' => 'required|string|max:255',
             'apellido' => 'required|string|max:255',
-            'email' => 'required|email|unique:clientes,email',
+            'email' => 'required|email|max:255|unique:clientes,email',
             'telefono' => 'nullable|string|max:50',
             'empresa' => 'nullable|string|max:255',
             'estado' => 'required|in:activo,inactivo',
@@ -71,7 +71,7 @@ class ClienteController extends Controller
         $data = $request->validate([
             'nombre' => 'required|string|max:255',
             'apellido' => 'required|string|max:255',
-            'email' => 'required|email|unique:clientes,email,'.$cliente->id,
+            'email' => 'required|email|max:255|unique:clientes,email,'.$cliente->id,
             'telefono' => 'nullable|string|max:50',
             'empresa' => 'nullable|string|max:255',
             'estado' => 'required|in:activo,inactivo',
@@ -84,6 +84,13 @@ class ClienteController extends Controller
 
     public function destroy(Cliente $cliente)
     {
+        // Borrar un cliente arrastra todos sus proyectos, tareas, hitos y facturas:
+        // si tiene proyectos, hay que resolverlos primero.
+        if ($cliente->proyectos()->exists()) {
+            return redirect()->route('clientes.index')
+                ->with('error', 'No se puede eliminar: el cliente tiene proyectos. Eliminá o reasigná sus proyectos primero (también podés marcarlo como inactivo).');
+        }
+
         $cliente->delete();
 
         return redirect()->route('clientes.index')->with('success', 'Cliente eliminado correctamente.');

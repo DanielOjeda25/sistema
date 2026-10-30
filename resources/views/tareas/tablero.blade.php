@@ -178,13 +178,13 @@
 
                         <div>
                             <x-input-label for="crear-titulo" value="Título" />
-                            <textarea id="crear-titulo" name="titulo" rows="2" required placeholder="Título de la tarea…"
+                            <textarea maxlength="255" id="crear-titulo" name="titulo" rows="2" required placeholder="Título de la tarea…"
                                       class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm"></textarea>
                         </div>
 
                         <div>
                             <x-input-label for="crear-descripcion" value="Descripción (opcional)" />
-                            <textarea id="crear-descripcion" name="descripcion" rows="3"
+                            <textarea maxlength="5000" id="crear-descripcion" name="descripcion" rows="3"
                                       class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm"></textarea>
                         </div>
 
@@ -325,12 +325,12 @@
 
                         <div>
                             <x-input-label for="editar-titulo" value="Título" />
-                            <x-text-input id="editar-titulo" name="titulo" type="text" class="mt-1 block w-full" required />
+                            <x-text-input maxlength="255" id="editar-titulo" name="titulo" type="text" class="mt-1 block w-full" required />
                         </div>
 
                         <div>
                             <x-input-label for="editar-descripcion" value="Descripción (opcional)" />
-                            <textarea id="editar-descripcion" name="descripcion" rows="3"
+                            <textarea maxlength="5000" id="editar-descripcion" name="descripcion" rows="3"
                                       class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm"></textarea>
                         </div>
 

@@ -10,7 +10,7 @@
 
 <div>
     <x-input-label for="contenido" value="Contenido" />
-    <textarea id="contenido" name="contenido" rows="6" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>{{ old('contenido', $entregable->contenido ?? '') }}</textarea>
+    <textarea maxlength="20000" id="contenido" name="contenido" rows="6" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>{{ old('contenido', $entregable->contenido ?? '') }}</textarea>
     <x-input-error class="mt-2" :messages="$errors->get('contenido')" />
 </div>
 
@@ -45,7 +45,7 @@
     <div>
         <x-input-label for="generado_por" value="Generado por" />
         <x-buscador-select name="generado_por"
-                           :opciones="$usuarios->mapWithKeys(fn ($u) => [$u->id => $u->name])->all()"
+                           :opciones="$usuarios->reject(fn ($u) => $u->hasRole('Cliente'))->mapWithKeys(fn ($u) => [$u->id => $u->name])->all()"
                            :seleccionado="old('generado_por', $entregable->generado_por ?? '')"
                            placeholder="Buscar usuario..." textoTodos="Nadie" />
         <x-input-error class="mt-2" :messages="$errors->get('generado_por')" />

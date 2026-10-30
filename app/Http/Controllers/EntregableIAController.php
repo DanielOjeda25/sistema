@@ -6,6 +6,7 @@ use App\Models\EntregableIA;
 use App\Models\Proyecto;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class EntregableIAController extends Controller
 {
@@ -41,11 +42,11 @@ class EntregableIAController extends Controller
     {
         $data = $request->validate([
             'titulo' => 'required|string|max:255',
-            'contenido' => 'required|string',
+            'contenido' => 'required|string|max:20000',
             'tipo' => ['required', 'in:'.implode(',', array_keys(EntregableIA::TIPOS))],
             'estado' => 'required|in:borrador,revisado,aprobado',
             'proyecto_id' => 'required|exists:proyectos,id',
-            'generado_por' => 'required|exists:users,id',
+            'generado_por' => ['required', Rule::in(User::internos()->pluck('id'))],
         ]);
 
         EntregableIA::create($data);
@@ -69,11 +70,11 @@ class EntregableIAController extends Controller
     {
         $data = $request->validate([
             'titulo' => 'required|string|max:255',
-            'contenido' => 'required|string',
+            'contenido' => 'required|string|max:20000',
             'tipo' => ['required', 'in:'.implode(',', array_keys(EntregableIA::TIPOS))],
             'estado' => 'required|in:borrador,revisado,aprobado',
             'proyecto_id' => 'required|exists:proyectos,id',
-            'generado_por' => 'required|exists:users,id',
+            'generado_por' => ['required', Rule::in(User::internos()->pluck('id'))],
         ]);
 
         $entregable->update($data);

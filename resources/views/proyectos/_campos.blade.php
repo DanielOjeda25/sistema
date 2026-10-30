@@ -12,7 +12,7 @@
 
 <div data-inline-field="descripcion">
     <x-input-label for="descripcion" value="Descripción (opcional)" />
-    <textarea id="descripcion" name="descripcion" rows="3" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">{{ old('descripcion', $proyectoItem->descripcion ?? '') }}</textarea>
+    <textarea maxlength="5000" id="descripcion" name="descripcion" rows="3" class="mt-1 block w-full border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">{{ old('descripcion', $proyectoItem->descripcion ?? '') }}</textarea>
     <x-input-error class="mt-2" :messages="$errors->get('descripcion')" />
 </div>
 
@@ -55,7 +55,7 @@
     <div data-inline-field="pm_id">
         <x-input-label for="pm_id" value="Project Manager" />
         <x-buscador-select name="pm_id"
-                           :opciones="$usuarios->mapWithKeys(fn ($u) => [$u->id => trim($u->name.' '.($u->apellido ?? ''))])->all()"
+                           :opciones="$usuarios->filter(fn ($u) => $u->hasAnyRole(['Jefe', 'PM']))->mapWithKeys(fn ($u) => [$u->id => trim($u->name.' '.($u->apellido ?? ''))])->all()"
                            :seleccionado="old('pm_id', $proyectoItem->pm_id ?? '')"
                            placeholder="Buscar PM..." textoTodos="Todos" />
         <x-input-error class="mt-2" :messages="$errors->get('pm_id')" />

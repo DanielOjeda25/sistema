@@ -14,6 +14,8 @@ class AuditoriaController extends Controller
         $rolElegido = $request->string('rol')->toString();
         $usuarioElegido = $request->string('usuario')->toString();
 
+        [$desde, $hasta] = $this->rangoFechas($request);
+
         $auditoria = Audit::with('user.roles')
             ->latest()
             // Busqueda libre: evento o modelo auditado.
@@ -39,6 +41,9 @@ class AuditoriaController extends Controller
             ->when($request->filled('accion'), function ($query) use ($request) {
                 $query->where('event', $request->string('accion')->toString());
             })
+            // Rango de fechas (dia completo, ambos extremos incluidos).
+            ->when($desde, fn ($query) => $query->whereDate('created_at', '>=', $desde))
+            ->when($hasta, fn ($query) => $query->whereDate('created_at', '<=', $hasta))
             // Historial de un registro concreto (desde el boton Historial de los listados).
             ->when($request->filled('modelo'), function ($query) use ($request) {
                 $query->where('auditable_type', $request->string('modelo')->toString())
@@ -81,7 +86,7 @@ class AuditoriaController extends Controller
                 ?? $this->etiquetaRegistro($request->string('modelo')->toString()).' #'.$request->string('registro')->toString();
         }
 
-        return view('auditoria.index', compact('auditoria', 'opcionesRol', 'opcionesUsuario', 'usuarioElegido', 'contexto'));
+        return view('auditoria.index', compact('auditoria', 'opcionesRol', 'opcionesUsuario', 'usuarioElegido', 'contexto', 'desde', 'hasta'));
     }
 
     /**

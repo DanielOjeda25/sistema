@@ -76,8 +76,8 @@ class HitoController extends Controller
     {
         $data = $request->validate([
             'nombre' => 'required|string|max:255',
-            'descripcion' => 'nullable|string',
-            'fecha_objetivo' => 'required|date',
+            'descripcion' => 'nullable|string|max:5000',
+            'fecha_objetivo' => 'required|date|after:1999-12-31|before:2101-01-01',
             'completado' => 'required|boolean',
             'proyecto_id' => 'required|exists:proyectos,id',
         ]);
@@ -102,8 +102,8 @@ class HitoController extends Controller
     {
         $data = $request->validate([
             'nombre' => 'required|string|max:255',
-            'descripcion' => 'nullable|string',
-            'fecha_objetivo' => 'required|date',
+            'descripcion' => 'nullable|string|max:5000',
+            'fecha_objetivo' => 'required|date|after:1999-12-31|before:2101-01-01',
             'completado' => 'required|boolean',
             'proyecto_id' => 'required|exists:proyectos,id',
         ]);
