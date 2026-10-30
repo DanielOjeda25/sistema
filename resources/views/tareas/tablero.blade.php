@@ -143,6 +143,7 @@
             proyectoId: {{ $proyectoId ?? 'null' }},
             sprintId: {{ $sprintId ?? 'null' }},
             usuarioId: {{ auth()->id() }},
+            defaultsCrear: { prioridad: 'media', proyecto_id: {{ $proyectoId ?? ($proyectos->first()?->id ?? 'null') }}, sprint_id: {{ $sprintId ?? 'null' }}, asignado_a: {{ $usuarios->contains(fn ($u) => $u->is(auth()->user())) ? auth()->id() : ($usuarios->first()?->id ?? 'null') }} },
             prioridades: @json($prioridades),
             columnas: @json($columnas),
             urls: {
@@ -160,6 +161,21 @@
     @if ($manifestViteExiste)
         @vite('resources/js/tablero.js')
     @endif
+
+    @php
+        // Opciones de los selectores estilizados de los modales (mismo componente que el resto del sistema).
+        $opcionesEstado = collect($columnas)->map(fn ($c) => $c[0])->all();
+        $opcionesPrioridad = ['baja' => 'Baja', 'media' => 'Media', 'alta' => 'Alta'];
+        $opcionesProyecto = $proyectos->mapWithKeys(fn ($p) => [$p->id => $p->nombre])->all();
+        $opcionesSprint = [];
+        foreach ($sprintsPorProyecto as $nombreProyecto => $sprintsProyecto) {
+            foreach ($sprintsProyecto as $s) {
+                $opcionesSprint[$s->id] = $nombreProyecto.' — '.$s->nombre;
+            }
+        }
+        $opcionesAsignado = $usuarios->mapWithKeys(fn ($u) => [$u->id => $u->name.' ('.$u->roles->pluck('name')->implode(', ').')'])->all();
+        $asignadoPorDefecto = $usuarios->contains(fn ($u) => $u->is(auth()->user())) ? auth()->id() : $usuarios->first()?->id;
+    @endphp
 
     @if ($puedeMover)
         {{-- Modal de creación: lo abre el botón "+ Añadir tarjeta" de cada columna --}}
@@ -191,19 +207,17 @@
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <div>
                                 <x-input-label for="crear-estado" value="Estado" />
-                                <select id="crear-estado" name="estado" class="mt-1 block w-full h-11 border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
-                                    @foreach ($columnas as $estado => [$etiqueta, $color])
-                                        <option value="{{ $estado }}">{{ $etiqueta }}</option>
-                                    @endforeach
-                                </select>
+                                <x-buscador-select name="estado" :conBuscador="false" textoTodos=""
+                                           :opciones="$opcionesEstado"
+                                           :seleccionado="null"
+                                           placeholder="Estado..." />
                             </div>
                             <div>
                                 <x-input-label for="crear-prioridad" value="Prioridad" />
-                                <select id="crear-prioridad" name="prioridad" class="mt-1 block w-full h-11 border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
-                                    <option value="baja">Baja</option>
-                                    <option value="media" selected>Media</option>
-                                    <option value="alta">Alta</option>
-                                </select>
+                                <x-buscador-select name="prioridad" :conBuscador="false" textoTodos=""
+                                           :opciones="$opcionesPrioridad"
+                                           :seleccionado="'media'"
+                                           placeholder="Prioridad..." />
                             </div>
                             <div>
                                 <x-input-label for="crear-fecha" value="Fecha límite (opcional)" />
@@ -214,32 +228,24 @@
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <div>
                                 <x-input-label for="crear-proyecto" value="Proyecto" />
-                                <select id="crear-proyecto" name="proyecto_id" class="mt-1 block w-full h-11 border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm" required>
-                                    @foreach ($proyectos as $p)
-                                        <option value="{{ $p->id }}" @selected($proyectoId == $p->id)>{{ $p->nombre }}</option>
-                                    @endforeach
-                                </select>
+                                <x-buscador-select name="proyecto_id" :conBuscador="true" textoTodos=""
+                                           :opciones="$opcionesProyecto"
+                                           :seleccionado="$proyectoId ?? array_key_first($opcionesProyecto)"
+                                           placeholder="Buscar proyecto..." />
                             </div>
                             <div>
                                 <x-input-label for="crear-sprint" value="Sprint (opcional)" />
-                                <select id="crear-sprint" name="sprint_id" class="mt-1 block w-full h-11 border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
-                                    <option value="">Sin sprint</option>
-                                    @foreach ($sprintsPorProyecto as $nombreProyecto => $sprintsProyecto)
-                                        <optgroup label="{{ $nombreProyecto }}">
-                                            @foreach ($sprintsProyecto as $s)
-                                                <option value="{{ $s->id }}" @selected($sprintId == $s->id)>{{ $s->nombre }}</option>
-                                            @endforeach
-                                        </optgroup>
-                                    @endforeach
-                                </select>
+                                <x-buscador-select name="sprint_id" :conBuscador="true" textoTodos="Sin sprint"
+                                           :opciones="$opcionesSprint"
+                                           :seleccionado="$sprintId"
+                                           placeholder="Buscar sprint..." />
                             </div>
                             <div>
                                 <x-input-label for="crear-asignado" value="Asignar a" />
-                                <select id="crear-asignado" name="asignado_a" class="mt-1 block w-full h-11 border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
-                                    @foreach ($usuarios as $u)
-                                        <option value="{{ $u->id }}" @selected($u->is(auth()->user()))>{{ $u->name }} ({{ $u->roles->pluck('name')->implode(', ') }})</option>
-                                    @endforeach
-                                </select>
+                                <x-buscador-select name="asignado_a" :conBuscador="true" textoTodos=""
+                                           :opciones="$opcionesAsignado"
+                                           :seleccionado="$asignadoPorDefecto"
+                                           placeholder="Buscar responsable..." />
                             </div>
                         </div>
 
@@ -337,19 +343,17 @@
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <div>
                                 <x-input-label for="editar-estado" value="Estado" />
-                                <select id="editar-estado" name="estado" class="mt-1 block w-full h-11 border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
-                                    @foreach ($columnas as $estado => [$etiqueta, $color])
-                                        <option value="{{ $estado }}">{{ $etiqueta }}</option>
-                                    @endforeach
-                                </select>
+                                <x-buscador-select name="estado" :conBuscador="false" textoTodos=""
+                                           :opciones="$opcionesEstado"
+                                           :seleccionado="null"
+                                           placeholder="Estado..." />
                             </div>
                             <div>
                                 <x-input-label for="editar-prioridad" value="Prioridad" />
-                                <select id="editar-prioridad" name="prioridad" class="mt-1 block w-full h-11 border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
-                                    <option value="baja">Baja</option>
-                                    <option value="media">Media</option>
-                                    <option value="alta">Alta</option>
-                                </select>
+                                <x-buscador-select name="prioridad" :conBuscador="false" textoTodos=""
+                                           :opciones="$opcionesPrioridad"
+                                           :seleccionado="null"
+                                           placeholder="Prioridad..." />
                             </div>
                             <div>
                                 <x-input-label for="editar-fecha" value="Fecha límite (opcional)" />
@@ -360,32 +364,24 @@
                         <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <div>
                                 <x-input-label for="editar-proyecto" value="Proyecto" />
-                                <select id="editar-proyecto" name="proyecto_id" class="mt-1 block w-full h-11 border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
-                                    @foreach ($proyectos as $p)
-                                        <option value="{{ $p->id }}">{{ $p->nombre }}</option>
-                                    @endforeach
-                                </select>
+                                <x-buscador-select name="proyecto_id" :conBuscador="true" textoTodos=""
+                                           :opciones="$opcionesProyecto"
+                                           :seleccionado="null"
+                                           placeholder="Buscar proyecto..." />
                             </div>
                             <div>
                                 <x-input-label for="editar-sprint" value="Sprint (opcional)" />
-                                <select id="editar-sprint" name="sprint_id" class="mt-1 block w-full h-11 border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
-                                    <option value="">Sin sprint</option>
-                                    @foreach ($sprintsPorProyecto as $nombreProyecto => $sprintsProyecto)
-                                        <optgroup label="{{ $nombreProyecto }}">
-                                            @foreach ($sprintsProyecto as $s)
-                                                <option value="{{ $s->id }}">{{ $s->nombre }}</option>
-                                            @endforeach
-                                        </optgroup>
-                                    @endforeach
-                                </select>
+                                <x-buscador-select name="sprint_id" :conBuscador="true" textoTodos="Sin sprint"
+                                           :opciones="$opcionesSprint"
+                                           :seleccionado="null"
+                                           placeholder="Buscar sprint..." />
                             </div>
                             <div>
                                 <x-input-label for="editar-asignado" value="Asignar a" />
-                                <select id="editar-asignado" name="asignado_a" class="mt-1 block w-full h-11 border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] rounded-md shadow-sm">
-                                    @foreach ($usuarios as $u)
-                                        <option value="{{ $u->id }}">{{ $u->name }} ({{ $u->roles->pluck('name')->implode(', ') }})</option>
-                                    @endforeach
-                                </select>
+                                <x-buscador-select name="asignado_a" :conBuscador="true" textoTodos=""
+                                           :opciones="$opcionesAsignado"
+                                           :seleccionado="null"
+                                           placeholder="Buscar responsable..." />
                             </div>
                         </div>
 

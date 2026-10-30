@@ -18,13 +18,13 @@
     @endif
 
     <div class="relative"
-         x-data="buscadorSelect({{ \Illuminate\Support\Js::from($seleccionado) }}, {{ \Illuminate\Support\Js::from($opciones) }}, {{ \Illuminate\Support\Js::from($conBuscador) }})"
+         x-data="buscadorSelect({{ \Illuminate\Support\Js::from($seleccionado) }}, {{ \Illuminate\Support\Js::from($opciones) }}, {{ \Illuminate\Support\Js::from($conBuscador) }}, {{ \Illuminate\Support\Js::from($autoEnviar) }}, {{ \Illuminate\Support\Js::from($textoTodos) }})"
          @click.outside="abierto = false">
         {{-- Valor real que se envía en el formulario --}}
         <input type="hidden" name="{{ $name }}" :value="valor" x-ref="oculto">
 
         {{-- Campo visible: muestra la etiqueta elegida o el texto de búsqueda --}}
-        <input type="text" x-model="texto" @focus="abrir()" @input="abierto = true; filtrar()"
+        <input type="text" x-model="texto" x-ref="visible" @focus="abrir()" @input="abierto = true; filtrar()"
                @readonly(!$conBuscador)
                :placeholder="valor ? '' : '{{ $placeholder }}'"
                class="block w-full h-11 rounded-lg border-gray-300 focus:border-[#00b87d] focus:ring-[#00b87d] text-sm shadow-sm"
@@ -70,7 +70,9 @@
     if (!window.buscadorSelectRegistrado) {
         window.buscadorSelectRegistrado = true;
         document.addEventListener('alpine:init', () => {
-            Alpine.data('buscadorSelect', (seleccionado = '', opciones = {}, conBuscador = true) => ({
+            // autoEnviar y textoTodos llegan por instancia: esta funcion se registra una sola
+            // vez y no puede leer las props de cada componente.
+            Alpine.data('buscadorSelect', (seleccionado = '', opciones = {}, conBuscador = true, autoEnviar = false, textoTodos = '') => ({
             opciones: {},
             filtradas: {},
             valor: '',
@@ -96,6 +98,9 @@
                 this.$refs.oculto.addEventListener('change', () => {
                     this.valor = this.$refs.oculto.value;
                     this.texto = this.opciones[this.valor] ?? '';
+                    // Un form.reset() deja vacio el cuadro visible sin que Alpine se entere:
+                    // se reescribe a mano para que no dependa de que el texto "cambie".
+                    this.$refs.visible.value = this.texto;
                     this.filtrar();
                 });
             },
@@ -142,14 +147,14 @@
                 // Para filtros que recargan la pagina al cambiar, como los selects nativos con onchange.
                 // Se escribe el valor en el input oculto a mano: el binding de Alpine se aplica
                 // despues y el formulario saldria con el valor viejo.
-                if ({{ $autoEnviar ? 'true' : 'false' }}) {
+                if (autoEnviar) {
                     this.$refs.oculto.value = id;
                     this.$el.closest('form')?.submit();
                 }
             },
 
             limpiar() {
-                this.elegir('', '{{ $textoTodos }}');
+                this.elegir('', textoTodos);
             },
         }));
     });

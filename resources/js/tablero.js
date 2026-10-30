@@ -14,6 +14,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const cfg = window.TABLERO;
     const token = document.querySelector('meta[name="csrf-token"]').content;
 
+    // Los selectores estilizados guardan su valor en un input oculto: hay que
+    // avisarle con "change" para que el cuadro visible muestre la etiqueta.
+    function fijar(form, nombre, valor) {
+        const campo = form.elements[nombre];
+        campo.value = valor;
+        campo.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
     // ---------------------------------------------------------------- AJAX
 
     async function enviar(url, method, body) {
@@ -231,8 +239,9 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.appendChild(modalCrear);
             formCrear.reset();
             // La columna desde la que se abrió define el estado inicial; el
-            // resto (proyecto, sprint, responsable) viene prefijado del HTML.
-            formCrear.estado.value = estado;
+            // resto (prioridad, proyecto, sprint, responsable) sale de la configuración.
+            fijar(formCrear, 'estado', estado);
+            Object.entries(cfg.defaultsCrear ?? {}).forEach(([campo, valor]) => fijar(formCrear, campo, valor ?? ''));
             ocultarError(errorCrear);
             modalCrear.classList.remove('hidden');
             formCrear.titulo.focus();
@@ -283,12 +292,12 @@ document.addEventListener('DOMContentLoaded', () => {
         formEditar.reset();
         formEditar.action = cfg.urls.update.replace(':id:', tarea.id);        formEditar.titulo.value = tarea.titulo;
         formEditar.descripcion.value = tarea.descripcion ?? '';
-        formEditar.estado.value = tarea.estado;
-        formEditar.prioridad.value = tarea.prioridad;
+        fijar(formEditar, 'estado', tarea.estado);
+        fijar(formEditar, 'prioridad', tarea.prioridad);
         formEditar.fecha_limite.value = soloFecha(tarea.fecha_limite);
-        formEditar.proyecto_id.value = tarea.proyecto_id;
-        formEditar.sprint_id.value = tarea.sprint_id ?? '';
-        formEditar.asignado_a.value = tarea.asignado_a ?? '';
+        fijar(formEditar, 'proyecto_id', tarea.proyecto_id);
+        fijar(formEditar, 'sprint_id', tarea.sprint_id ?? '');
+        fijar(formEditar, 'asignado_a', tarea.asignado_a ?? '');
 
         ocultarError(errorEditar);
         modal.classList.remove('hidden');
